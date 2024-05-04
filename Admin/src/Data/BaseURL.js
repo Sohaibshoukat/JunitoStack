@@ -1,0 +1,1 @@
+export const BaseURL="https://junito-backend.vercel.app/api/adminAuth"
