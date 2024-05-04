@@ -17,7 +17,7 @@ app.use('/api/adminAuth', require('./Routes/Admin/Admin'));
 app.use('/api/contact', require('./Routes/User/Contact'));
 app.use('/api/user', require('./Routes/User/User'));
 app.use('/api/company', require('./Routes/User/Company'));
-// app.use('/api/worker', require('./Routes/Worker'));
+app.use('/api/chat', require('./Routes/User/Chat'));
 
 app.listen(port, () => {
   console.log(`Inote-book listening at http://localhost:${port}`)

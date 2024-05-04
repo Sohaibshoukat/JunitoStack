@@ -8,10 +8,10 @@ const nodemailer = require('nodemailer')
 const multer = require('multer');
 
 const User = require("../../Models/User");
-const OTP = require("../../Models/EmailOtp");
 const Company = require("../../Models/Company");
 const SubUser = require("../../Models/SubUser");
 const Prompts = require("../../Models/Prompts");
+const FAQ = require("../../Models/FAQ");
 
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -47,37 +47,26 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const sendOTPEmail = async (id, email, res) => {
+const sendOTPEmail = async (id, FirstName, LastName, Password, email, res) => {
     try {
-        const otp = `${Math.floor(1000 + Math.random() * 9000)}`
 
         const mailOptions = {
             from: "no-reply@earn4views.com",
             to: email,
             subject: `Verify Your Email`,
-            html: `<p>Enter <b>${otp}</b> in the app to verify your email address and complete the proccess of Signup</p>
-            <p>This OTP will expire in 15 Minute</p>`
+            html: `<p>${FirstName} ${LastName} invited you to join Junito Platform for your company needs</p>
+            <br/>
+            <h2>You can Login using below Credentials</h2>
+            <p><span>Email: </span>${email}</p>
+            <p><span>Password: </span>${Password}</p>
+            `
         }
 
 
-        const saltRounds = 10;
-        const hashedOTP = await bcrypt.hash(otp, saltRounds)
 
-        await OTP.deleteMany({ UserID: id });
-
-        const otpresponse = await OTP.create({
-            UserID: id,
-            OTP: hashedOTP,
-            createdAt: new Date(),
-            expireAt: new Date(Date.now() + 240000)
-        })
 
         await transporter.sendMail(mailOptions)
 
-        return {
-            status: "Pending",
-            message: "Verification otp email send",
-        };
     } catch (error) {
         return {
             status: "Failed",
@@ -123,7 +112,8 @@ router.post("/createSubuser", fetchuser, async (req, res) => {
             LastName: req.body.LastName,
             Email: req.body.Email,
             Phone: req.body.Phone,
-            User_Type:"SubUser",
+            Is_Verfied: true,
+            User_Type: "SubUser",
             Status: "Active",
             Password: SecPassword
         })
@@ -135,11 +125,11 @@ router.post("/createSubuser", fetchuser, async (req, res) => {
         })
 
 
-        const response = await sendOTPEmail(user._id, req.body.Email, res);
+        const response = await sendOTPEmail(user._id, owner.FirstName, owner.LastName, req.body.Password, req.body.Email, res);
 
 
         success = true;
-        res.json({ success:true})
+        res.json({ success: true })
 
     } catch (error) {
         console.error(error)
@@ -260,6 +250,55 @@ router.put("/deactivateSubuser/:subuserId", fetchuser, async (req, res) => {
     }
 });
 
+router.get('/subUser',fetchuser, async (req, res) => {
+    try {
+        let owner = await User.findById(req.user.id);
+        if (!owner) {
+            return res.status(404).json({ success: false, message: "You Have no Access" });
+        }
+
+        let users = await SubUser.find({User_ID:req.user.id}).populate('Own_ID', 'FirstName LastName Email Phone ProfilePhoto Status')
+
+        res.send({success:true,SubUsers:users});
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/subUsers/List',fetchuser, async (req, res) => {
+    try {
+        let owner = await User.findById(req.user.id);
+        if (!owner) {
+            return res.status(404).json({ success: false, message: "You Have no Access" });
+        }
+
+        let users = await SubUser.find({User_ID:req.user.id}).populate('Own_ID', 'FirstName LastName Email')
+
+        res.send({success:true,SubUsers:users});
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/promptofday', async (req, res) => {
+    try {
+        // Count the total number of prompts in the database
+        const count = await Prompts.countDocuments();
+
+        // Generate a random index
+        const randomIndex = Math.floor(Math.random() * count);
+
+        // Fetch a single random prompt using the random index
+        const randomPrompt = await Prompts.findOne().skip(randomIndex);
+
+        res.send(randomPrompt);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
 router.get('/prompts/:department', async (req, res) => {
@@ -284,12 +323,75 @@ router.get('/prompts/:department', async (req, res) => {
             List: categorizedData[Type]
         }));
 
-        res.send(formattedData);
+        res.send({success:true,Prompts:formattedData});
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
     }
 });
+
+router.get('/departPrompt/:department', async (req, res) => {
+    try {
+        const department = req.params.department;
+
+        // Fetch data based on department
+        const data = await Prompts.aggregate([
+            { $match: { Department: department } }, // Filter by department
+            { $sample: { size: 10 } } // Retrieve 10 random documents
+        ]);
+
+        // Assuming you have an array of 10 image URLs
+        const imageUrls = [
+            "https://example.com/image1.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+            "https://example.com/image2.jpg",
+        ];
+
+        // Combine each prompt with an image URL
+        const promptsWithImages = data.map((prompt, index) => ({
+            ...prompt.toObject(),
+            imageUrl: imageUrls[index] // Add an image URL to each prompt
+        }));
+
+        res.send({ success: true, Prompts: promptsWithImages });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/promptdetail/:prompid', async (req, res) => {
+    try {
+        const department = req.params.department;
+
+        // Fetch data based on department
+        const prompt = await Prompts.findById(req.params.prompid);
+
+        res.send({success:true,Prompts:prompt});
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/faq', async (req, res) => {
+    try {
+        // Fetch data based on department
+        const data = await FAQ.find({ Department: department });
+        res.send({ success: true, FAQ: data });
+
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 
 module.exports = router

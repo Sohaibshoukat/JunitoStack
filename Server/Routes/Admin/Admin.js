@@ -9,9 +9,6 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
-// const Testimonial = require("../../Models/Testimonial");
-// const Blogs = require("../../Models/Blogs");
-// const Guide = require("../../Models/IntegerationGuide");
 
 // const aws = require("aws-sdk");
 const multer = require("multer");
