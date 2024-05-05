@@ -1,83 +1,92 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { FaRegSave } from 'react-icons/fa'
 import { IoIosSearch, IoMdAdd, IoMdClose } from 'react-icons/io'
+import { BaseURL } from '../../../Data/BaseURL';
+import AlertContext from '../../../Context/Alert/AlertContext';
+import AddUserModel from '../../../Components/Dashboard/User/AddUserModel';
+import EditUserModel from '../../../Components/Dashboard/User/EditUserModel';
 
-const User = ({ UserModel, setUserModel }) => {
+const User = () => {
 
-    const Users = [
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Active"
-        },
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Inactive"
-        },
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Active"
-        },
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Inactive"
-        }, {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Active"
-        },
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Inactive"
-        }, {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Active"
-        },
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Inactive"
-        }, {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Active"
-        },
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Inactive"
-        }, {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Active"
-        },
-        {
-            Name: "Jane Cooper",
-            Email: "jane@microsft.com",
-            Company: "Microsft",
-            Type: "Inactive"
-        },
-    ]
+    const [users, setUsers] = useState([]);
+    const [UserModel, setUserModel] = useState(false)
+    const [EditModel, setEditModel] = useState(false)
+    const [EditId, setEditId] = useState(null)
+
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch(`${BaseURL}/api/company/subUser`, {
+                method: 'GET',
+                headers: {
+                    'auth-token': localStorage.getItem('auth-token')
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setUsers(data.SubUsers);
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            showAlert(error.message, 'danger');
+        }
+    };
+
+    const deleteUser = async (subuserId) => {
+        try {
+            const response = await fetch(`${BaseURL}/api/company/deleteSubuser/${subuserId}`, {
+                method: 'DELETE',
+                headers: {
+                    'auth-token': localStorage.getItem('auth-token')
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                showAlert('Subuser deleted successfully', 'success');
+                fetchUsers(); // Refresh the user list after deletion
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            showAlert(error.message, 'danger');
+        }
+    };
+
+    const toggleUserStatus = async (subuserId) => {
+        try {
+            const response = await fetch(`${BaseURL}/api/company/statusSubuser/${subuserId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('auth-token')
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                showAlert('User status updated successfully', 'success');
+                fetchUsers(); // Refresh the user list after status update
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            showAlert(error.message, 'danger');
+        }
+    };
+
+
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
     return (
         <>
-
+            <AddUserModel UserModel={UserModel} setUserModel={setUserModel} fetchUsers={fetchUsers} />
+            <EditUserModel UserModel={EditModel} setUserModel={setEditModel} fetchUsers={fetchUsers} subuserid={EditId} />
             <div className='pt-5 pb-20 w-[95%] md:w-[90%] m-auto'>
                 <div className="flex justify-end my-4">
                     <button
@@ -113,14 +122,14 @@ const User = ({ UserModel, setUserModel }) => {
                     </div>
                     <div className="my-4">
                         <div class="w-[100%] overflow-y-scroll">
-                            <table>
+                            <table className='w-full'>
                                 <thead class="text-sm md:text-base font-normal uppercase text-slate-300">
                                     <tr>
                                         <th class="px-2 md:px-6 py-2 md:py-4">
                                             User name
                                         </th>
                                         <th class="px-2 md:px-6 py-2 md:py-4">
-                                            Company
+                                            Phone
                                         </th>
                                         <th class="px-2 md:px-6 py-2 md:py-4">
                                             Email
@@ -134,33 +143,38 @@ const User = ({ UserModel, setUserModel }) => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {Users?.map((item, index) => (
+                                    {users?.map((item, index) => (
                                         <tr class="bg-white border-b font-medium text-sm md:text-sm border-slate-200" key={index}>
                                             <th class="px-2 md:px-6 py-2 md:py-4">
                                                 <h2 className='w-max'>
-                                                    {item.Name}
+                                                    {item?.Own_ID?.FirstName + " " + item?.Own_ID?.LastName}
                                                 </h2>
                                             </th>
                                             <td class="px-2 md:px-6 py-2 md:py-4">
                                                 <h2 className='w-max'>
-                                                    {item.Company}
+                                                    {item?.Own_ID?.Phone}
                                                 </h2>
                                             </td>
                                             <td class="px-2 md:px-6 py-2 md:py-4">
                                                 <h2 className='w-max'>
-                                                    {item.Email}
+                                                    {item?.Own_ID?.Email}
                                                 </h2>
                                             </td>
                                             <td class="px-2 md:px-6 py-2 md:py-4">
                                                 <div className='flex text-white md:flex-row gap-2'>
                                                     <button
                                                         className='flex w-max gap-1 font-medium  bg-[#96A6D2] py-2 px-3 rounded-lg border-2 border-[#1D4ED8] items-center'
+                                                        onClick={()=>{
+                                                            setEditId(item._id)
+                                                            setEditModel(true)
+                                                        }}
                                                     >
                                                         <FaRegSave className='text-lg' />
                                                         Edit
                                                     </button>
                                                     <button
                                                         className='flex w-max gap-1 font-medium  bg-[#EAB374] py-2 px-3 rounded-lg border-2 border-[#D97706] items-center'
+                                                        onClick={()=>{deleteUser(item._id)}}
                                                     >
                                                         <FaRegSave className='text-lg' />
                                                         Delete
@@ -169,9 +183,10 @@ const User = ({ UserModel, setUserModel }) => {
                                             </td>
                                             <td class="px-2 md:px-6 py-2 md:py-4">
                                                 <button
-                                                    className={`flex w-max gap-1 font-medium ${item.Type == 'Active' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
+                                                    className={`flex w-max gap-1 font-medium ${item?.Own_ID?.Status == 'Active' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
+                                                    onClick={()=>{toggleUserStatus(item._id)}}
                                                 >
-                                                    {item.Type}
+                                                   {item?.Own_ID?.Status}
                                                 </button>
                                             </td>
                                         </tr>

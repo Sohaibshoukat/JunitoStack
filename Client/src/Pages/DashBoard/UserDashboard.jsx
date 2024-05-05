@@ -1,14 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DashBoardNav from '../../Components/Dashboard/DashboardNav'
 import { FiChevronDown } from 'react-icons/fi';
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import Home from './Views/Home';
 import FAQ from './Views/FAQ';
 import User from './Views/User';
-import AddUserModel from '../../Components/Dashboard/User/AddUserModel';
 import Prompts from './Views/Prompts';
 import DepartPrompt from './Views/DepartPrompt';
-import PromptDetailModel from '../../Components/Dashboard/PromptDetail/PromptDetailModel';
 import SharedChat from './Views/SharedChat';
 import ToDos from './Views/ToDos';
 
@@ -16,13 +14,20 @@ import ToDos from './Views/ToDos';
 
 const UserDashboard = () => {
 
-    const [UserModel, setUserModel] = useState(false)
-    const [PromptDetail, setPromptDetail] = useState(false)
+    const navigate = useNavigate()
+    
+
+    useEffect(() => {
+      if(localStorage.getItem("auth-token")){
+        return;
+      }else{
+        navigate("/login")
+      }
+    }, [])
+    
 
     return (
         <>
-            <AddUserModel UserModel={UserModel} setUserModel={setUserModel} />
-            <PromptDetailModel PromptDetail={PromptDetail} setPromptDetail={setPromptDetail} />
             <div className='flex flex-row h-[100vh] w-[100vw] overflow-hidden'>
 
                 {/* SideBar */}
@@ -48,11 +53,11 @@ const UserDashboard = () => {
                         <Routes>
                             <Route path="/" element={<Home />}></Route>
                             <Route path="/faq" element={<FAQ />}></Route>
-                            <Route path="/users" element={<User UserModel={UserModel} setUserModel={setUserModel} />}></Route>
+                            <Route path="/users" element={<User />}></Route>
                             <Route path="/prompts-browsing" element={<Prompts />}></Route>
                             <Route path="/shared" element={<SharedChat />}></Route>
                             <Route path="/to-do" element={<ToDos />}></Route>
-                            <Route path="/prompts-browsing/:dep" element={<DepartPrompt PromptDetail={PromptDetail} setPromptDetail={setPromptDetail}/>}></Route>
+                            <Route path="/prompts-browsing/:dep" element={<DepartPrompt/>}></Route>
                         </Routes>
                     </div>
                 </div>

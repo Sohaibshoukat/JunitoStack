@@ -1,12 +1,64 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import Nav from '../../Components/Nav'
 import Footer from '../../Components/Footer'
+import AlertContext from '../../Context/Alert/AlertContext'
+import { BaseURL } from '../../Data/BaseURL'
 
 const Signup = () => {
+
+    const navigate = useNavigate()
+
+    const [formData, setFormData] = useState({
+        FirstName: '',
+        LastName: '',
+        Email: '',
+        Phone: '',
+        CompanyName: '',
+        Password: '',
+        ConfirmPassword: ''
+    });
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        // Frontend validation
+        if (!formData.FirstName || !formData.LastName || !formData.Email || !formData.Phone || !formData.CompanyName || !formData.Password || !formData.ConfirmPassword) {
+            showAlert('All fields are required', 'danger');
+        }
+        if (formData.Password !== formData.ConfirmPassword) {
+            showAlert('Passwords do not match', 'danger');
+        }
+        // Backend API call
+        try {
+            const response = await fetch(`${BaseURL}/api/user/createuser`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            if (!data.success) {
+                showAlert(data.error || 'Signup failed', 'danger');
+            }
+            showAlert('OTP Email sent to your registerd email', 'success');
+            navigate(`/otpconfirm/${data.AuthToken}`)
+        } catch (error) {
+            showAlert(error.messaage, 'danger');
+        }
+    };
+
+
     return (
         <>
-        <Nav/>
+            <Nav />
             <div className='py-36'>
                 <h1 className='font-para text-5xl text-center m-auto font-bold text-black max-w-[70%]'>SignUp To Your BizBot Account</h1>
             </div>
@@ -20,11 +72,17 @@ const Signup = () => {
                                 <div className="flex flex-col md:flex-row justify-between gap-4">
                                     <input
                                         type="text"
+                                        name="FirstName"
+                                        value={formData.FirstName}
+                                        onChange={handleChange}
                                         placeholder='John'
                                         className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                     />
                                     <input
                                         type="text"
+                                        name="LastName"
+                                        value={formData.LastName}
+                                        onChange={handleChange}
                                         placeholder='Dep'
                                         className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                     />
@@ -32,23 +90,43 @@ const Signup = () => {
                                 <div className="flex flex-col md:flex-row justify-between gap-4">
                                     <input
                                         type="email"
+                                        name="Email"
+                                        value={formData.Email}
+                                        onChange={handleChange}
                                         placeholder='abc@gmail.com'
                                         className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                     />
                                     <input
                                         type="tel"
+                                        name="Phone"
+                                        value={formData.Phone}
+                                        onChange={handleChange}
                                         placeholder='1234567890'
                                         className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                     />
                                 </div>
                                 <input
-                                    type="password"
-                                    placeholder='******'
+                                    type="text"
+                                    name="CompanyName"
+                                    value={formData.CompanyName}
+                                    onChange={handleChange}
+                                    placeholder='Company Name'
                                     className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                 />
                                 <input
                                     type="password"
-                                    placeholder='******'
+                                    name="Password"
+                                    value={formData.Password}
+                                    onChange={handleChange}
+                                    placeholder='Password'
+                                    className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
+                                />
+                                <input
+                                    type="password"
+                                    name="ConfirmPassword"
+                                    value={formData.ConfirmPassword}
+                                    onChange={handleChange}
+                                    placeholder='Confirm Password'
                                     className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                 />
                                 <div className="flex flex-col gap-2 md:flex-row justify-between md:items-center">
@@ -65,25 +143,18 @@ const Signup = () => {
                                         </Link>
                                     </p>
                                 </div>
-                                <button className='text-white text-lg my-2 md:text-md lg:text-lg font-Para px-2 py-2 md:px-6 rounded-md bg-gray hover:text-black hover:bg-transparent hover:border-gray border-2 w-full border-gray duration-300 ease-in-out'>Create account</button>
+                                <button
+                                    className='text-white text-lg my-2 md:text-md lg:text-lg font-Para px-2 py-2 md:px-6 rounded-md bg-gray hover:text-black hover:bg-transparent hover:border-gray border-2 w-full border-gray duration-300 ease-in-out'
+                                    onClick={handleSubmit}
+                                >
+                                    Create account
+                                </button>
                                 <p className='text-black font-bold text-center font-para text-lg'>Already have an account?
                                     <Link to={'/login'}>
                                         <span className='text-gray'>
                                             Login</span>
                                     </Link>
                                 </p>
-                                <p className='text-lightgray font-para text-lg text-center'>Or Sign up with</p>
-                                <div className="flex flex-row gap-2">
-                                    <div className="basis-[33.3333%] border-2 border-gray  rounded-lg py-2 flex flex-col items-center hover:bg-gray ease-in-out duration-300">
-                                        <img src="./Social/facebook.png" alt="" className='w-[30px]' />
-                                    </div>
-                                    <div className="basis-[33.3333%] border-2 border-gray  rounded-lg py-2 flex flex-col items-center hover:bg-gray ease-in-out duration-300">
-                                        <img src="./Social/google.png" alt="" className='w-[30px]' />
-                                    </div>
-                                    <div className="basis-[33.3333%] border-2 border-gray  rounded-lg py-2 flex flex-col items-center hover:bg-gray ease-in-out duration-300">
-                                        <img src="./Social/apple.png" alt="" className='w-[30px]' />
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -95,7 +166,7 @@ const Signup = () => {
                     </div>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </>
     )
 }

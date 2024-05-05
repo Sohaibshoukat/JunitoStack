@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const Emails = require("../../Models/Email");
 
 
 
@@ -50,6 +51,14 @@ router.post("/sendMail", async (req, res) => {
         const { Name, Email, Company, Subject, Message } = req.body;
 
         const response = await sendEmail(Name, Email, Company, Subject, Message);
+
+        let savedemail = await Emails.create({
+            Email: Email,
+            Company: Company,
+            Name:Name,
+            Subject: Subject,
+            Status: "Active",
+        })
 
         if (response.status) {
             res.json({ success: true });

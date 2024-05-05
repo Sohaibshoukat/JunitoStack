@@ -17,27 +17,34 @@ import Service from './Pages/Portfolio/Service'
 // import Pricing from './Pages/Portfolio/Pricing'
 import UserDashboard from './Pages/DashBoard/UserDashboard'
 import ChatBot from './Pages/DashBoard/ChatBot'
+import AlertState from './Context/Alert/AlertState'
+import Alert from './Components/Alert'
+import OTP from './Pages/Portfolio/OTP'
+import Recoverpassword from './Pages/Portfolio/RecoverPassword'
 
 function App() {
 
   return (
     <>
-    
+
       <BrowserRouter >
-      <ScrollToTop/> 
-         <Routes>
-           <Route path="/" element={<Home />}></Route>
-           <Route path="/contact" element={<Contact />}></Route>
-           <Route path="/login" element={<Login />}></Route>
-           <Route path="/sign-up" element={<Signup />}></Route>
-           <Route path="/forget-password" element={<Forgetpassword />}></Route>
-          <Route path="/about" element={<About />}></Route>
-          <Route path="/service" element={<Service />}></Route>
-          <Route path="/dashboard/*" element={<UserDashboard />}></Route>
-          <Route path="/dashboard/chatbot" element={<ChatBot />}></Route>
-          {/*<Route path="/pricing-plans" element={<Pricing />}></Route>
-          <Route path="/auth" element={<Auth />}></Route> */}
-        </Routes>
+        <AlertState>
+          <Alert />
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Home />}></Route>
+            <Route path="/contact" element={<Contact />}></Route>
+            <Route path="/login" element={<Login />}></Route>
+            <Route path="/sign-up" element={<Signup />}></Route>
+            <Route path="/otpconfirm/:id" element={<OTP />}></Route>
+            <Route path="/forget-password" element={<Forgetpassword />}></Route>
+            <Route path="/recover-password/:id" element={<Recoverpassword />}></Route>
+            <Route path="/about" element={<About />}></Route>
+            <Route path="/service" element={<Service />}></Route>
+            <Route path="/dashboard/*" element={<UserDashboard />}></Route>
+            <Route path="/dashboard/chatbot" element={<ChatBot />}></Route>
+          </Routes>
+        </AlertState>
       </BrowserRouter>
     </>
   )

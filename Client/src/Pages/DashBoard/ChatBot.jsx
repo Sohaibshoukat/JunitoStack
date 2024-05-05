@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PromptsSlider from '../../Components/Dashboard/PromptsSlider'
 import BizBotDep from '../../Components/Dashboard/BizBotDep'
 import ChatHistory from '../../Components/Dashboard/ChatHistory'
 import { IoMdClose } from 'react-icons/io'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import TODOModel from '../../Components/Dashboard/TODOModel'
 import Conversation from '../../Components/Dashboard/Conversation'
 
@@ -15,6 +15,18 @@ const ChatBot = () => {
 
     const [Query, setQuery] = useState('')
     const [ChatsData, setChatsData] = useState([])
+
+    const [Profile, setProfile] = useState(false)
+
+
+
+    useEffect(() => {
+        if (localStorage.getItem("auth-token")) {
+            return;
+        } else {
+            navigate("/login")
+        }
+    }, [])
 
     return (
         <>
@@ -36,11 +48,11 @@ const ChatBot = () => {
                             </div>
                         </div>
                         <div className="flex flex-row gap-4 justify-end">
-                            <button 
-                                    className='hover:bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 hover:text-white bg-transparent text-gray font-para ease-in-out duration-300 self-end float-right'
-                                    onClick={()=>{setModel(false)}}
-                                >
-                                    Skip
+                            <button
+                                className='hover:bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 hover:text-white bg-transparent text-gray font-para ease-in-out duration-300 self-end float-right'
+                                onClick={() => { setModel(false) }}
+                            >
+                                Skip
                             </button>
                             <button className='bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 self-end float-right'>Continue</button>
                         </div>
@@ -52,12 +64,25 @@ const ChatBot = () => {
 
             <div className='w-full bg-white py-2 fixed top-0 z-50 items-center px-6 flex justify-between'>
                 <h2 className='text-gray font-bold font-head text-2xl'>Chatbot</h2>
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-center gap-2 cursor-pointer relative" onClick={() => { setProfile(!Profile) }}>
                     <img src="../Porp/User.png" alt="" className='w-10 h-10 rounded-full' />
                     <div className="flex font-para text-gray flex-col">
                         <h2 className='text-base font-bold'>Musfiq</h2>
                         <p className='text-sm'>User@gmail.com</p>
                     </div>
+                    {Profile && <div className="flex rounded-xl z-[999999999] right-0 w-[100%] flex-col gap-2 bg-white absolute bottom-[-250%] shadow-2xl  font-para text-lg font-medium py-2 px-4">
+                        <Link to={"/user-dashboard/profile/"}>
+                            <h3>Profile</h3>
+                        </Link>
+                        <Link to={"/user-dashboard/profile/setting"}>
+                            <h3>Setting</h3>
+                        </Link>
+                        <Link to={"/"}>
+                            <h3>
+                                SignOut
+                            </h3>
+                        </Link>
+                    </div>}
                 </div>
             </div>
             <div className='bg-[#F0F0F0] min-h-[100vh]'>

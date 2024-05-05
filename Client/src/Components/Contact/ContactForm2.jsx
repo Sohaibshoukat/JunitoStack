@@ -1,25 +1,28 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { CAlert } from '@coreui/react'
 import { IoIosSend } from 'react-icons/io'
+import AlertContext from '../../Context/Alert/AlertContext'
+import { BaseURL } from '../../Data/BaseURL'
 
 const ContactForm2 = () => {
 
-    const [Name, setName] = useState('')
-    const [Email, setEmail] = useState('')
-    const [Company, setCompany] = useState('')
-    const [Subject, setSubject] = useState('')
-    const [Message, setMessage] = useState('')
-    const [showAlert, setshowAlert] = useState(false)
-    const [AlertType, setAlertType] = useState(false)
-    const [IsLoading, setIsLoading] = useState(false)
-    const [AlertMessage, setAlertMessage] = useState('')
+    const [Name, setName] = useState('');
+    const [Email, setEmail] = useState('');
+    const [Company, setCompany] = useState(''); // New state for Company
+    const [Subject, setSubject] = useState(''); // New state for Subject
+    const [Message, setMessage] = useState('');
+    const [IsLoading, setIsLoading] = useState(false);
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
 
 
     const handleFormSubmit = async () => {
+        setIsLoading(true); // Set loading state to true when form is submitted
         try {
-            const response = await fetch('https://baader-backend.vercel.app/sendMail', {
+            const response = await fetch(`${BaseURL}/api/contact/sendMail`, {
                 method: 'POST',
-                body: JSON.stringify({ Name, Email, Subject, Message }),
+                body: JSON.stringify({ Name, Email, Company, Subject, Message }), // Include Company and Subject in the request body
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -28,38 +31,21 @@ const ContactForm2 = () => {
             if (data.success) {
                 setName('');
                 setEmail('');
-                setMessage('');
+                setCompany('');
                 setSubject('');
+                setMessage('');
 
-                setshowAlert(true)
-                setAlertType("success")
-                setAlertMessage("Your Message Have Been Send Succefully we will Get back to you soon")
-                setIsLoading(false);
-                setTimeout(() => {
-                    setshowAlert(false)
-                }, 3000);
-
-            }
-            else {
-                setshowAlert(true)
-                setAlertType('danger')
-                setAlertMessage("Error Occured")
-                setIsLoading(false);
-                setTimeout(() => {
-                    setshowAlert(false)
-                }, 5000);
+                showAlert("Thank you! Will get back to you soon", "success");
+            } else {
+                showAlert("Failed to send message. Please try again later.", "danger");
             }
         } catch (error) {
             console.log(error.message);
-            setshowAlert(true)
-            setAlertType('danger')
-            setAlertMessage("Error Occured")
+            showAlert("An error occurred. Please try again later.", 'danger');
+        } finally {
             setIsLoading(false);
-            setTimeout(() => {
-                setshowAlert(false)
-            }, 5000);
         }
-    }
+    };
 
     return (
         <>
@@ -137,28 +123,6 @@ const ContactForm2 = () => {
                 </div>
             </div>
 
-
-            {showAlert &&
-                <>
-                    {
-                        AlertType == "success" ? (
-                            <CAlert
-                                color={AlertType}
-                                className='text-white'
-                                style={{ position: "fixed", top: "50px", right: "10px", transition: "ease-in-out 5s", zIndex: "1000000000", borderRadius: "10px", padding: "15px", backgroundColor: `${AlertType == 'success' ? '#2acfb3' : '#bf1b2c'}` }}>
-                                {AlertMessage}
-                            </CAlert>
-                        ) : (
-                            <CAlert
-                                color={AlertType}
-                                className='text-white'
-                                style={{ position: "fixed", top: "50px", right: "10px", transition: "ease-in-out 5s", zIndex: "1000000000", borderRadius: "10px", padding: "15px", backgroundColor: `${AlertType == 'success' ? '#2acfb3' : '#bf1b2c'}` }}>
-                                {AlertMessage}
-                            </CAlert>
-                        )
-                    }
-                </>
-            }
         </>
     )
 }

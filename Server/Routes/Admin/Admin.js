@@ -681,10 +681,8 @@ router.get('/user-registrations', async (req, res) => {
       console.error('Error:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
+});
 
-
-// Delete a FAQ
 router.delete("/deleteuser/:id", fetchadmin, async (req, res) => {
     try {
         let admin = await Admin.findById(req.admin.id);
@@ -706,6 +704,7 @@ router.delete("/deleteuser/:id", fetchadmin, async (req, res) => {
 });
 
 
+
 router.get("/getEmails", fetchadmin, async (req, res) => {
     try {
         let admin = await Admin.findById(req.admin.id);
@@ -722,7 +721,6 @@ router.get("/getEmails", fetchadmin, async (req, res) => {
     }
 });
 
-// Delete a FAQ
 router.put("/updateemail/:id", fetchadmin, async (req, res) => {
     try {
         let admin = await Admin.findById(req.admin.id);

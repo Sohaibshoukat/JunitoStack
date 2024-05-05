@@ -90,17 +90,17 @@ router.post("/createSubuser", fetchuser, async (req, res) => {
 
         let owner = await User.findById(req.user.id);
         if (!owner) {
-            return res.status(404).json({ success: false, message: "You Have no Access" });
+            return res.json({ success: false, message: "You Have no Access" });
         }
 
         let company = await Company.findOne({ Owner_ID: req.user.id })
         if (!company) {
-            return res.status(404).json({ success: false, message: "No Company Registerd Found" });
+            return res.json({ success: false, message: "No Company Registerd Found" });
         }
 
         let user = await User.findOne({ Email: req.body.Email })
         if (user) {
-            return res.status(404).json({ success, error: "This Email already exist" })
+            return res.json({ success, message: "This Email already exist" })
         }
 
 
@@ -118,7 +118,7 @@ router.post("/createSubuser", fetchuser, async (req, res) => {
             Password: SecPassword
         })
 
-        user = await SubUser.create({
+        let subuser = await SubUser.create({
             User_ID: req.user.id,
             Company_ID: company._id,
             Own_ID: user._id,
@@ -204,7 +204,10 @@ router.delete("/deleteSubuser/:subuserId", fetchuser, async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        await subuser.remove();
+        subuser = await SubUser.findByIdAndDelete(subuserId);
+        if (!subuser) {
+            return res.status(404).json({ success: false, message: "Subuser not found" });
+        }
 
         res.json({ success: true });
     } catch (error) {
@@ -213,7 +216,7 @@ router.delete("/deleteSubuser/:subuserId", fetchuser, async (req, res) => {
     }
 });
 
-router.put("/deactivateSubuser/:subuserId", fetchuser, async (req, res) => {
+router.put("/statusSubuser/:subuserId", fetchuser, async (req, res) => {
     let success = false;
     try {
         let owner = await User.findById(req.user.id);
@@ -238,7 +241,12 @@ router.put("/deactivateSubuser/:subuserId", fetchuser, async (req, res) => {
             return res.status(403).json({ success: false, message: "You do not have permission to edit this subuser" });
         }
 
-        user.Status = "InActive";
+        if(user.Status=="Active"){
+            user.Status = "InActive";
+        }else{
+            user.Status = "Active";
+        }
+
 
         await user.save();
 
@@ -266,6 +274,22 @@ router.get('/subUser',fetchuser, async (req, res) => {
     }
 });
 
+router.get('/subUser/:id',fetchuser, async (req, res) => {
+    try {
+        let owner = await User.findById(req.user.id);
+        if (!owner) {
+            return res.status(404).json({ success: false, message: "You Have no Access" });
+        }
+
+        let user = await SubUser.findById(req.params.id).populate('Own_ID', 'FirstName LastName Email Phone ProfilePhoto Status')
+
+        res.send({success:true,SubUser:user});
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 router.get('/subUsers/List',fetchuser, async (req, res) => {
     try {
         let owner = await User.findById(req.user.id);
@@ -281,6 +305,8 @@ router.get('/subUsers/List',fetchuser, async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+
 
 router.get('/promptofday', async (req, res) => {
     try {
@@ -299,7 +325,6 @@ router.get('/promptofday', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
 
 router.get('/prompts/:department', async (req, res) => {
     try {
@@ -369,12 +394,11 @@ router.get('/departPrompt/:department', async (req, res) => {
 
 router.get('/promptdetail/:prompid', async (req, res) => {
     try {
-        const department = req.params.department;
 
         // Fetch data based on department
         const prompt = await Prompts.findById(req.params.prompid);
 
-        res.send({success:true,Prompts:prompt});
+        res.send({success:true,Prompt:prompt});
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -384,7 +408,7 @@ router.get('/promptdetail/:prompid', async (req, res) => {
 router.get('/faq', async (req, res) => {
     try {
         // Fetch data based on department
-        const data = await FAQ.find({ Department: department });
+        const data = await FAQ.find();
         res.send({ success: true, FAQ: data });
 
     } catch (error) {

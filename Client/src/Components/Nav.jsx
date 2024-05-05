@@ -18,7 +18,7 @@ const Nav = () => {
                             setDisplay(false)
                         }, 50);
                     }}>
-                        <img src="./Logo.png" alt="" className='w-[50px] md:w-[75px] h-[auto]' />
+                        <img src="../Logo.png" alt="" className='w-[50px] md:w-[75px] h-[auto]' />
                     </Link>
                 </div>
                 <div className={`${display && 'hidden'} hidden xl:flex gap-4 basis-[50%] justify-center`}>

@@ -1,23 +1,25 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { CAlert } from '@coreui/react'
+import AlertContext from '../../Context/Alert/AlertContext'
+import { BaseURL } from '../../Data/BaseURL'
 
 const ContactForm = () => {
 
     const [Name, setName] = useState('')
     const [Email, setEmail] = useState('')
-    const [Subject, setSubject] = useState('')
     const [Message, setMessage] = useState('')
-    const [showAlert, setshowAlert] = useState(false)
-    const [AlertType, setAlertType] = useState(false)
     const [IsLoading, setIsLoading] = useState(false)
-    const [AlertMessage, setAlertMessage] = useState('')
+
+
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
 
 
     const handleFormSubmit = async () => {
         try {
-            const response = await fetch('https://baader-backend.vercel.app/sendMail', {
+            const response = await fetch(`${BaseURL}/api/contact/sendcontactMail`, {
                 method: 'POST',
-                body: JSON.stringify({ Name, Email, Subject, Message }),
+                body: JSON.stringify({ Name, Email, Message }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -27,35 +29,20 @@ const ContactForm = () => {
                 setName('');
                 setEmail('');
                 setMessage('');
-                setSubject('');
 
-                setshowAlert(true)
-                setAlertType("success")
-                setAlertMessage("Your Message Have Been Send Succefully we will Get back to you soon")
+                showAlert("We will be in touch with you soon", "success")
                 setIsLoading(false);
-                setTimeout(() => {
-                    setshowAlert(false)
-                }, 3000);
+
 
             }
             else {
-                setshowAlert(true)
-                setAlertType('danger')
-                setAlertMessage("Error Occured")
                 setIsLoading(false);
-                setTimeout(() => {
-                    setshowAlert(false)
-                }, 5000);
+                showAlert(data.message, "success")
             }
         } catch (error) {
             console.log(error.message);
-            setshowAlert(true)
-            setAlertType('danger')
-            setAlertMessage("Error Occured")
+            showAlert(error.message, 'danger')
             setIsLoading(false);
-            setTimeout(() => {
-                setshowAlert(false)
-            }, 5000);
         }
     }
 
@@ -115,29 +102,6 @@ const ContactForm = () => {
                     </button>
                 </div>
             </div>
-
-
-            {showAlert &&
-                <>
-                    {
-                        AlertType == "success" ? (
-                            <CAlert
-                                color={AlertType}
-                                className='text-white'
-                                style={{ position: "fixed", top: "50px", right: "10px", transition: "ease-in-out 5s", zIndex: "1000000000", borderRadius: "10px", padding: "15px", backgroundColor: `${AlertType == 'success' ? '#2acfb3' : '#bf1b2c'}` }}>
-                                {AlertMessage}
-                            </CAlert>
-                        ) : (
-                            <CAlert
-                                color={AlertType}
-                                className='text-white'
-                                style={{ position: "fixed", top: "50px", right: "10px", transition: "ease-in-out 5s", zIndex: "1000000000", borderRadius: "10px", padding: "15px", backgroundColor: `${AlertType == 'success' ? '#2acfb3' : '#bf1b2c'}` }}>
-                                {AlertMessage}
-                            </CAlert>
-                        )
-                    }
-                </>
-            }
         </>
     )
 }

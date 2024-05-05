@@ -4,7 +4,6 @@ import { FaArrowRight } from 'react-icons/fa'
 
 const ContactSec = () => {
 
-
     const Dataset = [
         "Fill out the support form",
         "You wait, we'll get started",

@@ -146,7 +146,7 @@ router.post("/createuser", async (req, res) => {
         const AuthToken = jwt.sign(data, JWT_KEY);
 
         success = true;
-        res.json({ success, AuthToken, response })
+        res.json({ success, AuthToken: user.id, response })
 
     } catch (error) {
         console.error(error)
@@ -157,9 +157,8 @@ router.post("/createuser", async (req, res) => {
 //Verify OTP
 router.post("/verifyOTP", async (req, res) => {
     try {
-        let { token, otp } = req.body;
-        const password = jwt.verify(token, JWT_KEY);
-        const userID = password.user.id;
+        let { id, otp } = req.body;
+        const userID = id;
         if (!userID || !otp) {
             res.json({
                 status: "Failed",
@@ -194,8 +193,17 @@ router.post("/verifyOTP", async (req, res) => {
                         await User.updateOne({ _id: userID }, { Is_Verfied: true });
                         await OTP.deleteMany({ UserID: userID });
 
+                        const data = {
+                            user: {
+                                id: id,
+                            }
+                        }
+
+                        const AuthToken = jwt.sign(data, JWT_KEY);
+
                         res.json({
                             success: true,
+                            AuthToken: AuthToken,
                             message: "User Email verified successfully"
                         });
                     }
@@ -213,9 +221,9 @@ router.post("/verifyOTP", async (req, res) => {
 //Send OTP Again
 router.post("/SendOTPagain", async (req, res) => {
     try {
-        const { token } = req.body;
+        const { id } = req.body;
         const password = jwt.verify(token, JWT_KEY);
-        const userID = password.user.id;
+        const userID = id;
 
         // Delete existing OTP verification document
         await OTP.deleteMany({ UserID: userID });
