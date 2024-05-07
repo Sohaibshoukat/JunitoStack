@@ -241,9 +241,9 @@ router.put("/statusSubuser/:subuserId", fetchuser, async (req, res) => {
             return res.status(403).json({ success: false, message: "You do not have permission to edit this subuser" });
         }
 
-        if(user.Status=="Active"){
+        if (user.Status == "Active") {
             user.Status = "InActive";
-        }else{
+        } else {
             user.Status = "Active";
         }
 
@@ -258,23 +258,23 @@ router.put("/statusSubuser/:subuserId", fetchuser, async (req, res) => {
     }
 });
 
-router.get('/subUser',fetchuser, async (req, res) => {
+router.get('/subUser', fetchuser, async (req, res) => {
     try {
         let owner = await User.findById(req.user.id);
         if (!owner) {
             return res.status(404).json({ success: false, message: "You Have no Access" });
         }
 
-        let users = await SubUser.find({User_ID:req.user.id}).populate('Own_ID', 'FirstName LastName Email Phone ProfilePhoto Status')
+        let users = await SubUser.find({ User_ID: req.user.id }).populate('Own_ID', 'FirstName LastName Email Phone ProfilePhoto Status')
 
-        res.send({success:true,SubUsers:users});
+        res.send({ success: true, SubUsers: users });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
     }
 });
 
-router.get('/subUser/:id',fetchuser, async (req, res) => {
+router.get('/subUser/:id', fetchuser, async (req, res) => {
     try {
         let owner = await User.findById(req.user.id);
         if (!owner) {
@@ -283,23 +283,23 @@ router.get('/subUser/:id',fetchuser, async (req, res) => {
 
         let user = await SubUser.findById(req.params.id).populate('Own_ID', 'FirstName LastName Email Phone ProfilePhoto Status')
 
-        res.send({success:true,SubUser:user});
+        res.send({ success: true, SubUser: user });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
     }
 });
 
-router.get('/subUsers/List',fetchuser, async (req, res) => {
+router.get('/subUsers/List', fetchuser, async (req, res) => {
     try {
         let owner = await User.findById(req.user.id);
         if (!owner) {
             return res.status(404).json({ success: false, message: "You Have no Access" });
         }
 
-        let users = await SubUser.find({User_ID:req.user.id}).populate('Own_ID', 'FirstName LastName Email')
+        let users = await SubUser.find({ User_ID: req.user.id }).populate('Own_ID', 'FirstName LastName Email Status').limit(5);
 
-        res.send({success:true,SubUsers:users});
+        res.send({ success: true, SubUsers: users });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -319,7 +319,7 @@ router.get('/promptofday', async (req, res) => {
         // Fetch a single random prompt using the random index
         const randomPrompt = await Prompts.findOne().skip(randomIndex);
 
-        res.send(randomPrompt);
+        res.send({ prompt: randomPrompt });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -348,7 +348,7 @@ router.get('/prompts/:department', async (req, res) => {
             List: categorizedData[Type]
         }));
 
-        res.send({success:true,Prompts:formattedData});
+        res.send({ success: true, Prompts: formattedData });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -398,7 +398,7 @@ router.get('/promptdetail/:prompid', async (req, res) => {
         // Fetch data based on department
         const prompt = await Prompts.findById(req.params.prompid);
 
-        res.send({success:true,Prompt:prompt});
+        res.send({ success: true, Prompt: prompt });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');

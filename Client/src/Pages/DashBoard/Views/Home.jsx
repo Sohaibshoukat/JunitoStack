@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import TODOCart from '../../../Components/Dashboard/TODOCart'
 import { FaUserFriends } from 'react-icons/fa'
+import AlertContext from '../../../Context/Alert/AlertContext'
+import { BaseURL } from '../../../Data/BaseURL'
 
 const Home = () => {
   const ToDosData = [
@@ -159,78 +161,100 @@ const Home = () => {
     },
   ]
 
-  const Users = [
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Active"
-    },
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Inactive"
-    },
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Active"
-    },
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Inactive"
-    }, {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Active"
-    },
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Inactive"
-    }, {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Active"
-    },
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Inactive"
-    }, {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Active"
-    },
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Inactive"
-    }, {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Active"
-    },
-    {
-      Name: "Jane Cooper",
-      Email: "jane@microsft.com",
-      Company: "Microsft",
-      Type: "Inactive"
-    },
-  ]
+
+  const toggleUserStatus = async (subuserId) => {
+    try {
+      const response = await fetch(`${BaseURL}/api/company/statusSubuser/${subuserId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': localStorage.getItem('auth-token')
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        showAlert('User status updated successfully', 'success');
+        fetchUsers(); // Refresh the user list after status update
+      } else {
+        showAlert(data.message, 'danger');
+      }
+    } catch (error) {
+      showAlert(error.message, 'danger');
+    }
+  };
 
   const [ModelOpen, setModelOpen] = useState(false)
+  const [users, setUsers] = useState([]);
+  const [todos, setTodos] = useState([]);
+  const [promptday, setpromptday] = useState(null);
+
+  const AletContext = useContext(AlertContext);
+  const { showAlert } = AletContext;
+
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${BaseURL}/api/company/subUsers/List`, {
+        method: 'GET',
+        headers: {
+          'auth-token': localStorage.getItem('auth-token')
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setUsers(data.SubUsers);
+      } else {
+        showAlert(data.message, 'danger');
+      }
+    } catch (error) {
+      showAlert(error.message, 'danger');
+    }
+  };
+
+
+  const fetchTodos = async () => {
+    try {
+      const response = await fetch(`${BaseURL}/api/chat/todos`, {
+        method: 'GET',
+        headers: {
+          'auth-token': localStorage.getItem('auth-token')
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setTodos(data.todos);
+      } else {
+        showAlert(data.message, 'danger');
+      }
+    } catch (error) {
+      showAlert(error.message, 'danger');
+    }
+  };
+
+  const fetchPrompt = async () => {
+    try {
+      const response = await fetch(`${BaseURL}/api/company/promptofday`, {
+        method: 'GET',
+        headers: {
+          'auth-token': localStorage.getItem('auth-token')
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setpromptday(data.prompt);
+      } else {
+        showAlert(data.message, 'danger');
+      }
+    } catch (error) {
+      showAlert(error.message, 'danger');
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchTodos();
+    fetchPrompt()
+  }, []);
 
   return (
     <div className='w-[95%] m-auto pt-10 pb-20'>
@@ -268,8 +292,8 @@ const Home = () => {
             <p className='text-gray font-semibold '>{ToDosData?.length}</p>
           </div>
           <div className="flex my-6 flex-col gap-2 max-h-80 overflow-y-scroll">
-            {ToDosData.map((item, index) => (
-              <TODOCart item={item} key={index} />
+            {todos.map((item, index) => (
+              <TODOCart item={item} key={index} fetchTodos={fetchTodos} />
             ))}
           </div>
         </div>
@@ -311,19 +335,20 @@ const Home = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {Users?.map((item, index) => (
+                    {users?.map((item, index) => (
                       <tr class="bg-white border-b font-medium text-sm md:text-base border-slate-200" key={index}>
                         <td class="px-0 md:px-6 py-2 md:py-4">
-                          {item.Name}
+                          {item?.Own_ID?.FirstName + " " + item?.Own_ID?.LastName}
                         </td>
                         <td class="px-0 md:px-6 py-2 md:py-4">
-                          {item.Email}
+                          {item?.Own_ID?.Email}
                         </td>
                         <td class="px-0 md:px-6 py-2 md:py-4">
                           <button
-                            className={`flex gap-1 font-medium ${item.Type == 'Active' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
+                            className={`flex w-max gap-1 font-medium ${item?.Own_ID?.Status == 'Active' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
+                            onClick={() => { toggleUserStatus(item._id) }}
                           >
-                            {item.Type}
+                            {item?.Own_ID?.Status}
                           </button>
                         </td>
                       </tr>
@@ -336,17 +361,17 @@ const Home = () => {
           <div className="basis-[50%] font-para">
             <div className="flex flex-col gap-2">
               <h2 className='text-lg font-para font-bold'>Prompt of the Day</h2>
-              <p className='text-slate-400 text-sm'>Eum fuga consequuntur utadsjn et.</p>
+              <p className='text-slate-400 text-sm'>{promptday?.Category}</p>
             </div>
             <div className="my-4 bg-white gap-6 flex flex-col md:flex-row rounded-xl py-4 px-6">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 basis-[50%]">
                 <h1 className='text-sm font-medium'>Prompt</h1>
-                <p className='text-base font-bold'>Want to test our vertrieb? Let us your email and we will contact you for a demo</p>
+                <p className='text-base font-bold'>{promptday?.Name}</p>
                 <button className='bg-gray py-3 px-4 rounded-lg border-2 border-gray mt-4 text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 self-end float-right'>Read More</button>
               </div>
-                <div className="rounded-full">
-                    <img src="../promptemp.png" alt="" />
-                </div>
+              <div className="rounded-full basis-[50%]">
+                <img src="../promptemp.png" alt="" />
+              </div>
             </div>
           </div>
         </div>

@@ -2,41 +2,33 @@ import React, { useContext, useEffect, useState } from 'react'
 import PromptsSlider from '../../Components/Dashboard/PromptsSlider'
 import BizBotDep from '../../Components/Dashboard/BizBotDep'
 import ChatHistory from '../../Components/Dashboard/ChatHistory'
-import { Link, useNavigate } from 'react-router-dom'
+import { IoMdClose } from 'react-icons/io'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import TODOModel from '../../Components/Dashboard/TODOModel'
 import Conversation from '../../Components/Dashboard/Conversation'
-import PromptDesc from '../../Components/Dashboard/PromptDesc'
-import { BaseURL } from '../../Data/BaseURL'
-import BotDepContext from '../../Context/BotContaxt/BotDepContext'
-import { trimToWords } from '../../Data/UseFullFunction'
 import ChatContext from '../../Context/ChatContaxt/ChatContext'
+import { BaseURL } from '../../Data/BaseURL'
 import AlertContext from '../../Context/Alert/AlertContext'
-import HistoryContext from '../../Context/History/HistoryContext'
+import { FaRegShareSquare } from 'react-icons/fa'
 
-const ChatBot = () => {
-
-
-    const [Model, setModel] = useState(false)
-    const [ModelTODO, setModelTODO] = useState(false)
-    const [Query, setQuery] = useState('')
-    const [Profile, setProfile] = useState(false)
+const Chating = () => {
 
     const navigate = useNavigate()
+    const { id } = useParams()
 
-    const departcontext = useContext(BotDepContext);
-    const { department } = departcontext
-    
-    const AletContext = useContext(AlertContext);
-    const { showAlert } = AletContext;
+    const [ModelTODO, setModelTODO] = useState(false)
+    const [Query, setQuery] = useState('')
+    const [isLoadingChat, setisLoadingChat] = useState(false)
+    const [Profile, setProfile] = useState(false)
 
     const chatcontext = useContext(ChatContext);
     const { ChatsData, setChatsData } = chatcontext
 
-    const historyContext = useContext(HistoryContext);
-    const { fetchHistory } = historyContext;
+    const AletContext = useContext(AlertContext);
+    const { showAlert } = AletContext;
 
 
-    const NewChatCreate = async () => {
+    const UpdateChat = async () => {
         try {
             const NewData = ChatsData
             NewData.push({
@@ -50,22 +42,20 @@ const ChatBot = () => {
             setChatsData(NewData)
             setQuery("")
 
-            const responseSaving = await fetch(`${BaseURL}/api/chat/createnewchat`, {
-                method: 'POST',
+            const responseSaving = await fetch(`${BaseURL}/api/chat/${id}/addchat`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'auth-token': localStorage.getItem('auth-token')
                 },
                 body: JSON.stringify({
-                    Title: trimToWords(Query),
-                    Department: department,
-                    ChatConversation: NewData
+                    Type: "User",
+                    Query: Query
                 })
             });
             const data = await responseSaving.json();
             if (data.success) {
-                fetchHistory()
-                navigate(`/dashboard/c/${data?.Chat?._id}`)
+                fetchConversation()
             } else {
                 showAlert(data.message, 'danger');
             }
@@ -74,24 +64,65 @@ const ChatBot = () => {
         }
     }
 
+    const shareChat = async () => {
+        setisLoadingChat(true)
+        try {
+            const response = await fetch(`${BaseURL}/api/chat/chat/share`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('auth-token')
+                },
+                body: JSON.stringify({
+                    chatId: id
+                })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setisLoadingChat(false)
+                showAlert(data.message, 'success');
+            } else {
+                setisLoadingChat(false)
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            setisLoadingChat(false)
+            showAlert(error.message, 'danger');
+        }
+    };
+
+    const fetchConversation = async () => {
+        try {
+            const response = await fetch(`${BaseURL}/api/chat/chatdetail/${id}`, {
+                method: 'GET',
+                headers: {
+                    'auth-token': localStorage.getItem('auth-token')
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setChatsData(data?.Chat?.ChatConversation);
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            showAlert(error.message, 'danger');
+        }
+    };
+
     const newTopic = async () => {
         navigate("/dashboard/chatbot");
         setChatsData([])
     }
 
     useEffect(() => {
-        if (localStorage.getItem("auth-token")) {
-            return;
-        } else {
-            navigate("/login")
-        }
-    }, [])
+        fetchConversation()
+    }, [id])
 
     return (
         <>
-            <PromptDesc Model={Model} setModel={setModel} />
 
-            <TODOModel ModelTODO={ModelTODO} setModelTODO={setModelTODO} />
+            <TODOModel ModelTODO={ModelTODO} setModelTODO={setModelTODO} chatid={id} />
 
             <div className='w-full bg-white py-2 fixed top-0 z-50 items-center px-6 flex justify-between'>
                 <h2 className='text-gray font-bold font-head text-2xl'>Chatbot</h2>
@@ -118,38 +149,26 @@ const ChatBot = () => {
             </div>
             <div className='bg-[#F0F0F0] min-h-[100vh]'>
                 <div className="flex flex-row items-start gap-4 px-2 md:px-8 pt-20 pb-10 relative">
-                    <div className="basis-[70%] w-[97%] md:w-[90%] xl:w-[70%] m-auto ">
-                        {ChatsData?.length <= 0 ?
-                            <div className='flex flex-col justify-between gap-8'>
-                                <div className="text-center flex flex-col gap-3 w-[100%]">
-                                    <div className="flex gap-4 justify-center items-end">
-                                        <img src="../BizzBot.png" alt="" className='w-6 md:w-12' />
-                                        <h2 className='text-gray font-bold text-xl md:text-xl font-para'>Welcome to BizBot</h2>
-                                    </div>
-                                </div>
-                                <PromptsSlider Model={Model} setModel={setModel} />
-                                <div className='w-[90%] m-auto' id="AI-chat">
-                                    <div className='flex flex-col gap-4' id='Chat-Body'>
-                                        <div className="flex flex-col gap-2">
-                                            <div className="flex gap-2 items-start">
-                                                <img src="../BizzBot.png" alt="" className='w-6' />
-                                                <h2 className='text-gray font-bold text-lg font-para'>BizBot</h2>
-                                            </div>
-                                            <p className=' ml-4 text-gray font-para'>Hi ,How can I help you today?</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            :
-                            <Conversation setModelTODO={setModelTODO} />
-                        }
+                    <div className="basis-[70%] w-[97%] md:w-[90%] xl:w-[70%] mx-auto ">
+                        <div 
+                            className={`my-4 flex gap-2 items-center p-2 border-2 border-gray rounded-2xl w-fit ${isLoadingChat&&"opacity-50"} cursor-pointer`}
+                            onClick={()=>{
+                                if(!isLoadingChat){
+                                    shareChat()
+                                }
+                            }}
+                        >
+                            <FaRegShareSquare className='text-2xl text-gray'/>
+                            <h2>Share Chat</h2>
+                        </div>
+                        <Conversation setModelTODO={setModelTODO} />
                         <div className='w-full'>
                             <div className="flex flex-col md:flex-row gap-2 mt-8  w-full">
                                 <div
                                     className='rounded-2xl  flex h-fit w-[-webkit-fill-available] max-w-fit flex-row items-center gap-2 ease-in-out duration-100000 group gradientcolor p-3 cursor-pointer'
                                     onClick={newTopic}
                                 >
-                                    <img src="../Porp/chat.png" alt="" srcset="" className='w-4 h-4 md:w-6 md:h-6' />
+                                    <img src="../../Porp/chat.png" alt="" srcset="" className='w-4 h-4 md:w-6 md:h-6' />
                                     <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Topic</h2>
                                 </div>
                                 <div className="bg-white w-[100%] rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-4 px-4 flex flex-row">
@@ -162,13 +181,12 @@ const ChatBot = () => {
                                         className='border-none outline-none w-[100%] font-para text-base placeholder:text-gray/40'
                                     />
                                     <img
-                                        src="../Porp/send.png"
+                                        src="../../Porp/send.png"
                                         alt=""
                                         className={`w-6 h-6 ${Query == "" && "opacity-35"}`}
-
                                         onClick={() => {
                                             if (Query !== "") {
-                                                NewChatCreate()
+                                                UpdateChat()
                                             }
                                         }}
                                     />
@@ -181,7 +199,6 @@ const ChatBot = () => {
                                 See More
                             </button>
                         </div>
-
                     </div>
                     <div className="basis-[30%] max-h-[100vh] overflow-y-scroll hidden xl:block">
                         <div className="flex flex-col gap-4">
@@ -196,4 +213,4 @@ const ChatBot = () => {
     )
 }
 
-export default ChatBot
+export default Chating

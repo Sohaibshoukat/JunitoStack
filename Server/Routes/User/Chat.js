@@ -17,7 +17,9 @@ router.get('/chathistory', fetchuser, async (req, res) => {
             return res.status(404).json({ success: false, message: "You Have no Access" });
         }
 
-        const data = await Chat.find({ User_ID: req.user.id }, { Title: 1, Date: 1, Department: 1 });
+        const data = await Chat.find({ User_ID: req.user.id }, { Title: 1, Date: 1, Department: 1 })
+            .sort({ Date: -1 })
+            .limit(10);
 
         res.send({ success: true, Chats: data });
 
@@ -26,7 +28,7 @@ router.get('/chathistory', fetchuser, async (req, res) => {
     }
 });
 
-router.get('/chat/:chatId', fetchuser, async (req, res) => {
+router.get('/chatdetail/:chatId', fetchuser, async (req, res) => {
     try {
         let user = await User.findById(req.user.id);
         if (!user) {
@@ -74,7 +76,7 @@ router.post('/createnewchat', fetchuser, async (req, res) => {
     }
 });
 
-router.put('/chat/:chatId/addchat', fetchuser, async (req, res) => {
+router.put('/:chatId/addchat', fetchuser, async (req, res) => {
     try {
         let user = await User.findById(req.user.id);
         if (!user) {
@@ -188,18 +190,26 @@ router.put('/chat/:chatId/rename', fetchuser, async (req, res) => {
 // Shared Chat
 router.post('/chat/share', fetchuser, async (req, res) => {
     try {
+        const userId=req.user.id
         let user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ success: false, message: "You have no access" });
         }
 
-        const { companyId, chatId } = req.body;
-
-        // Check if the provided company ID is valid
-        const company = await Company.findById(companyId);
+        let company = await Company.findOne({ Owner_ID: userId });
         if (!company) {
-            return res.status(404).json({ success: false, message: "Company not found" });
+            let subuser = await SubUser.findOne({ Own_ID: userId });
+            if (!subuser) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+            company = await Company.findById(subuser.Company_ID);
+            if(!company){
+                return res.status(404).json({ success: false, message: "Company not found" });
+            }
         }
+
+        const { chatId } = req.body;
+
 
         // Check if the provided chat ID is valid
         const chat = await Chat.findById(chatId);
@@ -208,34 +218,40 @@ router.post('/chat/share', fetchuser, async (req, res) => {
         }
 
         // Create a new shared chat document
-        const sharedChat = new SharedChat({
+        const sharedChat = await SharedChat.create({
             User_ID: req.user.id,
-            Company: companyId,
+            Company: company._id,
             Chat_id: chatId
         });
 
-        // Save the shared chat document
-        await sharedChat.save();
 
         res.status(201).json({ success: true, message: "Chat shared with company successfully", SharedChat: sharedChat });
 
     } catch (error) {
+        console.log(error)
         res.status(500).send('Internal Server Error');
     }
 });
 
 router.get('/sharedChats', fetchuser, async (req, res) => {
     try {
-        const { companyId } = req.body;
+        const userId=req.user.id
 
         let user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ success: false, message: "You have no access" });
         }
 
-        const company = await Company.findById(companyId);
+        let company = await Company.findOne({ Owner_ID: userId });
         if (!company) {
-            return res.status(404).json({ success: false, message: "Company not found" });
+            let subuser = await SubUser.findOne({ Own_ID: userId });
+            if (!subuser) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+            company = await Company.findById(subuser.Company_ID);
+            if(!company){
+                return res.status(404).json({ success: false, message: "Company not found" });
+            }
         }
 
         // Check if the user is authorized to access shared chats for this company
@@ -244,7 +260,7 @@ router.get('/sharedChats', fetchuser, async (req, res) => {
         }
 
         // Fetch shared chats for the company and populate Chat details
-        const sharedChats = await SharedChat.find({ Company: companyId }).populate('Chat_id', 'Title Department');
+        const sharedChats = await SharedChat.find({ Company: company._id }).populate('Chat_id', 'Title Department ChatConversation');
 
         res.status(200).json({ success: true, sharedChats });
 
@@ -272,8 +288,8 @@ router.get('/Sahredchat/:sharedid', fetchuser, async (req, res) => {
             return res.status(404).json({ success: false, message: "Chat not found" });
         }
 
-        if(sharedchat.User_ID.toString()==req.user.id){
-           return res.send({ success: true, Chat: chat, Type: "Owned" });
+        if (sharedchat.User_ID.toString() == req.user.id) {
+            return res.send({ success: true, Chat: chat, Type: "Owned" });
         }
 
         res.send({ success: true, Chat: chat, Type: "Shared" });
@@ -321,7 +337,7 @@ router.delete('/sharedChat/:sharedChatId', fetchuser, async (req, res) => {
 //ToDos
 router.post('/todos/add', fetchuser, async (req, res) => {
     try {
-        const { Title, Description, Priority, Deadline, subUsers, companyId, chatId } = req.body;
+        const { Title, Description, Priority, Deadline, subUsers, chatId } = req.body;
         const userId = req.user.id;
 
         // Check if user exists
@@ -331,9 +347,16 @@ router.post('/todos/add', fetchuser, async (req, res) => {
         }
 
         // Check if company exists
-        const company = await Company.findById(companyId);
+        let company = await Company.findOne({ Owner_ID: userId });
         if (!company) {
-            return res.status(404).json({ success: false, message: "Company not found" });
+            let subuser = await SubUser.findOne({ Own_ID: userId });
+            if (!subuser) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+            company = await Company.findById(subuser.Company_ID);
+            if(!company){
+                return res.status(404).json({ success: false, message: "Company not found" });
+            }
         }
 
         // Check if chat exists
@@ -355,9 +378,9 @@ router.post('/todos/add', fetchuser, async (req, res) => {
             Deadline,
             subUsers,
             User_ID: userId,
-            Company: companyId,
+            Company: company._id,
             Chat_id: chatId,
-            Status:"Pending"
+            Status: "Pending"
         });
 
         // Save the new ToDo
@@ -380,9 +403,38 @@ router.get('/todos', fetchuser, async (req, res) => {
                 { User_ID: userId }, // User created the ToDo
                 { subUsers: userId } // User is listed in the subUsers array
             ]
-        });
+        }).populate({
+            path: 'subUsers',
+            select: 'FirstName LastName ProfilePhoto', // Only select firstName and lastName fields
+            model: 'User' // The model to use for populating
+        })
 
-        res.status(200).json({ success: true, todos });
+        res.status(200).json({ success: true, todos })
+
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/todos/List', fetchuser, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Find ToDos where the user is the creator or listed in subUsers
+        const todos = await ToDos.find({
+            $or: [
+                { User_ID: userId }, // User created the ToDo
+                { subUsers: userId } // User is listed in the subUsers array
+            ]
+        }).populate({
+            path: 'subUsers',
+            select: 'FirstName LastName ProfilePhoto',
+            model: 'User'
+        })
+        .sort({ Date: -1 })
+        .limit(5);
+
+        res.status(200).json({ success: true, todos })
 
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -433,11 +485,11 @@ router.get('/todos/:todoId/chat', fetchuser, async (req, res) => {
             return res.status(404).json({ success: false, message: "Chat not found" });
         }
 
-        if(chat.User_ID.toString()==req.user.id){
+        if (chat.User_ID.toString() == req.user.id) {
             return res.send({ success: true, Chat: chat, Type: "Owned" });
-         }
+        }
 
-        res.status(200).json({ success: true, Chat:chat, Type: "Shared" });
+        res.status(200).json({ success: true, Chat: chat, Type: "Shared" });
 
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -475,7 +527,7 @@ router.delete('/todos/:todoId', fetchuser, async (req, res) => {
         const userId = req.user.id;
 
         // Find the ToDo by its ID
-        const todo = await ToDos.findById(todoId);
+        let todo = await ToDos.findById(todoId);
 
         if (!todo) {
             return res.status(404).json({ success: false, message: "ToDo not found" });
@@ -487,7 +539,8 @@ router.delete('/todos/:todoId', fetchuser, async (req, res) => {
         }
 
         // Delete the ToDo
-        await todo.remove();
+        todo = await ToDos.findByIdAndDelete(todoId);
+
 
         res.status(200).json({ success: true, message: "ToDo deleted successfully" });
 
