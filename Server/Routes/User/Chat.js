@@ -1,4 +1,5 @@
 const express = require("express");
+const axios = require('axios');
 const router = express.Router();
 const fetchuser = require('../../Middleware/Fetchuser')
 const bcrypt = require('bcryptjs');
@@ -9,6 +10,105 @@ const Company = require("../../Models/Company");
 const SharedChat = require("../../Models/SharedChat");
 const SubUser = require("../../Models/SubUser");
 const ToDos = require("../../Models/ToDos");
+
+const OpenAI = require('openai');
+const pythonServerURL = "http://127.0.0.1:8000";
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
+
+function fillChatDetails(message) {
+    var placeholders = message.match(/\[(.*?)\]/g);
+    placeholders = Array.from(new Set(placeholders))
+    if (placeholders) {
+        //TODO: Get these values from the database
+        const accountDetails = {
+            name: "John Doe",
+            company: "Acme Inc.",
+            email: "john.doe@acme.com",
+            noofemployees: 250,
+            companyaddress: "123 Main St, Cityville, State 12345",
+            companydesc: "Acme Inc. is a leading provider of innovative solutions for the widget industry.",
+            department: "Sales and Marketing",
+            product: "Super Widget 3000",
+            targetcustomers: "Manufacturing companies, construction firms, and automotive industry",
+            companystructure: "Hierarchical with CEO, VPs, Directors, and team leads",
+            regulations: "Compliant with industry standards and local regulations",
+            customerquestions: "How does the product work? What are the pricing options? What kind of support is available?",
+            communicationchannels: "Email, phone, website, social media",
+            feedbackmethod: "Online surveys, customer support interactions, focus groups",
+            date: new Date().toISOString().split('T')[0],
+            year: new Date().getFullYear()
+        };
+
+        let filledMsg = message;
+        placeholders.forEach((placeholder) => {
+            const key = placeholder.substring(1, placeholder.length - 1).toLowerCase().replace(" ", "").replace("_", "");
+            if (accountDetails[key] !== undefined) {
+                filledMsg = filledMsg.replaceAll(placeholder, accountDetails[key]);
+            }
+        });
+        return filledMsg;
+    } else {
+        return message;
+    }
+}
+
+router.post('/upload-document', async (req, res) => {
+    // TODO: Upload the document to the server
+});
+
+
+router.post('/ask', async (req, res) => {
+    try {
+        const chatDetails = req.body;
+        const response = await axios.post(`${pythonServerURL}/chat`, chatDetails);
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post("/fillPlaceholders", async (req, res) => {
+    let query = req.body.message;
+
+    try {
+        const messages = [
+            {role: "system", content: `You are an assistant that maps the placeholders in the given prompt to placholders from this list 
+                                            [name, company, email, noofemployees, companyaddress, companydesc, department, product, targetcustomers, 
+                                            companystructure, regulations, customerquestions, communicationchannels, feedbackmethod, date, year].
+                                            Placeholder are enclosed in square brackets. If a placeholder is not in the list, you should ignore it.  
+                                            Do NOT answer the question, just reformulate it if needed and otherwise return it as is.` },
+            { role: "user", content: query }
+        ];
+        const completions = await openai.chat.completions.create({
+            messages: messages,
+            model: "gpt-3.5-turbo",
+        });
+        const message = completions.choices[0].message.content; 
+        const filledMsg = fillChatDetails(message);
+        res.status(200).json({ filledMessage: filledMsg });
+
+        
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+// deleting documents
+router.post('/delete-document', async (req, res) => {
+    try {
+        const filename = req.body.file_name;
+        const response = await axios.post(`${pythonServerURL}/delete-document`, { file_name: filename });
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 
 router.get('/chathistory', fetchuser, async (req, res) => {
     try {
@@ -190,7 +290,7 @@ router.put('/chat/:chatId/rename', fetchuser, async (req, res) => {
 // Shared Chat
 router.post('/chat/share', fetchuser, async (req, res) => {
     try {
-        const userId=req.user.id
+        const userId = req.user.id
         let user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ success: false, message: "You have no access" });
@@ -203,7 +303,7 @@ router.post('/chat/share', fetchuser, async (req, res) => {
                 return res.status(404).json({ success: false, message: "User not found" });
             }
             company = await Company.findById(subuser.Company_ID);
-            if(!company){
+            if (!company) {
                 return res.status(404).json({ success: false, message: "Company not found" });
             }
         }
@@ -235,7 +335,7 @@ router.post('/chat/share', fetchuser, async (req, res) => {
 
 router.get('/sharedChats', fetchuser, async (req, res) => {
     try {
-        const userId=req.user.id
+        const userId = req.user.id
 
         let user = await User.findById(req.user.id);
         if (!user) {
@@ -249,7 +349,7 @@ router.get('/sharedChats', fetchuser, async (req, res) => {
                 return res.status(404).json({ success: false, message: "User not found" });
             }
             company = await Company.findById(subuser.Company_ID);
-            if(!company){
+            if (!company) {
                 return res.status(404).json({ success: false, message: "Company not found" });
             }
         }
@@ -354,7 +454,7 @@ router.post('/todos/add', fetchuser, async (req, res) => {
                 return res.status(404).json({ success: false, message: "User not found" });
             }
             company = await Company.findById(subuser.Company_ID);
-            if(!company){
+            if (!company) {
                 return res.status(404).json({ success: false, message: "Company not found" });
             }
         }
@@ -431,8 +531,8 @@ router.get('/todos/List', fetchuser, async (req, res) => {
             select: 'FirstName LastName ProfilePhoto',
             model: 'User'
         })
-        .sort({ Date: -1 })
-        .limit(5);
+            .sort({ Date: -1 })
+            .limit(5);
 
         res.status(200).json({ success: true, todos })
 
