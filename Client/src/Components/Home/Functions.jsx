@@ -49,37 +49,13 @@ const Functions = () => {
                     <p className='font-para text-sm text-white'>Embark on a journey of innovation with our AI chatbot companions. From personalized customer interactions to seamless automation solutions, we're here to shape the future of communication, one conversation at a time.</p>
                 </div>
                 <div className='basis-[60%] w-[80%] md:w-[70%]'>
-                    <Swiper
-                        slidesPerView={1}
-                        spaceBetween={2}
-                        pagination={{
-                            clickable: true,
-                        }}
-                        autoplay={{
-                            delay: 2500,
-                            disableOnInteraction: false,
-                        }}
-                        modules={[Pagination, Autoplay]}
-                        breakpoints={{
-                            640: {
-                                slidesPerView: 1,
-                                spaceBetween: 20,
-                            },
-                            768: {
-                                slidesPerView: 2,
-                                spaceBetween: 40,
-                            },
-                            1024: {
-                                slidesPerView: 2,
-                                spaceBetween: 30,
-                            },
-                            1200:{
-                                slidesPerView: 3,
-                                spaceBetween: 50,
-                            }
-                        }}
-                        className="mySwiper my-4"
-                    >
+                <Swiper
+        scrollbar={{
+          hide: true,
+        }}
+        modules={[Scrollbar]}
+        className="mySwiper"
+      >
                         {FeatureData.map((item,index)=>(
                         <SwiperSlide>
                             <div className="bg-white rounded-lg flex flex-col gap-4 py-8 px-6 shadow-shadow2 items-center">
