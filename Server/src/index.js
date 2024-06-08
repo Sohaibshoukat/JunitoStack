@@ -1,5 +1,5 @@
 require('dotenv').config()
-const connectToMongo = require("./DB");
+const connectToMongo = require("../DB");
 const express = require('express')
 var cors = require('cors');
 // const cookieSession = require("cookie-session");
