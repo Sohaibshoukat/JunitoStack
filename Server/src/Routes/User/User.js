@@ -98,7 +98,7 @@ const sendOTPEmail = async (id, email, res) => {
 ///////
 //API's Start
 /////
-//Create a user 
+//Create a user
 router.post("/createuser", async (req, res) => {
     let success = false;
     const errors = validationResult(req);
@@ -404,7 +404,7 @@ router.get("/getProImg", fetchuser, async (req, res) => {
     }
 })
 
-//Update User Data 
+//Update User Data
 router.put("/UpdateUser", fetchuser, PhotosUploader.fields([{ name: 'ProfilePhoto', maxCount: 1 }]), async (req, res) => {
     try {
         const { Name, CNIC, Phone, Age, Gender } = req.body;
@@ -469,7 +469,7 @@ router.put("/ChangePassword", fetchuser, async (req, res) => {
     }
 });
 
-//Forget Password 
+//Forget Password
 router.put("/forgetPassword", fetchuser, async (req, res) => {
     try {
         const { OTPReq, NewPassword } = req.body;
