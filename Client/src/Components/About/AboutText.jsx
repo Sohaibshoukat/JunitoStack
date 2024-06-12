@@ -1,6 +1,8 @@
 import React from 'react'
+import { useNavigate } from "react-router-dom"
 
 const AboutText = () => {
+    const navigate = useNavigate()
     return (
         <div className='w-[90%] lg:w-[90%] m-auto bg-white shadow-shadow2 py-4 md:py-10 px-6 md:px-10'>
             <div className="flex flex-col lg:flex-row justify-between gap-6 items-center">
@@ -23,7 +25,14 @@ const AboutText = () => {
                         >
                             Donec sit amet ex vel ex sollicitudin posuere at et metus. Duis sodales ligula nisi, molestie lacinia ex rhoncus vel.
                         </p>
-                        <button className='bg-[#1F2429] rounded-full px-5 my-2 py-2 w-fit font-para text-white font-bold text-base md:text-lg'>Read More</button>
+                        <button
+                            className='bg-[#1F2429] rounded-full px-5 my-2 py-2 w-fit font-para text-white font-bold text-base md:text-lg'
+                            onClick={() => {
+                                navigate('/contact')
+                            }}
+                        >
+                            Connect with us
+                        </button>
                     </div>
                 </div>
                 <div className="basis-[40%] relative w-[100%]">

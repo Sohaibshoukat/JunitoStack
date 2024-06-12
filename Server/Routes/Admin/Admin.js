@@ -9,39 +9,30 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
-
-// const aws = require("aws-sdk");
-const multer = require("multer");
 const Adminotps = require("../../Models/AdminEmailOtp");
 const Prompts = require("../../Models/Prompts");
 const User = require("../../Models/User");
 const SubUser = require("../../Models/SubUser");
 const Emails = require("../../Models/Email");
-// const multerS3 = require("multer-s3");
-
-// const s3 = new aws.S3({
-//     accessKeyId: process.env.AWS_ACCESS_KEY,
-//     secretAccessKey: process.env.AWS_SECRET_KEY,
-//     region: process.env.AWS_REION,
-// });
+const Company = require("../../Models/Company");
+const Chat = require("../../Models/Chat");
+const multer = require('multer');
 
 
 
-// const uploadAdmin = (bucketName, folderName) =>
-//     multer({
-//         storage: multerS3({
-//             s3,
-//             bucket: bucketName,
-//             metadata: function (req, file, cb) {
-//                 cb(null, { fieldName: file.fieldname });
-//             },
-//             key: function (req, file, cb) {
-//                 const fileName = `Admin-${Date.now()}.jpg`;
-//                 const filePath = folderName ? `${folderName}/${fileName}` : fileName;
-//                 cb(null, filePath);
-//             }
-//         }),
-//     });
+const PhotosStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        console.log(9)
+        return cb(null, './Uploads/ProfilePhoto/Admin');
+        console.log(8)
+    },
+    filename: function (req, file, cb) {
+        return cb(null, `${Date.now()}-${file.originalname}`);
+    }
+});
+
+const PhotosUploader = multer({ storage: PhotosStorage });
+
 
 
 const transporter = nodemailer.createTransport({
@@ -203,7 +194,7 @@ router.get("/getadmin", fetchadmin, async (req, res) => {
 })
 
 // Update a Testimonial
-router.put("/updateadmin", fetchadmin, async (req, res) => {
+router.put("/updateadmin", fetchadmin, PhotosUploader.single('profimg'), async (req, res) => {
     try {
         let admin = await Admin.findById(req.admin.id);
         if (!admin) {
@@ -211,10 +202,11 @@ router.put("/updateadmin", fetchadmin, async (req, res) => {
         }
 
         const { Email, Name, Phone } = req.body;
-
+        let path = req.file ? req.file.path : null;
 
         const updatedAdmin = {
             Name,
+            ProfilePhoto: path,
             Phone,
             Email,
         };
@@ -584,6 +576,68 @@ router.delete("/deleteFAQ/:id", fetchadmin, async (req, res) => {
 });
 
 
+
+router.post("/createuser", fetchadmin, async (req, res) => {
+    let success = false;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success, errors: errors.array() });
+    }
+
+    try {
+        let admin = await Admin.findById(req.admin.id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "You Have no Access" });
+        }
+
+        let user = await User.findOne({ Email: req.body.Email })
+        if (user) {
+            return res.status(404).json({ success, message: "This Email already exist" })
+        }
+
+
+        user = await User.create({
+            FirstName: req.body.FirstName,
+            LastName: req.body.LastName,
+            Email: req.body.Email,
+            Phone: req.body.Phone,
+            Status: "Active",
+            User_Type: "Owner",
+            ActiveUsed:false,
+        })
+
+
+        let company = await Company.create({
+            CompanyName: req.body.Company,
+            Owner_ID: user._id
+        })
+
+        const mailOptions = {
+            from: "no-reply@earn4views.com",
+            to: req.body.Email,
+            subject: "Congratulation! Your account Created",
+            html: `<p>Hi ${user.FirstName + " " + user.LastName},</p>
+<p>Your new account has been created as ${user.FirstName + " " + user.LastName}.</p>
+<p>Please create your password on below link </p>
+    <a href="http://localhost:5174/createpassword/${user._id}" target="_blank">Create Password</a>
+    <p>Thank you!</p>
+  
+
+    <p>This is an automated email. Do not reply to this email.</p>`,
+        };
+        await transporter.sendMail(mailOptions);
+
+
+        success = true;
+        res.json({ success, message: "Email send to user for password creation" })
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('error occured')
+    }
+})
+
+
 //GetUserList
 router.get("/getUsers", fetchadmin, async (req, res) => {
     try {
@@ -592,16 +646,24 @@ router.get("/getUsers", fetchadmin, async (req, res) => {
             return res.status(404).json({ success: false, message: "You Have no Access" });
         }
 
-        const users = await User.find();
+        // Get all users with User_Type as "Owner"
+        const owners = await User.find({ User_Type: "Owner" });
 
-        // Loop through each user and find their subusers
-        const usersWithSubusers = await Promise.all(users.map(async (user) => {
-            // Find subusers of the current user
-            const subusers = await SubUser.find({ User_ID: user._id });
-            // Return user object along with subusers
-            return { user, subusers };
+        // Loop through each owner to get their subusers and company data
+        const ownersWithDetails = await Promise.all(owners.map(async (owner) => {
+            const subusers = await SubUser.find({ User_ID: owner._id }).populate('Own_ID');
+            const company = await Company.findOne({ Owner_ID: owner._id });
+
+            console.log(owner)
+
+            return {
+                owner,
+                subusers: subusers.map(subuser => subuser.Own_ID),
+                company
+            };
         }));
-        res.json({ success: true, users: usersWithSubusers });
+
+        res.json({ success: true, owners: ownersWithDetails });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Error occurred' });
@@ -635,53 +697,92 @@ router.get("/getLatestUsers", fetchadmin, async (req, res) => {
 
 router.get('/user-registrations', async (req, res) => {
     try {
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
-      console.log(sixMonthsAgo)
-  
-      const result = await User.aggregate([
-        {
-          $match: {
-            date: { $gte: sixMonthsAgo } // Filter registrations from the last six months
-          }
-        },
-        {
-          $group: {
-            _id: {
-              $dateToString: { format: "%Y-%m", date: "$date" } // Group by year and month
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+        sixMonthsAgo.setDate(1);  // Set to the first day of the month for consistency
+
+        const result = await User.aggregate([
+            {
+                $match: {
+                    date: { $gte: sixMonthsAgo }
+                }
             },
-            count: { $sum: 1 } // Count registrations for each month
-          }
-        },
-        {
-          $sort: { "_id": 1 } // Sort by month
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m", date: "$date" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id": 1 }
+            }
+        ]);
+
+        const currentMonth = new Date();
+        currentMonth.setDate(1);  // Set to the first day of the current month
+        const sixMonthsAgoMonth = new Date();
+        sixMonthsAgoMonth.setMonth(currentMonth.getMonth() - 5);
+        sixMonthsAgoMonth.setDate(1);
+
+        const monthsMap = {};
+        let cursorMonth = new Date(sixMonthsAgoMonth);
+
+        while (cursorMonth <= currentMonth) {
+            const key = cursorMonth.toISOString().slice(0, 7);
+            monthsMap[key] = 0;
+            cursorMonth.setMonth(cursorMonth.getMonth() + 1);
         }
-      ]);
-  
-      const currentMonth = new Date().toISOString().slice(0, 7); // Get current year and month
-      const sixMonthsAgoMonth = new Date();
-      sixMonthsAgoMonth.setMonth(sixMonthsAgoMonth.getMonth() - 6);
-      const monthsMap = {};
-      let cursorMonth = new Date(sixMonthsAgoMonth);
-      
-      while (cursorMonth.toISOString().slice(0, 7) !== currentMonth) {
-        const key = cursorMonth.toISOString().slice(0, 7);
-        monthsMap[key] = 0;
-        cursorMonth.setMonth(cursorMonth.getMonth() + 1);
-      }
-  
-      // Merge the result with monthsMap
-      const formattedResult = Object.entries(monthsMap).map(([month, count]) => ({
-        month,
-        registrations: result.find(entry => entry._id === month)?.count || count
-      }));
-  
-      res.json(formattedResult);
+
+        const formattedResult = Object.entries(monthsMap).map(([month, count]) => ({
+            month,
+            registrations: result.find(entry => entry._id === month)?.count || count
+        }));
+
+        res.json(formattedResult);
     } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+
+router.get('/department-percentage', async (req, res) => {
+    try {
+        const totalChats = await Chat.countDocuments();
+
+        if (totalChats === 0) {
+            return res.json({ message: "No chats found", data: [] });
+        }
+
+        const departmentCounts = await Chat.aggregate([
+            {
+                $group: {
+                    _id: "$Department",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    department: "$_id",
+                    count: 1,
+                    percentage: { $multiply: [{ $divide: ["$count", totalChats] }, 100] }
+                }
+            },
+            {
+                $sort: { count: -1 } // Sort by count in descending order (optional)
+            }
+        ]);
+
+        res.json(departmentCounts);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 router.delete("/deleteuser/:id", fetchadmin, async (req, res) => {
     try {

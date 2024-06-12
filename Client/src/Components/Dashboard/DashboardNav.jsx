@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { IoBag, IoChatboxEllipsesOutline, IoHome, IoLogOutOutline } from "react-icons/io5";
 import { FaRobot } from "react-icons/fa6";
-import { FaRegQuestionCircle,FaUserPlus } from "react-icons/fa";
+import { FaRegQuestionCircle, FaUserPlus } from "react-icons/fa";
 import { SiGooglesheets } from 'react-icons/si';
 
 const DashboardNav = () => {
@@ -56,19 +56,33 @@ const DashboardNav = () => {
             <ul className='flex flex-col gap-2 md:gap-4 overflow-y-scroll max-h-[90vh]'>
                 {tabs.map((tab, index) => (
                     <Link key={index} to={tab.link}>
-                        <li>
-                            <div
-                                className={`
+                        {tab.name == "Prompts" ?
+                            <li>
+                                <div
+                                    className={`
+                                inline-flex w-full px-2 md:px-4 py-2 md:py-3 gap-4 items-center text-darkgray justify-center lg:justify-start
+                                group  ease-in-out duration-300 hover:bg-accence hover:rounded-2xl hover:text-primary
+                                ${location.pathname.includes('prompts') ? 'bg-gray rounded-2xl text-white shadow-2xl' : 'text-gray'}
+                            `}>
+                                    <tab.Icon className='text-lg md:text-xl' />
+                                    <div className={`hidden lg:block mb-0 font-para text-base `}>
+                                        {tab.name}
+                                    </div>
+                                </div>
+                            </li>
+                            : <li>
+                                <div
+                                    className={`
                                     inline-flex w-full px-2 md:px-4 py-2 md:py-3 gap-4 items-center text-darkgray justify-center lg:justify-start
                                     group  ease-in-out duration-300 hover:bg-accence hover:rounded-2xl hover:text-primary
                                     ${location.pathname === tab.link ? 'bg-gray rounded-2xl text-white shadow-2xl' : 'text-gray'}
                                 `}>
-                                <tab.Icon className='text-lg md:text-xl' />
-                                <div className={`hidden lg:block mb-0 font-para text-base `}>
-                                    {tab.name}
+                                    <tab.Icon className='text-lg md:text-xl' />
+                                    <div className={`hidden lg:block mb-0 font-para text-base `}>
+                                        {tab.name}
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
+                            </li>}
                     </Link>
                 ))}
                 <li>

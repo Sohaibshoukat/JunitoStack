@@ -9,10 +9,11 @@ import EditUserModel from '../../../Components/Dashboard/User/EditUserModel';
 const User = () => {
 
     const [users, setUsers] = useState([]);
-    const [UserModel, setUserModel] = useState(false)
-    const [EditModel, setEditModel] = useState(false)
-    const [EditId, setEditId] = useState(null)
-
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filter, setfilter] = useState('')
+    const [UserModel, setUserModel] = useState(false);
+    const [EditModel, setEditModel] = useState(false);
+    const [EditId, setEditId] = useState(null);
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -77,11 +78,23 @@ const User = () => {
         }
     };
 
-
-
     useEffect(() => {
         fetchUsers();
     }, []);
+
+    // Filter users based on search query
+    const filteredUsers = users.filter(user => {
+        const fullName = `${user?.Own_ID?.FirstName} ${user?.Own_ID?.LastName}`.toLowerCase();
+        const email = user?.Own_ID?.Email.toLowerCase();
+        const status = user?.Own_ID?.Status.toLowerCase();
+    
+        if (filter === "") {
+            return fullName.includes(searchQuery.toLowerCase()) || email.includes(searchQuery.toLowerCase());
+        } else {
+            return (fullName.includes(searchQuery.toLowerCase()) || email.includes(searchQuery.toLowerCase())) && status === filter.toLowerCase();
+        }
+    });
+    
 
     return (
         <>
@@ -104,18 +117,25 @@ const User = () => {
                         <div className="flex flex-col md:flex-row gap-3">
                             <div className="bg-slate-100 rounded-lg py-2 px-2 flex flex-row gap-2 items-center">
                                 <IoIosSearch className='text-xl' />
-                                <input type="text" className='text-base outline-none active:outline-none border-none bg-transparent' placeholder='Search...' />
+                                <input
+                                    type="text"
+                                    className='text-base outline-none active:outline-none border-none bg-transparent'
+                                    placeholder='Search...'
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
                             </div>
                             <div className="bg-slate-100 rounded-lg py-2 px-2 flex flex-row gap-2 items-center">
                                 <h2 className='text-base font-medium'>Sort By: </h2>
                                 <select
                                     name="" id=""
+                                    value={filter}
+                                    onChange={(e) => { setfilter(e.target.value) }}
                                     className='text-base outline-none active:outline-none border-none bg-transparent'
                                 >
-                                    <option value="Newst">Newest</option>
-                                    <option value="Newst">Newest</option>
-                                    <option value="Newst">Newest</option>
-                                    <option value="Newst">Newest</option>
+                                    <option value="">Select Filter</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">InActive</option>
                                 </select>
                             </div>
                         </div>
@@ -143,7 +163,7 @@ const User = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {users?.map((item, index) => (
+                                    {filteredUsers?.map((item, index) => (
                                         <tr class="bg-white border-b font-medium text-sm md:text-sm border-slate-200" key={index}>
                                             <th class="px-2 md:px-6 py-2 md:py-4">
                                                 <h2 className='w-max'>
@@ -164,7 +184,7 @@ const User = () => {
                                                 <div className='flex text-white md:flex-row gap-2'>
                                                     <button
                                                         className='flex w-max gap-1 font-medium  bg-[#96A6D2] py-2 px-3 rounded-lg border-2 border-[#1D4ED8] items-center'
-                                                        onClick={()=>{
+                                                        onClick={() => {
                                                             setEditId(item._id)
                                                             setEditModel(true)
                                                         }}
@@ -174,7 +194,7 @@ const User = () => {
                                                     </button>
                                                     <button
                                                         className='flex w-max gap-1 font-medium  bg-[#EAB374] py-2 px-3 rounded-lg border-2 border-[#D97706] items-center'
-                                                        onClick={()=>{deleteUser(item._id)}}
+                                                        onClick={() => { deleteUser(item._id) }}
                                                     >
                                                         <FaRegSave className='text-lg' />
                                                         Delete
@@ -184,9 +204,9 @@ const User = () => {
                                             <td class="px-2 md:px-6 py-2 md:py-4">
                                                 <button
                                                     className={`flex w-max gap-1 font-medium ${item?.Own_ID?.Status == 'Active' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
-                                                    onClick={()=>{toggleUserStatus(item._id)}}
+                                                    onClick={() => { toggleUserStatus(item._id) }}
                                                 >
-                                                   {item?.Own_ID?.Status}
+                                                    {item?.Own_ID?.Status}
                                                 </button>
                                             </td>
                                         </tr>

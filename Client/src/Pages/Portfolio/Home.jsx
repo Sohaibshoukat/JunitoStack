@@ -14,7 +14,7 @@ import Footer from '../../Components/Footer'
 const Home = () => {
   return (
     <>
-        <Nav /> 
+      <Nav />
 
       <Banner />
 
@@ -30,9 +30,9 @@ const Home = () => {
 
       <Why />
 
-      <ContactSec/>
+      <ContactSec />
 
-      <Footer/>
+      <Footer />
 
     </>
   )

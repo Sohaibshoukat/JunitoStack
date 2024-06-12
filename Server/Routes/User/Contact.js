@@ -45,6 +45,7 @@ const sendEmail = async (Name, Email, Company, Subject, Message, res) => {
     }
 }
 
+
 // Create a user
 router.post("/sendMail", async (req, res) => {
     try {
@@ -119,5 +120,48 @@ router.post("/sendcontactMail", async (req, res) => {
     }
 });
 
+const sendEmailRead = async (Email, Department, res) => {
+    try {
+
+        const mailOptions = {
+            from: Email,
+            to: "sohaibshoukat94@gmail.com",
+            subject: `${Email} | ${Department}`,
+            html: `
+      <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Email:</span> ${Email}</p></div>
+      <br/>
+      <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Message:</span> This customer is intrested in ${Department}</p></div>`
+        }
+
+        await transporter.sendMail(mailOptions)
+
+        return {
+            status: True
+        };
+    } catch (error) {
+        return {
+            status: "Failed",
+            message: error.message,
+        };
+    }
+}
+
+router.post("/sendMailMore", async (req, res) => {
+    try {
+        const { Email, Department } = req.body;
+
+        const response = await sendEmailRead(Email, Department);
+
+        if (response.status) {
+            res.json({ success: true });
+        } else {
+            res.json({ success: false });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error occurred');
+    }
+});
 
 module.exports = router

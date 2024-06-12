@@ -2,13 +2,28 @@ import React, { useContext, useEffect, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import AlertContext from '../../../Context/Alert/AlertContext';
 import { BaseURL } from '../../../Data/BaseURL';
+import ChatContext from '../../../Context/ChatContaxt/ChatContext';
+import { useNavigate } from 'react-router-dom';
+import BotDepContext from '../../../Context/BotContaxt/BotDepContext';
+import { trimToWords } from '../../../Data/UseFullFunction';
 
-const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
+const PromptDetailModel = ({ Model, setModel, SelectedId }) => {
 
     const [Prompt, setPrompt] = useState(null)
 
+    const navigate = useNavigate()
+
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
+
+    const chatcontext = useContext(ChatContext);
+    const { ChatsData, setChatsData } = chatcontext
+
+    const departcontext = useContext(BotDepContext);
+    const { setdepartment, department } = departcontext
+
+    const [IsLoading, setIsLoading] = useState(false)
+
 
     const fetchPrompt = async () => {
         try {
@@ -29,6 +44,66 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
         }
     };
 
+    const NewChatCreate = async (Query) => {
+        setIsLoading(true)
+        try {
+            const NewData = []
+
+            const askData = {
+                query: Query,
+                history: [],
+                role: department
+            }
+
+            const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('auth-token')
+                },
+                body: JSON.stringify(askData)
+            });
+
+            const AskDetail = await ChatResponse.json()
+
+            NewData.push({
+                Type: "User",
+                Query: Query
+            })
+
+            NewData.push({
+                Type: "BizzBot",
+                Query: AskDetail.response.content
+            })
+
+            setChatsData(NewData)
+
+            const responseSaving = await fetch(`${BaseURL}/api/chat/createnewchat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('auth-token')
+                },
+                body: JSON.stringify({
+                    Title: trimToWords(Query),
+                    Department: department,
+                    ChatConversation: NewData
+                })
+            });
+            const data = await responseSaving.json();
+            if (data.success) {
+                setIsLoading(false)
+                navigate(`/dashboard/c/${data?.Chat?._id}`)
+            } else {
+                setIsLoading(false)
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            setIsLoading(false)
+            showAlert(error.message, 'danger');
+        }
+    }
+
     useEffect(() => {
         if (SelectedId) {
             fetchPrompt()
@@ -37,40 +112,52 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
 
     return (
         <>
-            {PromptDetail && Prompt &&
+            {Model && Prompt &&
                 <div className='fixed z-50 top-0 left-0 w-[100vw] h-[100vh] flex flex-col justify-center items-center'>
-                    <div className="bg-black/50 w-[100vw] h-[100vh] absolute z-30" onC5lick={() => { setPromptDetail(false) }}></div>
-                    <div className='bg-gray rounded-2xl my-20 py-6 px-4 md:px-8 w-[95%] md:w-[90%] lg:w-[80%] xl:w-[70%] max-h-[95vh] overflow-y-scroll relative z-30 m-auto h-fit'>
+                    {console.log(1234)}
+                    <div className="bg-black/50 w-[100vw] h-[100vh] absolute z-30" onClick={() => { setModel(false) }}></div>
+                    <div className='bg-gray rounded-2xl my-20 py-6 px-4 md:px-8 w-[95%] md:w-[90%] lg:w-[80%] xl:w-[70%] max-h-[95vh] overflow-y-scroll relative z-30 h-fit'>
                         <div className='flex-row pb-2 flex justify-end  items-end mb-5'>
-                            <IoMdClose className='text-white text-4xl' onClick={() => { setPromptDetail(false) }} />
+                            <IoMdClose className='text-white text-4xl cursor-pointer' onClick={() => { setModel(false) }} />
                         </div>
                         <div className="flex flex-col font-para w-[90%] m-auto gap-4">
                             <h2 className='text-center font-bold text-white text-2xl'>{Prompt?.Name}</h2>
-                            <div className="flex flex-col gap-2">
-                                <div className="flex flex-row gap-2 items-center">
-                                    <h2 className='text-white font-medium'>Category</h2>
-                                    <div
-                                        className='bg-[#FEF6E6] w-fit text-sm border-[#FF8900] text-[#FF8900] text-center py-1 px-3 rounded-lg border-2'
-                                    >
-                                        {Prompt?.Category}
+                            <div className="flex flex-col gap-6 md:flex-row justify-between">
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex flex-row gap-2 items-center">
+                                        <h2 className='text-white font-medium'>Category</h2>
+                                        <div
+                                            className='bg-[#FEF6E6] w-fit text-sm border-[#FF8900] text-[#FF8900] text-center py-1 px-3 rounded-lg border-2'
+                                        >
+                                            {Prompt?.Category}
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row gap-2 items-center">
+                                        <h2 className='text-white font-medium'>Potential</h2>
+                                        <div
+                                            className='bg-[#F0F9FF] text-sm border-[#0095FF] text-[#0095FF] w-fit text-center py-1 px-3 rounded-lg border-2'
+                                        >
+                                            {Prompt?.Potential}
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-row gap-2 items-center">
+                                        <h2 className='text-white font-medium'>Type</h2>
+                                        <div
+                                            className='bg-[#FEF6E6] text-sm w-fit border-[#FF8900] text-[#FF8900] text-center py-1 px-3 rounded-lg border-2'
+                                        >
+                                            {Prompt?.Type}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex flex-row gap-2 items-center">
-                                    <h2 className='text-white font-medium'>Potential</h2>
-                                    <div
-                                        className='bg-[#F0F9FF] text-sm border-[#0095FF] text-[#0095FF] w-fit text-center py-1 px-3 rounded-lg border-2'
-                                    >
-                                        {Prompt?.Potential}
-                                    </div>
-                                </div>
-                                <div className="flex flex-row gap-2 items-center">
-                                    <h2 className='text-white font-medium'>Type</h2>
-                                    <div
-                                        className='bg-[#FEF6E6] text-sm w-fit border-[#FF8900] text-[#FF8900] text-center py-1 px-3 rounded-lg border-2'
-                                    >
-                                        {Prompt?.Type}
-                                    </div>
-                                </div>
+                                <button
+                                    className={`bg-white font-para text-lg border-2 border-white h-fit font-semibold rounded-lg py-2 px-4 ${IsLoading ? "opacity-30" : "hover:bg-transparent hover:text-white"} ease-in-out duration-300`}
+                                    onClick={() => {
+                                        setChatsData([])
+                                        NewChatCreate(Prompt?.PromptsList[0]?.value)
+                                    }}
+                                >
+                                    Try it now
+                                </button>
                             </div>
                             <div className="flex text-white flex-col gap-2">
                                 <h2 className='text-lg font-bold'>Uber</h2>
@@ -88,7 +175,7 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
                                     ))}
                                 </div>
                             </div>
-                            <div className="flex text-white flex-col gap-2">
+                            {Prompt?.TipsList?.length > 0 && <div className="flex text-white flex-col gap-2">
                                 <h2 className='text-lg font-bold'>Tips</h2>
                                 <div className="flex flex-col gap-3">
                                     {Prompt?.TipsList?.map((tipdata, index) => (
@@ -97,7 +184,7 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </div>}
                         </div>
                     </div>
                 </div>

@@ -10,12 +10,39 @@ const Company = require("../../Models/Company");
 const SharedChat = require("../../Models/SharedChat");
 const SubUser = require("../../Models/SubUser");
 const ToDos = require("../../Models/ToDos");
+const nodemailer = require('nodemailer');
+const fs = require('fs');
+const FormData = require('form-data');
 
 const OpenAI = require('openai');
-const pythonServerURL = "http://127.0.0.1:8000";
+const multer = require("multer");
+const pythonServerURL = "https://bizbot.junito.at";
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
+
+const FileStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        console.log(9)
+        return cb(null, './Uploads/ProfilePhoto/User');
+        console.log(8)
+    },
+    filename: function (req, file, cb) {
+        return cb(null, `${Date.now()}-${file.originalname}`);
+    }
+});
+
+const FileUploader = multer({ storage: FileStorage });
+
+let transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: 'calviiinho@gmail.com', // Your Gmail email address
+        pass: 'gzsh rwsl nkjq hgdo', // Your Gmail app password or an app-specific password
+    },
+})
 
 
 function fillChatDetails(message) {
@@ -55,8 +82,28 @@ function fillChatDetails(message) {
     }
 }
 
-router.post('/upload-document', async (req, res) => {
-    // TODO: Upload the document to the server
+router.post('/upload-document', FileUploader.single('fileup'), async (req, res) => {
+    try {
+        const filePath = req.file.path;
+        const fileName = req.file.originalname;
+
+        // Prepare the form data
+        const form = new FormData();
+        form.append('file_content', fs.createReadStream(filePath), fileName);
+
+        // Post the file to the Python API
+        const response = await axios.post(`${pythonServerURL}/upload-document`, form, {
+            headers: {
+                ...form.getHeaders(),
+            },
+        });
+
+        // Send the response back to the client
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 
@@ -66,7 +113,7 @@ router.post('/ask', async (req, res) => {
         const response = await axios.post(`${pythonServerURL}/chat`, chatDetails);
         res.status(response.status).json(response.data);
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -76,7 +123,8 @@ router.post("/fillPlaceholders", async (req, res) => {
 
     try {
         const messages = [
-            {role: "system", content: `You are an assistant that maps the placeholders in the given prompt to placholders from this list 
+            {
+                role: "system", content: `You are an assistant that maps the placeholders in the given prompt to placholders from this list 
                                             [name, company, email, noofemployees, companyaddress, companydesc, department, product, targetcustomers, 
                                             companystructure, regulations, customerquestions, communicationchannels, feedbackmethod, date, year].
                                             Placeholder are enclosed in square brackets. If a placeholder is not in the list, you should ignore it.  
@@ -87,15 +135,17 @@ router.post("/fillPlaceholders", async (req, res) => {
             messages: messages,
             model: "gpt-3.5-turbo",
         });
-        const message = completions.choices[0].message.content; 
+        const message = completions.choices[0].message.content;
         const filledMsg = fillChatDetails(message);
         res.status(200).json({ filledMessage: filledMsg });
 
-        
+
     } catch (error) {
         console.error(error);
     }
 });
+
+
 
 // deleting documents
 router.post('/delete-document', async (req, res) => {
@@ -108,7 +158,6 @@ router.post('/delete-document', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 
 router.get('/chathistory', fetchuser, async (req, res) => {
     try {
@@ -172,6 +221,7 @@ router.post('/createnewchat', fetchuser, async (req, res) => {
         res.status(201).json({ success: true, message: "Chat created successfully", Chat: newChat });
 
     } catch (error) {
+        console.log(error)
         res.status(500).send('Internal Server Error');
     }
 });
@@ -184,7 +234,7 @@ router.put('/:chatId/addchat', fetchuser, async (req, res) => {
         }
 
         const chatId = req.params.chatId;
-        const { Type, Query } = req.body;
+        const { Type, Query, Response } = req.body;
 
         const chat = await Chat.findById(chatId);
 
@@ -193,12 +243,43 @@ router.put('/:chatId/addchat', fetchuser, async (req, res) => {
         }
 
         chat.ChatConversation.push({ Type, Query });
+        chat.ChatConversation.push({ Type: "BizBot", Query: Response });
 
         await chat.save();
 
         res.status(200).json({ success: true, message: "New chat added successfully", Chat: chat });
 
     } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.put('/:chatId/regenratechat', fetchuser, async (req, res) => {
+    try {
+        let user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        const chatId = req.params.chatId;
+        const { Response } = req.body;
+
+        const chat = await Chat.findById(chatId);
+
+        if (!chat) {
+            return res.status(404).json({ success: false, message: "Chat not found" });
+        }
+
+        console.log(chat?.ChatConversation?.length)
+
+        chat.ChatConversation[chat?.ChatConversation?.length - 1] = { Type: "BizBot", Query: Response };
+
+        await chat.save();
+
+        res.status(200).json({ success: true, message: "BizBot response updated successfully", Chat: chat });
+
+    } catch (error) {
+        console.error(error); // Log the error for debugging
         res.status(500).send('Internal Server Error');
     }
 });
@@ -369,6 +450,45 @@ router.get('/sharedChats', fetchuser, async (req, res) => {
     }
 });
 
+router.get('/sharedChatList', fetchuser, async (req, res) => {
+    try {
+        const userId = req.user.id
+
+        let user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        let company = await Company.findOne({ Owner_ID: userId });
+        if (!company) {
+            let subuser = await SubUser.findOne({ Own_ID: userId });
+            if (!subuser) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+            company = await Company.findById(subuser.Company_ID);
+            if (!company) {
+                return res.status(404).json({ success: false, message: "Company not found" });
+            }
+        }
+
+        // Check if the user is authorized to access shared chats for this company
+        if (user._id.toString() !== company.Owner_ID.toString()) {
+            return res.status(403).json({ success: false, message: "You do not have permission to access shared chats for this company" });
+        }
+
+        // Fetch shared chats for the company and populate Chat details
+        const sharedChats = await SharedChat.find({ Company: company._id })
+            .populate('Chat_id', 'Title Department')
+            .sort({ Date: -1 })
+            .limit(5);
+
+        res.status(200).json({ success: true, sharedChats });
+
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 router.get('/Sahredchat/:sharedid', fetchuser, async (req, res) => {
     try {
         let user = await User.findById(req.user.id);
@@ -421,18 +541,44 @@ router.delete('/sharedChat/:sharedChatId', fetchuser, async (req, res) => {
             return res.status(403).json({ success: false, message: "You do not have permission to delete this shared chat" });
         }
 
-        // Delete the shared chat
-        await sharedChat.remove();
+        await SharedChat.findByIdAndDelete(sharedChatId);
+
 
         res.status(200).json({ success: true, message: "Shared chat deleted successfully" });
 
     } catch (error) {
+        console.log(error)
         res.status(500).send('Internal Server Error');
     }
 });
 
 
+const sendEmailContact = async (FirstName, Email, LastName, res) => {
+    try {
+        const mailOptions = {
+            from: "sohaibshoukat94@gmail.com",
+            to: Email,
+            subject: `Added at Todo`,
+            html: `
+            <h1>Hi ${FirstName} ${LastName} </h1>
+            <h3>You have been added to a TODO login to your account to check it out.</h>
 
+            <a href="http://localhost:5173/login" target="_blank">Login to your Account</a>
+`
+        }
+
+        await transporter.sendMail(mailOptions)
+
+        return {
+            status: True
+        };
+    } catch (error) {
+        return {
+            status: "Failed",
+            message: error.message,
+        };
+    }
+}
 
 //ToDos
 router.post('/todos/add', fetchuser, async (req, res) => {
@@ -460,15 +606,21 @@ router.post('/todos/add', fetchuser, async (req, res) => {
         }
 
         // Check if chat exists
-        const chat = await Chat.findById(chatId);
-        if (!chat) {
-            return res.status(404).json({ success: false, message: "Chat not found" });
+        if (chatId) {
+            const chat = await Chat.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ success: false, message: "Chat not found" });
+            }
+            if (chat.User_ID.toString() !== userId) {
+                return res.status(403).json({ success: false, message: "You do not have permission to add a ToDo for this chat" });
+            }
         }
 
-        // Check if user is authorized to add a ToDo for this chat
-        if (chat.User_ID.toString() !== userId) {
-            return res.status(403).json({ success: false, message: "You do not have permission to add a ToDo for this chat" });
-        }
+        await subUsers.map(async (item) => {
+            let subuser = await User.findById(item).select('FirstName LastName Email')
+            console.log(subuser)
+            await sendEmailContact(subuser.FirstName, subuser.Email, subuser.LastName)
+        })
 
         // Create a new ToDo
         const newToDo = new ToDos({
@@ -480,13 +632,89 @@ router.post('/todos/add', fetchuser, async (req, res) => {
             User_ID: userId,
             Company: company._id,
             Chat_id: chatId,
-            Status: "Pending"
+            Status: "Open"
         });
 
         // Save the new ToDo
         await newToDo.save();
 
         res.status(201).json({ success: true, message: "ToDo added successfully", ToDo: newToDo });
+
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.put('/todos/edit/:id', fetchuser, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { Title, Description, Priority, Deadline, subUsers, chatId } = req.body;
+        const userId = req.user.id;
+
+        // Check if ToDo exists
+        let todo = await ToDos.findById(id);
+        if (!todo) {
+            return res.status(404).json({ success: false, message: "ToDo not found" });
+        }
+
+        // Check if user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Check if company exists
+        let company = await Company.findOne({ Owner_ID: userId });
+        if (!company) {
+            let subuser = await SubUser.findOne({ Own_ID: userId });
+            if (!subuser) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+            company = await Company.findById(subuser.Company_ID);
+            if (!company) {
+                return res.status(404).json({ success: false, message: "Company not found" });
+            }
+        }
+
+        // Check if chat exists
+        if (chatId) {
+            const chat = await Chat.findById(chatId);
+            if (!chat) {
+                return res.status(404).json({ success: false, message: "Chat not found" });
+            }
+            if (chat.User_ID.toString() !== userId) {
+                return res.status(403).json({ success: false, message: "You do not have permission to edit a ToDo for this chat" });
+            }
+        }
+
+        // Check if the ToDo belongs to the user or the user's company
+        if (todo.User_ID.toString() !== userId && todo.Company.toString() !== company._id.toString()) {
+            return res.status(403).json({ success: false, message: "You do not have permission to edit this ToDo" });
+        }
+
+        // Update the subUsers and send email notifications
+        if (subUsers) {
+            await Promise.all(subUsers.map(async (item) => {
+                let subuser = await User.findById(item).select('FirstName LastName Email');
+                if (subuser) {
+                    console.log(subuser);
+                    await sendEmailContact(subuser.FirstName, subuser.Email, subuser.LastName);
+                }
+            }));
+        }
+
+        // Update the ToDo
+        todo.Title = Title || todo.Title;
+        todo.Description = Description || todo.Description;
+        todo.Priority = Priority || todo.Priority;
+        todo.Deadline = Deadline || todo.Deadline;
+        todo.subUsers = subUsers || todo.subUsers;
+        todo.Chat_id = chatId || todo.Chat_id;
+
+        // Save the updated ToDo
+        await todo.save();
+
+        res.status(200).json({ success: true, message: "ToDo updated successfully", ToDo: todo });
 
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -609,7 +837,7 @@ router.put('/todos/:todoId/complete', fetchuser, async (req, res) => {
         }
 
         // Update the status of the ToDo to "Completed"
-        todo.Status = "Completed";
+        todo.Status = "Done";
 
         // Save the updated ToDo
         await todo.save();

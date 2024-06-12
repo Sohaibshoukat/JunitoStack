@@ -8,7 +8,7 @@ const ContactComp = () => {
         <>
             <div className="bg-gray w-[90%] m-auto rounded-2xl py-4 md:py-8 px-4 md:px-8">
                 <div className="flex lg:flex-row flex-col gap-10 justify-between">
-                    <div className="basis-[40%] flex flex-col gap-5 justify-between">
+                    <div className="basis-[40%] flex flex-col gap-10">
                         <h1 className='text-white font-para text-xl md:text-2xl lg:text-3xl font-bold'>
                             Let’s discuss on something <span className='text-black'>cool</span> together
                         </h1>

@@ -15,6 +15,13 @@ const UserSchema = new Schema({
     Phone: {
         type: String,
     },
+    Age: {
+        type: String,
+    },
+    Gender: {
+        type: String,
+        enum:["Male","Female"]
+    },
     ProfilePhoto: {
         type: String,
     },
@@ -24,6 +31,9 @@ const UserSchema = new Schema({
     Status: {
         type: String,
         enum: ["Active", "InActive"]
+    },
+    ActiveUsed: {
+        type: Boolean
     },
     User_Type:{
         type: String,

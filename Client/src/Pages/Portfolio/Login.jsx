@@ -34,7 +34,7 @@ const Login = () => {
             const data = await response.json();
 
             if(!data.success){
-                showAlert(data.message,'danger')
+                showAlert(data.Message || 'Login failed check credentials','danger')
                 return;
             }
 
@@ -80,7 +80,7 @@ const Login = () => {
                                     <div className="flex flex-col gap-2 md:flex-row justify-between md:items-center">
                                         <div className="flex gap-3 items-center">
                                             <input
-                                                type="check"
+                                                type="checkbox"
                                                 className='w-5 h-5  border-2 border-black/50 rounded-md'
                                             />
                                             <p className='text-black font-medium font-para text-lg'>Remember me</p>

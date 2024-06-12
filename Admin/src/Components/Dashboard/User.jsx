@@ -23,7 +23,7 @@ const User = () => {
             });
             const data = await response.json();
             if (data.success) {
-                setUserData(data.users);
+                setUserData(data.owners);
             } else {
                 showAlert(data.message, 'danger');
             }
@@ -34,23 +34,23 @@ const User = () => {
 
     const deleteUser = async (userId) => {
         try {
-          const response = await fetch(`${BaseURL}/deleteuser/${userId}`, {
-            method: 'DELETE',
-            headers: {
-              "AdminBizzToken": sessionStorage.getItem('AdminBizzToken')
+            const response = await fetch(`${BaseURL}/deleteuser/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    "AdminBizzToken": sessionStorage.getItem('AdminBizzToken')
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                showAlert(data.message, 'success');
+                fetchUserData()
+            } else {
+                showAlert(data.message, 'danger');
             }
-          });
-          const data = await response.json();
-          if (data.success) {
-            showAlert(data.message, 'success');
-            fetchUserData()
-          } else {
-            showAlert(data.message, 'danger');
-          }
         } catch (error) {
-          showAlert(error.message, 'danger');
+            showAlert(error.message, 'danger');
         }
-      };
+    };
 
 
     return (
@@ -71,33 +71,51 @@ const User = () => {
                                     <div
                                         className={`w-max`}
                                     >
-                                        {item?.user?.CompanyName}
+                                        {item?.company?.CompanyName}
                                     </div>
                                 </td>
                                 <td class="px-2 md:px-6 bg-gray my-3 text-base md:text-lg font-semibold py-3 text-left w-max min-w-[30%]">
-                                    <h2 className='w-max'>{item?.user?.FirstName + item?.user?.LastName}</h2>
+                                    <h2 className='w-max'>{item?.owner?.FirstName + item?.owner?.LastName}</h2>
                                 </td>
                                 <td class="px-2 md:px-6 bg-gray my-3 py-1 md:py-3 text-left ">
-                                    <div className="flex gap-[-2px]">
-                                        {item.subusers.slice(0, 2).map((item2, index2) => (
-                                            <div className='w-8 h-8 rounded-full -ml-3 border-2 border-white' key={index2}>
-                                                <img src={item2.ProfilePhoto} alt="" />
-                                            </div>
-                                        ))}
-                                        {item.subusers.length > 2 && (
-                                            <div className='w-8 h-8 rounded-full text-gray bg-white -ml-3 border-2 border-gray flex items-center justify-center'>
-                                                +{item.subusers?.length - 2}
-                                            </div>
-                                        )}
-                                    </div>
+                                    {item.subusers.length > 0 ? (
+                                        <div className="flex gap-[-2px]">
+                                            {item.subusers.slice(0, 2).map((item2, index2) => (
+                                                <div className='w-8 h-8 rounded-full -ml-3 border-2 border-white flex items-center justify-center bg-gray-200' key={index2}>
+                                                    {item2?.ProfilePhoto ? (
+                                                        <img src={item2?.ProfilePhoto} alt="" className="w-full h-full rounded-full" />
+                                                    ) : (
+                                                        <span className="text-black font-semibold">
+                                                            {item2?.FirstName?.charAt(0).toUpperCase()}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            {item.subusers.length > 2 && (
+                                                <div className='w-8 h-8 rounded-full text-gray bg-white -ml-3 border-2 border-gray flex items-center justify-center'>
+                                                    +{item.subusers.length - 2}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className='font-Para font-semibold text-white'>0 Sub User</p>
+                                    )}
+
                                 </td>
                                 <td class="px-2 w-max md:px-6 text-gray-400 bg-gray my-3 py-1 md:py-3 text-left ">
-                                <h2 className={`w-max ${item?.user?.Status == "Active" ? "bg-green-500 " : "bg-red-500"} p-2 rounded-lg w-max`}>{item?.user?.Status}</h2>
+                                    <h2
+                                        className={`
+                                            ${item?.owner?.Status == "Active" ? "bg-green-500 " : "bg-red-500"} 
+                                            p-2 rounded-lg w-max
+                                        `}
+                                    >
+                                        {item?.owner?.Status}
+                                    </h2>
                                 </td>
                                 <td class="px-2 md:px-6 text-gray-400 bg-gray my-3 py-1 md:py-3 text-left ">
-                                    <div 
+                                    <div
                                         className="flex gap-2 items-center py-2 px-2 bg-[#D97706] w-fit rounded-lg cursor-pointer"
-                                        onClick={() => deleteUser(item.user._id)}
+                                        onClick={() => deleteUser(item.owner._id)}
                                     >
                                         <FiSave />
                                         Delete

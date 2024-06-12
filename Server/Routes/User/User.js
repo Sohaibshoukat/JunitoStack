@@ -11,16 +11,13 @@ const User = require("../../Models/User");
 const OTP = require("../../Models/EmailOtp");
 const Company = require("../../Models/Company");
 
-
-const upload = multer({ storage: multer.memoryStorage() });
-
 const JWT_KEY = process.env.JWT_KEY;
 
 
 const PhotosStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         console.log(9)
-        return cb(null, './uploads/UserProfile');
+        return cb(null, './Uploads/ProfilePhoto/User');
         console.log(8)
     },
     filename: function (req, file, cb) {
@@ -98,7 +95,7 @@ const sendOTPEmail = async (id, email, res) => {
 ///////
 //API's Start
 /////
-//Create a user 
+//Create a user
 router.post("/createuser", async (req, res) => {
     let success = false;
     const errors = validationResult(req);
@@ -147,6 +144,48 @@ router.post("/createuser", async (req, res) => {
 
         success = true;
         res.json({ success, AuthToken: user.id, response })
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('error occured')
+    }
+})
+
+router.post("/createpassword/:id", async (req, res) => {
+    let success = false;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success, errors: errors.array() });
+    }
+
+    try {
+
+        let user = await User.findById(req.params.id)
+        if (!user) {
+            return res.status(404).json({ success, error: "No User Found" })
+        }
+
+        if (user.ActiveUsed==true) {
+            return res.status(404).json({ success, error: "You alreaded Created Password" })
+        }
+
+
+        const Salt = await bcrypt.genSalt(10);
+        const SecPassword = await bcrypt.hash(req.body.Password, Salt)
+
+        const userfield={
+            ActiveUsed:true,
+            Password:SecPassword
+        }
+
+        const newUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { $set: userfield },
+            { new: true }
+        );
+
+        success = true;
+        res.json({ success })
 
     } catch (error) {
         console.error(error)
@@ -307,7 +346,7 @@ router.post("/loginuser", async (req, res) => {
     try {
         let user = await User.findOne({ Email: Email })
         if (!user) {
-            return res.status(400).json({ Message: "Account doesn't Fine" })
+            return res.status(400).json({ Message: "Account doesn't Found" })
         }
 
         const passwordCompare = await bcrypt.compare(Password, user.Password)
@@ -405,28 +444,22 @@ router.get("/getProImg", fetchuser, async (req, res) => {
 })
 
 //Update User Data 
-router.put("/UpdateUser", fetchuser, PhotosUploader.fields([{ name: 'ProfilePhoto', maxCount: 1 }]), async (req, res) => {
+router.put("/UpdateUser", fetchuser, PhotosUploader.single('profimg'), async (req, res) => {
     try {
-        const { Name, CNIC, Phone, Age, Gender } = req.body;
+        const { FirstName, LastName, Phone, Age, Gender } = req.body;
+        let path = req.file ? req.file.path : null;
 
         const newUser = {};
-        if (Name) newUser.Name = Name;
-        if (CNIC) newUser.CNIC = CNIC;
+        if (FirstName) newUser.FirstName = FirstName;
+        if (LastName) newUser.LastName = LastName;
         if (Phone) newUser.Phone = Phone;
         if (Age) newUser.Age = Age;
         if (Gender) newUser.Gender = Gender;
+        if (path) newUser.ProfilePhoto = path
 
         let user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
-        }
-
-        if (req.files) {
-            if (req.files['ProfilePhoto']) {
-                let path = req.files['ProfilePhoto'][0].path;
-                let remainingUrl = path.replace('uploads/', '')
-                newUser.ProfilePhoto = remainingUrl;
-            }
         }
 
         user = await User.findByIdAndUpdate(req.user.id, { $set: newUser }, { new: true });
@@ -588,6 +621,46 @@ router.put("/forgetPasswordemail", async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error occurred');
+    }
+});
+
+
+
+router.get("/getcompany", fetchuser, async (req, res) => {
+    try {
+        let userid = req.user.id;
+        const company = await Company.findOne({ Owner_ID: userid });
+        if (!company) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        res.json({ success: true, company });
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('error occured')
+    }
+})
+
+router.put('/updatecompany', fetchuser, async (req, res) => {
+    try {
+        const userId = req.user.id; // Extract user ID from request
+        const companyData = req.body; // Extract data from request body
+
+        // Find company by owner ID and update it
+        const company = await Company.findOneAndUpdate(
+            { Owner_ID: userId },
+            { $set: companyData },
+            { new: true, runValidators: true }
+        );
+
+        if (!company) {
+            return res.status(404).json({ success: false, message: 'Company not found' });
+        }
+
+        res.json({ success: true, company });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error');
     }
 });
 

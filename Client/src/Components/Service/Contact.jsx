@@ -6,7 +6,7 @@ const Contact = () => {
         <div className='bg-gray rounded-xl py-10 md:py-20 px-6 md:px-10 lg:px-20 2xl:px-40 w-[90%]  xl:w-[85%] m-auto'>
             <div className="flex flex-col md:flex-row justify-between gap-10">
                 <div className="basis-[60%] flex flex-col gap-3 md:gap-6 justify-between">
-                    <h2 className='font-mont textstyle text-lg md:text-xl lg:text-2xl xl:text-3xl'>/Contact us</h2>
+                    <h2 className='font-mont textstyle text-lg md:text-xl lg:text-2xl xl:text-3xl'>/ Contact us</h2>
                     <h1 className='font-play text-xl md:text-2xl xl:text-4xl text-white mb-2'>Have you decided to work on a project with us?</h1>
                     <Link to={'/contact'}>
                         <div className='relative flex gap-4 items-center group'>

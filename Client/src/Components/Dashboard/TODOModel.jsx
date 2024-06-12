@@ -75,7 +75,7 @@ const TODOModel = ({ ModelTODO, setModelTODO,chatid }) => {
     return (
         <>
             {ModelTODO &&
-                <div className='fixed z-50 w-[100vw] h-[100vh] flex flex-col justify-center items-center'>
+                <div className='fixed top-0 left-0 z-50 w-[100vw] h-[100vh] flex flex-col justify-center items-center'>
                     <div className="bg-black/50 w-[100vw] h-[100vh] absolute z-30" onC5lick={() => { setModelTODO(false) }}></div>
                     <div className='bg-gray/50 rounded-2xl py-6 px-4 md:px-8 w-[90%] md:w-[80%] lg:w-[60%] xl:w-[50%] relative z-30 m-auto h-fit'>
                         <div className='flex flex-row pb-2 border-b-2 border-white justify-between items-end mb-5'>

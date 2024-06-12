@@ -83,7 +83,7 @@ const AdminDashboard = () => {
                 <div className='flex flex-row bg-white text-custom-black justify-between items-center shadow-md py-4 px-4 '>
                     <h1 className='lg:text-2xl text-gray md:text-xl font-Para sm:text-lg font-bold'>Dashboard</h1>
                     <div className='flex flex-row items-center relative px-2 md:px-5' onClick={() => { setProfile(!Profile) }}>
-                        <img src={AdminData?.ProfilePhoto ? AdminData.ProfilePhoto : "../Owner.png"} className='h-8 w-8 md:w-10 md:h-10 mx-2 rounded-lg bg-gray' />
+                        <img src={AdminData?.ProfilePhoto ? `http://localhost:5000/${AdminData.ProfilePhoto}` : "../Owner.png"} className='h-10 w-10 md:w-12 md:h-12 mx-2 rounded-full' />
                         <h1 className='md:text-xl sm:text-base'>{AdminData?.Name}</h1>
                         <FiChevronDown className='mx-2' />
                         {Profile &&
@@ -124,7 +124,7 @@ const AdminDashboard = () => {
                             element={<UserAnalysis />}
                         />
                         <Route
-                            path='/blocked-users'
+                            path='/emails'
                             element={<Emails />}
                         />
                         <Route

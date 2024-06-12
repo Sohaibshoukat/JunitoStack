@@ -13,7 +13,7 @@ const Banner = () => {
                     <p className='basis-[50%] font-para text-base md:text-lg text-white'>Welcome to the JUNITO Ai company where we provide you the Ai Chatbots for different departments like HR, Sales etc. Collaborate with us and find best services and engage your future with AI. we can provide you different features to associate with Ai.</p>
                 </div>
                 <div className='m-auto w-[90%] 2xl:w-[80%]'>
-                    <img src="./Banner/servicebanner.png" alt="" />
+                    <img src="./Banner/ServiceBanner.svg" alt="" />
                 </div>
             </div>
         </div>

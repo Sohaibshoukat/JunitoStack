@@ -39,7 +39,7 @@ const ToDosSchema = new Schema({
     },
     Status:{
         type:String,
-        enum:["Pending","Completed"]
+        enum:["Open","Done"]
     }
 })
 

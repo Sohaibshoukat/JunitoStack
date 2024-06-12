@@ -1,1 +1,1 @@
-export const BaseURL ="https://junito-backend.vercel.app"
+export const BaseURL ="https://junitoserver.impulxor.com"

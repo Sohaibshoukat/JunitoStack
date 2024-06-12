@@ -31,7 +31,7 @@ const Nav = () => {
         {
             name: 'Emails',
             Icon: IoBag,
-            link: '/admin-dashboard/blocked-users',
+            link: '/admin-dashboard/emails',
         },
         {
             name: "FAQ's",

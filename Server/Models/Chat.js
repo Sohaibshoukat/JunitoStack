@@ -20,7 +20,10 @@ const ChatSchema = new Schema({
         {
             Type: {
                 type: String,
-                enum: ["User", "BizzBot"]
+                enum: ["User", "BizBot"]
+            },
+            FileName:{
+                type:String,
             },
             Query: {
                 type: String,

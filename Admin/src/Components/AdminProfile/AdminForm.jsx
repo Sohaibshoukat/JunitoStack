@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { FaCamera, FaPencilAlt } from "react-icons/fa";
+import { FaCamera } from "react-icons/fa";
 import image from '../../assets/admin.png';
 import AlertContext from '../../Context/Alert/AlertContext';
 import { BaseURL } from '../../Data/BaseURL';
-import { convertDateFormat } from '../../Context/DateFunction';
 
 const AdminForm = () => {
     const [adminData, setAdminData] = useState(null);
-    const [Image, setImage] = useState('')
-    const [ImageSet, setImageSet] = useState(null)
+    const [Image, setImage] = useState('');
+    const [ImageSet, setImageSet] = useState(null);
 
     const alertcontext = useContext(AlertContext);
-    const { showAlert } = alertcontext
+    const { showAlert } = alertcontext;
 
     const fetchAdminData = async () => {
         try {
@@ -23,6 +22,7 @@ const AdminForm = () => {
             const data = await response.json();
             if (response.ok) {
                 setAdminData(data.adminData);
+                setImage(data.adminData.ProfilePhoto)
             } else {
                 showAlert(data.message, 'danger');
             }
@@ -33,28 +33,32 @@ const AdminForm = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setImageSet(file)
+        setImageSet(file);
         setImage(URL.createObjectURL(file));
-        setAdminData({ ...adminData, ProfilePhoto: URL.createObjectURL(file) })
+        setAdminData({ ...adminData, ProfilePhoto: URL.createObjectURL(file) });
     };
 
     const updateAdminData = async () => {
+        const formData = new FormData();
+        formData.append('Name', adminData.Name);
+        formData.append('Email', adminData.Email);
+        formData.append('Phone', adminData.Phone);
+        if (ImageSet) {
+            formData.append('profimg', ImageSet);
+        }
+
         try {
             const response = await fetch(`${BaseURL}/updateadmin`, {
                 method: 'PUT',
                 headers: {
-                    "AdminBizzToken": sessionStorage.getItem('AdminBizzToken'),
-                    "Content-Type": "application/json"
+                    "AdminBizzToken": sessionStorage.getItem('AdminBizzToken')
                 },
-                body: JSON.stringify({
-                    Email: adminData.Email,
-                    Name: adminData.Name,
-                    Phone: adminData.Phone
-                })
+                body: formData
             });
             const data = await response.json();
             if (response.ok) {
                 showAlert(data.message, 'success');
+                fetchAdminData()
             } else {
                 showAlert(data.message, 'danger');
             }
@@ -73,7 +77,7 @@ const AdminForm = () => {
                 <div className="bg-white w-[90%] lg:w-[80%] py-6 px-6 m-auto" style={{ boxShadow: "1px 1px 7.800000190734863px 0px #00000040" }}>
                     <div className="flex flex-col gap-2 w-[90%] md:w-[80%] m-auto">
                         <div className="relative self-center">
-                            <img src={adminData ? adminData?.ProfilePhoto : "../Owner.png"} alt="" className='w-40 h-36 rounded-full' />
+                            <img src={adminData ? Image : "../Owner.png"} alt="" className='w-40 h-36 rounded-full' />
                             <div className="absolute bottom-2 bg-black p-2 rounded-full z-10 right-0">
                                 <label htmlFor="fileupload">
                                     <FaCamera className="text-white cursor-pointer" />

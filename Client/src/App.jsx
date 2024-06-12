@@ -22,6 +22,7 @@ import ChatState from './Context/ChatContaxt/ChatState'
 import HistoryState from './Context/History/HistoryState'
 import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
+import CreatePassword from './Pages/Portfolio/CreatePassword'
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
                   <Route path="/" element={<Home />}></Route>
                   <Route path="/contact" element={<Contact />}></Route>
                   <Route path="/login" element={<Login />}></Route>
+                  <Route path="/createpassword/:id" element={<CreatePassword />}></Route>
                   <Route path="/sign-up" element={<Signup />}></Route>
                   <Route path="/otpconfirm/:id" element={<OTP />}></Route>
                   <Route path="/forget-password" element={<Forgetpassword />}></Route>

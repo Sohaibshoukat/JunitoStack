@@ -12,6 +12,7 @@ const Company = require("../../Models/Company");
 const SubUser = require("../../Models/SubUser");
 const Prompts = require("../../Models/Prompts");
 const FAQ = require("../../Models/FAQ");
+const PromptImages = require("../../Models/PromptImags");
 
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -21,9 +22,7 @@ const JWT_KEY = process.env.JWT_KEY;
 
 const PhotosStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(9)
         return cb(null, './uploads/UserProfile');
-        console.log(8)
     },
     filename: function (req, file, cb) {
         return cb(null, `${Date.now()}-${file.originalname}`);
@@ -319,7 +318,12 @@ router.get('/promptofday', async (req, res) => {
         // Fetch a single random prompt using the random index
         const randomPrompt = await Prompts.findOne().skip(randomIndex);
 
-        res.send({ prompt: randomPrompt });
+        const images = await PromptImages.find({ Department: randomPrompt.Department });
+
+        const randomIndex2 = Math.floor(Math.random() * 10);
+
+
+        res.send({ prompt: randomPrompt, image: images[randomIndex2] });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -417,5 +421,52 @@ router.get('/faq', async (req, res) => {
 });
 
 
+router.get('/promptsrandom/:department', async (req, res) => {
+    try {
+        const department = req.params.department;
+
+        // Find 10 random prompts for the given department
+        const prompts = await Prompts.aggregate([
+            { $match: { Department: department } },
+            { $sample: { size: 10 } }
+        ]);
+
+        // Find the corresponding images for the department
+        const images = await PromptImages.find({ Department: department });
+
+        // Assign each prompt an image
+        const result = await prompts.map((prompt, index) => {
+            const imageIndex = index % images.length;
+            return {
+                ...prompt,
+                Image: images[imageIndex].Src,
+            };
+        });
+
+        res.json(result);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+router.get('/random', async (req, res) => {
+    try {
+      const departments = ["HR", "Marketing", "Vertrieb", "Support", "Agentour", "Startup"];
+      const randomPrompts = {};
+  
+      for (const department of departments) {
+        const prompts = await Prompts.aggregate([
+          { $match: { Department: department } },
+          { $sample: { size: 1 } }
+        ]);
+        randomPrompts[department] = prompts[0] || null;
+      }
+  
+      res.json(randomPrompts);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
 
 module.exports = router
