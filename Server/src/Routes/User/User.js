@@ -443,8 +443,8 @@ router.get("/getProImg", fetchuser, async (req, res) => {
     }
 })
 
-//Update User Data 
-router.put("/UpdateUser", fetchuser, PhotosUploader.single('profimg'), async (req, res) => {
+//Update User Data
+router.put("/UpdateUser", fetchuser, PhotosUploader.fields([{ name: 'ProfilePhoto', maxCount: 1 }]), async (req, res) => {
     try {
         const { FirstName, LastName, Phone, Age, Gender } = req.body;
         let path = req.file ? req.file.path : null;
@@ -502,7 +502,7 @@ router.put("/ChangePassword", fetchuser, async (req, res) => {
     }
 });
 
-//Forget Password 
+//Forget Password
 router.put("/forgetPassword", fetchuser, async (req, res) => {
     try {
         const { OTPReq, NewPassword } = req.body;
