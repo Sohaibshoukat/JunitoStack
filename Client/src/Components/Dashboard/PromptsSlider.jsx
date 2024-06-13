@@ -134,7 +134,7 @@ const PromptsSlider = ({ Model, setModel, setSelectedID }) => {
                                     setModel(true)
                                 }}
                             >
-                                <img src={'../Prompt/img1.png'} alt="" className='rounded-2xl' />
+                                <img src={`${BaseURL}/${item.ICON}`} alt="" className='rounded-2xl h-[250px] md:h-[300px] w-[100%]' />
                                 <div className="bg-white rounded-lg absolute bottom-0 text-sm flex flex-col gap-4 py-2 md:py-2 px-3 md:px-2 w-[] shadow-shadow2 items-center">
                                     <p className='font-para text-sm'>{trimToWords(item.desc)}</p>
                                 </div>

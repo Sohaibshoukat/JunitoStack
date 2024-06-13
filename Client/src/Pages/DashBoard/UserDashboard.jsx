@@ -78,7 +78,7 @@ const UserDashboard = () => {
                     <div className='flex flex-row text-custom-black justify-between items-center shadow-md p-2 '>
                         <h1 className='lg:text-xl md:text-lg sm:text-base font-bold'>Dashboard</h1>
                         <div className="flex flex-row items-center gap-2 cursor-pointer relative" onClick={() => { setProfile(!Profile) }}>
-                            <img src={UserData?.ProfilePhoto ? UserData?.ProfilePhoto : "../Porp/User.png"} alt="" className='w-6 h-6 md:w-10 md:h-10 rounded-full' />
+                            <img src={UserData?.ProfilePhoto ? `${BaseURL}/${UserData?.ProfilePhoto}` : "../Porp/User.png"} alt="" className='w-6 h-6 md:w-10 md:h-10 rounded-full' />
                             <div className="flex font-para text-gray flex-col">
                                 <h2 className='text-base font-bold'>{UserData?.FirstName + " " + UserData?.LastName}</h2>
                                 <p className='text-sm hidden md:block'>{UserData?.Email}</p>

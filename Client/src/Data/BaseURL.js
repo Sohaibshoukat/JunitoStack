@@ -1,1 +1,1 @@
-export const BaseURL ="https://junitoserver.impulxor.com"
+export const BaseURL ="https://junitobackend.zypherdigital.com"

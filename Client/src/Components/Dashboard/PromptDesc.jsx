@@ -72,7 +72,7 @@ const PromptDesc = ({ Model, setModel, SelectedID }) => {
             })
 
             NewData.push({
-                Type: "BizzBot",
+                Type: "BizBot",
                 Query: AskDetail.response.content
             })
 
@@ -93,6 +93,7 @@ const PromptDesc = ({ Model, setModel, SelectedID }) => {
             const data = await responseSaving.json();
             if (data.success) {
                 setIsLoading(false)
+                setModel(false)
                 navigate(`/dashboard/c/${data?.Chat?._id}`)
             } else {
                 setIsLoading(false)
@@ -138,12 +139,14 @@ const PromptDesc = ({ Model, setModel, SelectedID }) => {
                                 Skip
                             </button>
                             <button
-                                className='bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 self-end float-right'
+                                className={`bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 text-white  font-para ease-in-out duration-300 self-end float-right ${IsLoading ?"opacity-30":"hover:bg-transparent hover:text-gray"}`}
                                 onClick={() => {
-                                    setChatsData([])
-                                    NewChatCreate(Prompt?.PromptsList[0]?.value)
+                                    if(!IsLoading){
+                                        setChatsData([])
+                                        NewChatCreate(Prompt?.PromptsList[0]?.value)
+                                    }
                                 }}
-                            >Continue</button>
+                            >{!IsLoading?"Continue":"Creating Chat"}</button>
                         </div>
                     </div>
                 </div>

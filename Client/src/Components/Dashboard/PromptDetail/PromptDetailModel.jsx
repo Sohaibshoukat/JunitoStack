@@ -72,7 +72,7 @@ const PromptDetailModel = ({ Model, setModel, SelectedId }) => {
             })
 
             NewData.push({
-                Type: "BizzBot",
+                Type: "BizBot",
                 Query: AskDetail.response.content
             })
 

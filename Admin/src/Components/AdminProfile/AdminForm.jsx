@@ -77,7 +77,7 @@ const AdminForm = () => {
                 <div className="bg-white w-[90%] lg:w-[80%] py-6 px-6 m-auto" style={{ boxShadow: "1px 1px 7.800000190734863px 0px #00000040" }}>
                     <div className="flex flex-col gap-2 w-[90%] md:w-[80%] m-auto">
                         <div className="relative self-center">
-                            <img src={adminData ? Image : "../Owner.png"} alt="" className='w-40 h-36 rounded-full' />
+                            <img src={adminData ? `https://junitobackend.zypherdigital.com/${Image}` : "../Owner.png"} alt="" className='w-40 h-36 rounded-full' />
                             <div className="absolute bottom-2 bg-black p-2 rounded-full z-10 right-0">
                                 <label htmlFor="fileupload">
                                     <FaCamera className="text-white cursor-pointer" />

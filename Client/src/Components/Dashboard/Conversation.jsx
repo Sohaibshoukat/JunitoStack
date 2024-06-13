@@ -70,7 +70,7 @@ const Conversation = ({ setModelTODO, RegenrateChat }) => {
                             <div className="flex flex-row items-center gap-3">
                                 {item.Type == "User"
                                     ? <img
-                                        src={UserData?.ProfilePhoto ? UserData?.ProfilePhoto : "../../Porp/User.png"}
+                                        src={UserData?.ProfilePhoto ? `${BaseURL}/${UserData?.ProfilePhoto}` : "../../Porp/User.png"}
                                         className='w-6 md:w-8 h-6 md:h-8 rounded-full'
                                     />
                                     : <img

@@ -619,7 +619,7 @@ router.post("/createuser", fetchadmin, async (req, res) => {
             html: `<p>Hi ${user.FirstName + " " + user.LastName},</p>
 <p>Your new account has been created as ${user.FirstName + " " + user.LastName}.</p>
 <p>Please create your password on below link </p>
-    <a href="http://localhost:5174/createpassword/${user._id}" target="_blank">Create Password</a>
+    <a href="https://admin-junito.vercel.app/createpassword/${user._id}" target="_blank">Create Password</a>
     <p>Thank you!</p>
   
 
