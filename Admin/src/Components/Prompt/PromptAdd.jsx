@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const PromptAdd = ({ setActiveStep, handleChange, formData }) => {
-    const [promptList, setPromptList] = useState([{ value: '' }]);
+    const [promptList, setPromptList] = useState(formData.PromptsList);
 
     const handlePromptChange = (index, newText) => {
         const updatedPromptList = [...promptList];
@@ -69,7 +69,7 @@ const PromptAdd = ({ setActiveStep, handleChange, formData }) => {
                 }}
                 className='bg-gray rounded-xl py-2 px-4 border-2 my-4 border-gray text-white hover:bg-transparent hover:text-gray ease-in-out duration-300'
             >
-                Submit
+                Next
             </button>
         </div>
     );

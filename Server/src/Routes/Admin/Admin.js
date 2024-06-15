@@ -843,4 +843,47 @@ router.put("/updateemail/:id", fetchadmin, async (req, res) => {
 });
 
 
+router.get('/prompts/:department', async (req, res) => {
+    try {
+        const department = req.params.department;
+
+        // Fetch data based on department
+        const data = await Prompts.find({ Department: department });
+
+        // Categorize data by Type
+        const categorizedData = {};
+        data.forEach(prompt => {
+            if (!categorizedData[prompt.Type]) {
+                categorizedData[prompt.Type] = [];
+            }
+            categorizedData[prompt.Type].push(prompt);
+        });
+
+        // Format categorized data
+        const formattedData = Object.keys(categorizedData).map(Type => ({
+            Type: Type,
+            List: categorizedData[Type]
+        }));
+
+        res.send({ success: true, Prompts: formattedData });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/promptdetail/:prompid', async (req, res) => {
+    try {
+
+        // Fetch data based on department
+        const prompt = await Prompts.findById(req.params.prompid);
+
+        res.send({ success: true, Prompt: prompt });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 module.exports = router

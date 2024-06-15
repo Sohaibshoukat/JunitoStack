@@ -89,6 +89,8 @@ const Company = () => {
                 body: JSON.stringify(formData)
             });
 
+            console.log(formData)
+
             const result = await response.json();
 
             if (result.success) {

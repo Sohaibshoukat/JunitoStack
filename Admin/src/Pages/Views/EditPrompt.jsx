@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BusinessArea from '../../Components/Prompt/BusinessArea';
 import PromptDetail from '../../Components/Prompt/PromptDetail';
 import PromptAdd from '../../Components/Prompt/PromptAdd';
 import PromptTip from '../../Components/Prompt/PromptTip';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { BaseURL } from '../../Data/BaseURL';
 
-const Prompt = () => {
+const EditPrompt = () => {
 
     const navigate = useNavigate()
+    const { id } = useParams()
+
 
     const [activeStep, setActiveStep] = useState(0);
 
@@ -29,17 +32,46 @@ const Prompt = () => {
         });
     };
 
+    const fetchPrompt = async () => {
+        try {
+            const response = await fetch(`${BaseURL}/promptdetail/${id}`, {
+                method: 'GET',
+                headers: {
+                    'auth-token': localStorage.getItem('auth-token')
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setformData({
+                    Department:data.Prompt.Department, 
+                    Name:data.Prompt.Name, 
+                    Category:data.Prompt.Category, 
+                    Potential:data.Prompt.Potential, 
+                    Type:data.Prompt.Type, 
+                    Info:data.Prompt.Info, 
+                    PromptsList:data.Prompt.PromptsList, 
+                    TipsList:data.Prompt.TipsList
+                })
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            showAlert(error.message, 'danger');
+        }
+    };
+
+    useEffect(() => {
+      if(id){
+        fetchPrompt()
+      }
+    }, [id])
+    
+
 
     return (
         <>
             <div className={`flex font-Para flex-col justify-center items-center rounded-md m-5 md:m-10 `}>
                 <div className="bg-white w-[95%] md:w-[90%] xl:w-[80%] py-6 px-4 md:px-6 m-auto" style={{ boxShadow: "1px 1px 7.800000190734863px 0px #00000040" }}>
-                    <button
-                        className='bg-gray  rounded-lg py-2 px-4 border-2 border-gray hover:bg-transparent text-white hover:text-gray ease-in-out duration-300 w-max font-Para font-semibold'
-                        onClick={()=>{navigate('/admin-dashboard/prompt-browsing')}}
-                    >
-                        Browse Prompt
-                    </button>
                     <div className="py-6 flex justify-between flex-r">
                         <ol class="flex items-center w-full">
                             <li class={`flex w-full items-center ${activeStep >= 1 ? "text-white after:border-gray":"after:border-[#EFF0F6]"} after:content-[''] after:w-full after:h-1 after:border-b  after:border-gray-100 after:border-4 after:inline-block dark:after:border-gray-700`}>
@@ -66,13 +98,13 @@ const Prompt = () => {
                     </div>
                     <div className="py-6">
                         {activeStep == 2 ?
-                            <PromptDetail setActiveStep={setActiveStep} handleChange={handleChange} formData={formData} />
+                            <PromptDetail setActiveStep={setActiveStep} handleChange={handleChange} formData={formData}  EditId={id}  />
                             : activeStep == 3 ?
-                                <PromptAdd setActiveStep={setActiveStep} handleChange={handleChange} formData={formData} />
+                                <PromptAdd setActiveStep={setActiveStep} handleChange={handleChange} formData={formData}  EditId={id} />
                                 : activeStep == 4 ?
-                                    <PromptTip setActiveStep={setActiveStep} handleChange={handleChange}  formData={formData} setformData={setformData}/>
+                                    <PromptTip setActiveStep={setActiveStep} handleChange={handleChange}  formData={formData} setformData={setformData} EditId={id} />
                                     :
-                                    <BusinessArea setActiveStep={setActiveStep} handleChange={handleChange} formData={formData} />
+                                    <BusinessArea setActiveStep={setActiveStep} handleChange={handleChange} formData={formData}  EditId={id} />
                         }
                     </div>
                 </div>
@@ -81,4 +113,4 @@ const Prompt = () => {
     );
 }
 
-export default Prompt;
+export default EditPrompt;

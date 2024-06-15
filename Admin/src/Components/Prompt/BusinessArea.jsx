@@ -4,31 +4,31 @@ const BusinessArea = ({ setActiveStep, handleChange, formData }) => {
     const Department = [
         {
             Title: "HR",
-            Icon: "../assets/Bots/hr.png"
+            Icon: "../../assets/Bots/hr.png"
         },
         {
             Title: "Startup",
-            Icon: "../assets/Bots/startup.png"
+            Icon: "../../assets/Bots/startup.png"
         },
         {
             Title: "Vertrieb",
-            Icon: "../assets/Bots/vertrieb.png"
+            Icon: "../../assets/Bots/vertrieb.png"
         },
         {
             Title: "Support",
-            Icon: "../assets/Bots/support.png"
+            Icon: "../../assets/Bots/support.png"
         },
         {
             Title: "Marketing",
-            Icon: "../assets/Bots/marketing.png"
+            Icon: "../../assets/Bots/marketing.png"
         },
         {
             Title: "Sales",
-            Icon: "../assets/Bots/sales.png"
+            Icon: "../../assets/Bots/sales.png"
         },
         {
             Title: "Agentour",
-            Icon: "../assets/Bots/agentor.png"
+            Icon: "../../assets/Bots/agentor.png"
         },
 
     ]

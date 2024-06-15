@@ -1,11 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
-import AlertContext from '../../../Context/Alert/AlertContext';
-import { BaseURL } from '../../../Data/BaseURL';
-import ChatContext from '../../../Context/ChatContaxt/ChatContext';
 import { useNavigate } from 'react-router-dom';
-import BotDepContext from '../../../Context/BotContaxt/BotDepContext';
-import { trimToWords } from '../../../Data/UseFullFunction';
+import AlertContext from '../../Context/Alert/AlertContext';
+import { BaseURL } from '../../Data/BaseURL';
 
 const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
 
@@ -16,18 +13,12 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
-    const chatcontext = useContext(ChatContext);
-    const { ChatsData, setChatsData } = chatcontext
-
-    const departcontext = useContext(BotDepContext);
-    const { setdepartment, department } = departcontext
-
     const [IsLoading, setIsLoading] = useState(false)
 
 
     const fetchPrompt = async () => {
         try {
-            const response = await fetch(`${BaseURL}/api/company/promptdetail/${SelectedId}`, {
+            const response = await fetch(`${BaseURL}/promptdetail/${SelectedId}`, {
                 method: 'GET',
                 headers: {
                     'auth-token': localStorage.getItem('auth-token')
@@ -44,76 +35,29 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
         }
     };
 
-    const NewChatCreate = async (Query) => {
-        setIsLoading(true)
+    const deletePrompt = async () => {
+        setIsLoading(true);
         try {
-            const NewData = []
-
-            const askData = {
-                query: Query,
-                history: [],
-                role: department
-            }
-
-            const PlaceHolderResponse = await fetch(`${BaseURL}/api/chat/fillPlaceholders`, {
-                method: 'POST',
+            const response = await fetch(`${BaseURL}/deletePrompt/${Prompt._id}`, {
+                method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json',
+                    "AdminBizzToken": sessionStorage.getItem('AdminBizzToken'),
                     'auth-token': localStorage.getItem('auth-token')
-                },
-                body: JSON.stringify(askData.query)
+                }
             });
-
-            console.log(PlaceHolderResponse)
-
-            const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': localStorage.getItem('auth-token')
-                },
-                body: JSON.stringify(askData)
-            });
-
-            const AskDetail = await ChatResponse.json()
-
-            NewData.push({
-                Type: "User",
-                Query: Query
-            })
-
-            NewData.push({
-                Type: "BizBot",
-                Query: AskDetail.response.content
-            })
-
-            setChatsData(NewData)
-
-            const responseSaving = await fetch(`${BaseURL}/api/chat/createnewchat`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': localStorage.getItem('auth-token')
-                },
-                body: JSON.stringify({
-                    Title: trimToWords(Query),
-                    Department: department,
-                    ChatConversation: NewData
-                })
-            });
-            const data = await responseSaving.json();
-            if (data.success) {
-                setIsLoading(false)
-                navigate(`/dashboard/c/${data?.Chat?._id}`)
+            const data = await response.json();
+            if (response.ok) {
+                showAlert(data.message, 'success');
+                setPromptDetail(false);
             } else {
-                setIsLoading(false)
                 showAlert(data.message, 'danger');
             }
         } catch (error) {
-            setIsLoading(false)
             showAlert(error.message, 'danger');
         }
-    }
+        setIsLoading(false);
+    };
+
 
     useEffect(() => {
         if (SelectedId) {
@@ -123,9 +67,8 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
 
     return (
         <>
-            {PromptDetail && Prompt &&
+            {PromptDetail &&
                 <div className='fixed z-50 top-0 left-0 w-[100vw] h-[100vh] flex flex-col justify-center items-center'>
-                    {console.log(1234)}
                     <div className="bg-black/50 w-[100vw] h-[100vh] absolute z-30" onClick={() => { setPromptDetail(false) }}></div>
                     <div className='bg-gray rounded-2xl my-20 py-6 px-4 md:px-8 w-[95%] md:w-[90%] lg:w-[80%] xl:w-[70%] max-h-[95vh] overflow-y-scroll relative z-30 h-fit'>
                         <div className='flex-row pb-2 flex justify-end  items-end mb-5'>
@@ -160,15 +103,24 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
                                         </div>
                                     </div>
                                 </div>
+                                <div className="flex gap-4 item-center">
                                 <button
                                     className={`bg-white font-para text-lg border-2 border-white h-fit font-semibold rounded-lg py-2 px-4 ${IsLoading ? "opacity-30" : "hover:bg-transparent hover:text-white"} ease-in-out duration-300`}
                                     onClick={() => {
-                                        setChatsData([])
-                                        NewChatCreate(Prompt?.PromptsList[0]?.value)
+                                        deletePrompt()
                                     }}
                                 >
-                                    Try it now
+                                    Delete Prompt
                                 </button>
+                                <button
+                                    className={`bg-white font-para text-lg border-2 border-white h-fit font-semibold rounded-lg py-2 px-4 ${IsLoading ? "opacity-30" : "hover:bg-transparent hover:text-white"} ease-in-out duration-300`}
+                                    onClick={() => {
+                                        navigate(`/admin-dashboard/edit-prompts/${Prompt?._id}`)
+                                    }}
+                                >
+                                    Edit Prompt
+                                </button>
+                                </div>
                             </div>
                             <div className="flex text-white flex-col gap-2">
                                 <h2 className='text-lg font-bold'>Uber</h2>

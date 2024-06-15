@@ -55,6 +55,18 @@ const PromptDesc = ({ Model, setModel, SelectedID }) => {
                 role: department
             }
 
+            const PlaceHolderResponse = await fetch(`${BaseURL}/api/chat/fillPlaceholders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('auth-token')
+                },
+                body: JSON.stringify({ query: askData.query, department: department })
+            });
+
+            const placeholderdata = await PlaceHolderResponse.json()
+            console.log(placeholderdata)
+
             const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
                 method: 'POST',
                 headers: {
@@ -139,14 +151,14 @@ const PromptDesc = ({ Model, setModel, SelectedID }) => {
                                 Skip
                             </button>
                             <button
-                                className={`bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 text-white  font-para ease-in-out duration-300 self-end float-right ${IsLoading ?"opacity-30":"hover:bg-transparent hover:text-gray"}`}
+                                className={`bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 text-white  font-para ease-in-out duration-300 self-end float-right ${IsLoading ? "opacity-30" : "hover:bg-transparent hover:text-gray"}`}
                                 onClick={() => {
-                                    if(!IsLoading){
+                                    if (!IsLoading) {
                                         setChatsData([])
                                         NewChatCreate(Prompt?.PromptsList[0]?.value)
                                     }
                                 }}
-                            >{!IsLoading?"Continue":"Creating Chat"}</button>
+                            >{!IsLoading ? "Continue" : "Creating Chat"}</button>
                         </div>
                     </div>
                 </div>

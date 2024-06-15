@@ -646,10 +646,29 @@ router.put('/updatecompany', fetchuser, async (req, res) => {
         const userId = req.user.id; // Extract user ID from request
         const companyData = req.body; // Extract data from request body
 
+        console.log(companyData)
+
+        const NewData={
+            CompanyName:companyData?.CompanyName,
+            Address:companyData?.Address,
+            CompanyMoto:companyData?.CompanyDescription,
+            NumEmployee:companyData?.NumEmployee,
+            CompanySell:companyData?.CompanySell,
+            ContactEmail:companyData?.ContactEmail,
+            CollectiveAgreement:companyData?.CollectiveAgreement,
+            Customers:companyData?.Customers,
+            Struture:companyData?.Structure,
+            dailyoperation:companyData?.DailyOperation,
+            rules:companyData?.Rules,
+            communication:companyData?.Communication,
+            questions:companyData?.Questions,
+            feedback:companyData?.Feedback
+        }
+
         // Find company by owner ID and update it
         const company = await Company.findOneAndUpdate(
             { Owner_ID: userId },
-            { $set: companyData },
+            { $set: NewData },
             { new: true, runValidators: true }
         );
 

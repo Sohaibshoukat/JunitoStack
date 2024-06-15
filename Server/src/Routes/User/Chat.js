@@ -45,26 +45,40 @@ let transporter = nodemailer.createTransport({
 })
 
 
-function fillChatDetails(message) {
+async function fillChatDetails(message,user_id,department) {
     var placeholders = message.match(/\[(.*?)\]/g);
     placeholders = Array.from(new Set(placeholders))
     if (placeholders) {
-        //TODO: Get these values from the database
+        
+        const user = await User.findById({ _id: user_id });
+        const company = await Company.findOne({ Owner_ID: user_id });
+        if (!company) {
+            let subuser = await SubUser.findOne({ Own_ID: userId });
+            if (!subuser) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+            company = await Company.findById(subuser.Company_ID);
+            if (!company) {
+                return res.status(404).json({ success: false, message: "Company not found" });
+            }
+        }
+        
+
         const accountDetails = {
-            name: "John Doe",
-            company: "Acme Inc.",
-            email: "john.doe@acme.com",
-            noofemployees: 250,
-            companyaddress: "123 Main St, Cityville, State 12345",
-            companydesc: "Acme Inc. is a leading provider of innovative solutions for the widget industry.",
-            department: "Sales and Marketing",
-            product: "Super Widget 3000",
-            targetcustomers: "Manufacturing companies, construction firms, and automotive industry",
-            companystructure: "Hierarchical with CEO, VPs, Directors, and team leads",
-            regulations: "Compliant with industry standards and local regulations",
-            customerquestions: "How does the product work? What are the pricing options? What kind of support is available?",
-            communicationchannels: "Email, phone, website, social media",
-            feedbackmethod: "Online surveys, customer support interactions, focus groups",
+            name: `${user?.FirstName} ${user?.LastName}`,
+            company: company?.CompanyName,
+            email: company?.ContactEmail,
+            noofemployees: company?.NumEmployee ,
+            companyaddress: company?.Address,
+            companydesc: company?.CompanyMoto,
+            department: department ,
+            product: company?.CompanySell,
+            targetcustomers: company?.Customers,
+            companystructure: company?.Struture,
+            regulations: company?.rules,
+            customerquestions: company?.questions,
+            communicationchannels: company?.communication,
+            feedbackmethod: company?.feedback,
             date: new Date().toISOString().split('T')[0],
             year: new Date().getFullYear()
         };
@@ -118,9 +132,11 @@ router.post('/ask', async (req, res) => {
     }
 });
 
-router.post("/fillPlaceholders", async (req, res) => {
+router.post("/fillPlaceholders",fetchuser, async (req, res) => {
     let query = req.body.message;
+    let department = req.body.department
 
+    let user_id =req.user.id;
     try {
         const messages = [
             {
@@ -136,7 +152,7 @@ router.post("/fillPlaceholders", async (req, res) => {
             model: "gpt-3.5-turbo",
         });
         const message = completions.choices[0].message.content;
-        const filledMsg = fillChatDetails(message);
+        const filledMsg = fillChatDetails(message,user_id,department);
         res.status(200).json({ filledMessage: filledMsg });
 
 

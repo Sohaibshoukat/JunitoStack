@@ -26,6 +26,9 @@ import AddGuideDetail from './Views/AddGuideDetail';
 import Emails from './Views/Email';
 import Prompt from './Views/Prompt';
 import { BaseURL } from '../Data/BaseURL';
+import PromptBrowsing from './Views/PromptBrowsing';
+import PromptList from './Views/PromptList';
+import EditPrompt from './Views/EditPrompt';
 
 
 const AdminDashboard = () => {
@@ -118,6 +121,18 @@ const AdminDashboard = () => {
                         <Route
                             path='/prompts'
                             element={<Prompt />}
+                        />
+                        <Route
+                            path='/edit-prompts/:id'
+                            element={<EditPrompt />}
+                        />
+                        <Route
+                            path='/prompt-browsing'
+                            element={<PromptBrowsing />}
+                        />
+                        <Route
+                            path='/prompt-list/:dep'
+                            element={<PromptList />}
                         />
                         <Route
                             path='/user-analysis'

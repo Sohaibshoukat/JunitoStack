@@ -1,10 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { BaseURL } from '../../Data/BaseURL';
 import AlertContext from '../../Context/Alert/AlertContext';
+import { useNavigate } from 'react-router-dom';
 
-const PromptTip = ({ setActiveStep, handleChange, formData,setformData }) => {
-    const [tipList, setTipList] = useState([{ value: '' }]);
+const PromptTip = ({ setActiveStep, handleChange, formData, setformData, EditId }) => {
+    const [tipList, setTipList] = useState(formData.TipsList);
 
+    const navigate = useNavigate()
     const alertcontext = useContext(AlertContext);
     const { showAlert } = alertcontext
 
@@ -21,31 +23,60 @@ const PromptTip = ({ setActiveStep, handleChange, formData,setformData }) => {
 
     const handleSubmit = async () => {
         try {
-            const response = await fetch(`${BaseURL}/createPrompt`, {
-                method: 'POST',
-                headers: {
-                    "AdminBizzToken": sessionStorage.getItem('AdminBizzToken'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                showAlert("Prompt Created Success", "success");
-                setformData({
-                    Department: "",
-                    Name: "",
-                    Category: "",
-                    Potential: "",
-                    Type: "",
-                    Info: "",
-                    PromptsList: [],
-                    TipsList: []
-                })
-                setActiveStep(1)
-            } else {
-                showAlert(data.message, "danger");
+            if(EditId){
+                const response = await fetch(`${BaseURL}/updatePrompt/${EditId}`, {
+                    method: 'PUT',
+                    headers: {
+                        "AdminBizzToken": sessionStorage.getItem('AdminBizzToken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showAlert("Prompt Updated Success", "success");
+                    setformData({
+                        Department: "",
+                        Name: "",
+                        Category: "",
+                        Potential: "",
+                        Type: "",
+                        Info: "",
+                        PromptsList: [],
+                        TipsList: []
+                    })
+                    EditId=null
+                    navigate("/admin-dashboard/prompts")
+                    setActiveStep(1)
+                } else {
+                    showAlert(data.message, "danger");
+                }
+            }else{
+                const response = await fetch(`${BaseURL}/createPrompt`, {
+                    method: 'POST',
+                    headers: {
+                        "AdminBizzToken": sessionStorage.getItem('AdminBizzToken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showAlert("Prompt Created Success", "success");
+                    setformData({
+                        Department: "",
+                        Name: "",
+                        Category: "",
+                        Potential: "",
+                        Type: "",
+                        Info: "",
+                        PromptsList: [],
+                        TipsList: []
+                    })
+                    setActiveStep(1)
+                } else {
+                    showAlert(data.message, "danger");
+                }
             }
         } catch (error) {
             showAlert(error.message, "danger");
@@ -88,7 +119,7 @@ const PromptTip = ({ setActiveStep, handleChange, formData,setformData }) => {
                 onClick={handleSubmit}
                 className='bg-gray rounded-xl py-2 px-4 border-2 my-4 border-gray text-white hover:bg-transparent hover:text-gray ease-in-out duration-300'
             >
-                Submit
+                {!EditId ? "Submit" : "Edit Prompt"}
             </button>
         </div>
     );
