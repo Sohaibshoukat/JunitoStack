@@ -49,7 +49,6 @@ async function fillChatDetails(message,user_id,department) {
     var placeholders = message.match(/\[(.*?)\]/g);
     placeholders = Array.from(new Set(placeholders))
     if (placeholders) {
-        
         const user = await User.findById({ _id: user_id });
         const company = await Company.findOne({ Owner_ID: user_id });
         if (!company) {
@@ -125,6 +124,17 @@ router.post('/ask', async (req, res) => {
     try {
         const chatDetails = req.body;
         const response = await axios.post(`${pythonServerURL}/chat`, chatDetails);
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/searchsuggestion', async (req, res) => {
+    try {
+        const chatDetails = req.body;
+        const response = await axios.post(`${pythonServerURL}/searchQuery`, chatDetails);
         res.status(response.status).json(response.data);
     } catch (error) {
         console.error(error.message);

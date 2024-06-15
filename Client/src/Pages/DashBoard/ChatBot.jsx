@@ -13,16 +13,22 @@ import ChatContext from '../../Context/ChatContaxt/ChatContext'
 import AlertContext from '../../Context/Alert/AlertContext'
 import HistoryContext from '../../Context/History/HistoryContext'
 import PromptDetailModel from '../../Components/Dashboard/PromptDetail/PromptDetailModel'
+import { ImAttachment } from 'react-icons/im'
 
 const ChatBot = () => {
 
 
     const [Model, setModel] = useState(false)
     const [ModelTODO, setModelTODO] = useState(false)
+    const [SearchSugesstonsData, setSearchSugesstonsData] = useState([])
     const [Query, setQuery] = useState('')
     const [Profile, setProfile] = useState(false)
     const [UserData, setUserData] = useState(null)
     const [IsDisable, setIsDisable] = useState(false)
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [abortController, setAbortController] = useState(null)
+
+
 
     const navigate = useNavigate()
 
@@ -46,15 +52,68 @@ const ChatBot = () => {
             setIsDisable(true)
             const NewData = ChatsData
 
+            const chatHistory = await ChatsData.map((item) => {
+
+                if (item.Type == "User") {
+                    return { role: "user", content: item.Query }
+                } else {
+                    return { role: "assistant", content: item.Query }
+                }
+
+            })
+
             NewData.push({
                 Type: "User",
                 Query: Query
             })
 
-            const askData = {
-                query: Query,
-                history: [],
-                role: department
+            // const askData = {
+            //     query: Query,
+            //     history: [],
+            //     role: department
+            // }
+
+            let fileName = null;
+
+            // If a file is selected, upload it first
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append('fileup', selectedFile);
+
+                const uploadResponse = await fetch(`${BaseURL}/api/chat/upload-document`, {
+                    method: 'POST',
+                    headers: {
+                        'auth-token': localStorage.getItem('auth-token')
+                    },
+                    body: formData
+                });
+
+                const uploadResult = await uploadResponse.json();
+                if (uploadResponse.ok) {
+                    fileName = await uploadResult.filename;
+                } else {
+                    setIsDisable(false);
+                    showAlert(uploadResult.error || 'File upload failed', 'danger');
+                    return;
+                }
+            }
+
+            let askData;
+
+            if (fileName !== null) {
+                askData = {
+                    query: Query,
+                    history: chatHistory,
+                    role: department,
+                    file_name: fileName
+                }
+            } else {
+                console.log(123)
+                askData = {
+                    query: Query,
+                    history: chatHistory,
+                    role: department
+                }
             }
 
             const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
@@ -102,6 +161,58 @@ const ChatBot = () => {
             showAlert(error.message, 'danger');
         }
     }
+
+    const SearchSuggesstion = async () => {
+        if (abortController) {
+            abortController.abort()
+        }
+        const newAbortController = new AbortController()
+        setAbortController(newAbortController)
+
+        try {
+            const chatHistory = await ChatsData.map((item) => {
+                if (item.Type == "User") {
+                    return { role: "user", content: item.Query }
+                } else {
+                    return { role: "assistant", content: item.Query }
+                }
+            })
+
+            let askData = {
+                data: Query,
+                history: chatHistory,
+                role: department,
+            }
+
+            const ChatResponse = await fetch(`${BaseURL}/api/chat/searchsuggestion`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('auth-token')
+                },
+                body: JSON.stringify(askData),
+                signal: newAbortController.signal
+            });
+
+            const AskDetail = await ChatResponse.json()
+            const suggestions = Object.values(AskDetail)
+            setSearchSugesstonsData(suggestions)
+
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log('Request was aborted')
+            } else {
+                setIsDisable(false)
+                showAlert(error.message, 'danger')
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (Query !== "") {
+            SearchSuggesstion()
+        }
+    }, [Query])
 
     const newTopic = async () => {
         navigate("/dashboard/chatbot");
@@ -167,7 +278,7 @@ const ChatBot = () => {
                     Chatbot
                 </h2>
                 <div className="flex flex-row items-center gap-2 cursor-pointer relative" onClick={() => { setProfile(!Profile) }}>
-                <img src={UserData?.ProfilePhoto ? `${BaseURL}/${UserData?.ProfilePhoto}` : "../Porp/User.png"} alt="" className='w-6 h-6 md:w-10 md:h-10 rounded-full' />
+                    <img src={UserData?.ProfilePhoto ? `${BaseURL}/${UserData?.ProfilePhoto}` : "../Porp/User.png"} alt="" className='w-6 h-6 md:w-10 md:h-10 rounded-full' />
                     <div className="flex font-para text-gray flex-col">
                         <h2 className='text-base font-bold'>{UserData?.FirstName + " " + UserData?.LastName}</h2>
                         <p className='text-sm hidden md:block'>{UserData?.Email}</p>
@@ -227,26 +338,51 @@ const ChatBot = () => {
                                     <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Topic</h2>
                                 </div>
                                 <div
-                                    className="bg-white w-[100%] rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-row h-full">
-                                    <textarea
-                                        name=""
-                                        id=""
-                                        rows={'3'}
-                                        value={Query}
-                                        onChange={(e) => { setQuery(e.target.value) }}
-                                        placeholder='Ask my anything......'
-                                        className='border-none outline-none w-[100%] font-para text-base placeholder:text-gray/40'
-                                    />
-                                    <img
-                                        src="../Porp/send.png"
-                                        alt=""
-                                        className={`w-6 h-6 ${Query == "" && "opacity-35"} ${IsDisable && 'opacity-35'}`}
-                                        onClick={() => {
-                                            if (Query !== "" || IsDisable) {
-                                                NewChatCreate()
-                                            }
-                                        }}
-                                    />
+                                    className="bg-white w-[100%] rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-2 h-full"
+                                >
+                                    <div className="flex justify-between">
+                                        <div className="flex gap-4 w-[100%]">
+                                            <label htmlFor="fileupload">
+                                                <ImAttachment
+                                                    className='text-xl cursor-pointer'
+                                                />
+                                                <input
+                                                    type="file"
+                                                    id='fileupload'
+                                                    className='hidden opacity-0 absolute'
+                                                    onChange={(e) => setSelectedFile(e.target.files[0])} // Update state on file select
+                                                />
+                                            </label>
+                                            <textarea
+                                                name=""
+                                                id=""
+                                                rows={'2'}
+                                                value={Query}
+                                                onChange={(e) => { setQuery(e.target.value) }}
+                                                placeholder='Ask my anything......'
+                                                className='border-none outline-none w-[100%] font-para text-base placeholder:text-gray/40'
+                                            />
+                                        </div>
+                                        <img
+                                            src="../Porp/send.png"
+                                            alt=""
+                                            className={`w-6 h-6 ${Query == "" && "opacity-35"} ${IsDisable && 'opacity-35'}`}
+                                            onClick={() => {
+                                                if (Query !== "" || IsDisable) {
+                                                    NewChatCreate()
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    {Query.length > 0 && <div className="w-full h-full max-h-[22vh] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
+                                        {SearchSugesstonsData?.map((item) => {
+                                            return (
+                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={()=>{setQuery(item)}}>
+                                                    <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>}
                                 </div>
                             </div>
                             <button

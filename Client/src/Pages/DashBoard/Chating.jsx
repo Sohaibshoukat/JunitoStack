@@ -22,11 +22,13 @@ const Chating = () => {
 
     const [ModelTODO, setModelTODO] = useState(false)
     const [Query, setQuery] = useState('')
+    const [SearchSugesstonsData, setSearchSugesstonsData] = useState([])
     const [isLoadingChat, setisLoadingChat] = useState(false)
     const [Profile, setProfile] = useState(false)
     const [UserData, setUserData] = useState(null)
     const [IsDisable, setIsDisable] = useState(false)
     const [selectedFile, setSelectedFile] = useState(null);
+    const [abortController, setAbortController] = useState(null)
 
     const chatcontext = useContext(ChatContext);
     const { ChatsData, setChatsData } = chatcontext
@@ -78,15 +80,15 @@ const Chating = () => {
             }
 
             let askData;
-            
-            if(fileName!==null){
+
+            if (fileName !== null) {
                 askData = {
-                   query: Query,
-                   history: chatHistory,
-                   role: department,
-                   file_name: fileName
-               }
-            }else{
+                    query: Query,
+                    history: chatHistory,
+                    role: department,
+                    file_name: fileName
+                }
+            } else {
                 console.log(123)
                 askData = {
                     query: Query,
@@ -149,80 +151,58 @@ const Chating = () => {
         }
     }
 
+    const SearchSuggesstion = async () => {
+        if (abortController) {
+            abortController.abort()
+        }
+        const newAbortController = new AbortController()
+        setAbortController(newAbortController)
 
-    // const UpdateChat = async () => {
-    //     try {
-    //         setIsDisable(true)
-    //         setQuery("")
-    //         console.log(ChatsData)
-    //         const chatHistory = await ChatsData.map((item) => {
+        try {
+            const chatHistory = await ChatsData.map((item) => {
+                if (item.Type == "User") {
+                    return { role: "user", content: item.Query }
+                } else {
+                    return { role: "assistant", content: item.Query }
+                }
+            })
 
-    //             if (item.Type == "User") {
-    //                 return { role: "user", content: item.Query }
-    //             } else {
-    //                 return { role: "assistant", content: item.Query }
-    //             }
+            let askData = {
+                data: Query,
+                history: chatHistory,
+                role: department,
+            }
 
-    //         })
+            const ChatResponse = await fetch(`${BaseURL}/api/chat/searchsuggestion`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'auth-token': localStorage.getItem('auth-token')
+                },
+                body: JSON.stringify(askData),
+                signal: newAbortController.signal
+            });
 
-    //         console.log(chatHistory)
-    //         const askData = {
-    //             query: Query,
-    //             history: chatHistory,
-    //             role: department
-    //         }
+            const AskDetail = await ChatResponse.json()
+            const suggestions = Object.values(AskDetail)
+            setSearchSugesstonsData(suggestions)
 
-    //         const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'auth-token': localStorage.getItem('auth-token')
-    //             },
-    //             body: JSON.stringify(askData)
-    //         });
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log('Request was aborted')
+            } else {
+                setIsDisable(false)
+                showAlert(error.message, 'danger')
+            }
+        }
+    }
 
-    //         const AskDetail = await ChatResponse.json()
+    useEffect(() => {
+        if (Query !== "") {
+            SearchSuggesstion()
+        }
+    }, [Query])
 
-    //         const NewData = ChatsData
-
-    //         NewData.push({
-    //             Type: "User",
-    //             Query: Query
-    //         })
-
-    //         NewData.push({
-    //             Type: "BizBot",
-    //             Query: AskDetail.response.content
-    //         })
-
-    //         setChatsData(NewData)
-
-    //         const responseSavingchat = await fetch(`${BaseURL}/api/chat/${id}/addchat`, {
-    //             method: 'PUT',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'auth-token': localStorage.getItem('auth-token')
-    //             },
-    //             body: JSON.stringify({
-    //                 Type: "User",
-    //                 Query: Query,
-    //                 Response: AskDetail.response.content
-    //             })
-    //         });
-
-    //         const dataChat = await responseSavingchat.json();
-
-    //         if (dataChat.success) {
-    //             setIsDisable(false)
-    //         } else {
-    //             setIsDisable(false)
-    //             showAlert(dataChat.message, 'danger');
-    //         }
-    //     } catch (error) {
-    //         setIsDisable(false)
-    //         showAlert(error.message, 'danger');
-    //     }
-    // }
 
     const RegenrateChat = async (index) => {
         try {
@@ -397,7 +377,7 @@ const Chating = () => {
             <div className='w-full bg-white py-2 fixed top-0 z-50 items-center px-6 flex justify-between'>
                 <h2 className='text-gray font-bold font-head text-2xl'>Chatbot</h2>
                 <div className="flex flex-row items-center gap-2 cursor-pointer relative" onClick={() => { setProfile(!Profile) }}>
-                <img src={UserData?.ProfilePhoto ? `${BaseURL}/${UserData?.ProfilePhoto}` : "../Porp/User.png"} alt="" className='w-6 h-6 md:w-10 md:h-10 rounded-full' />
+                    <img src={UserData?.ProfilePhoto ? `${BaseURL}/${UserData?.ProfilePhoto}` : "../Porp/User.png"} alt="" className='w-6 h-6 md:w-10 md:h-10 rounded-full' />
                     <div className="flex font-para text-gray flex-col">
                         <h2 className='text-base font-bold'>{UserData?.FirstName + " " + UserData?.LastName}</h2>
                         <p className='text-sm hidden md:block'>{UserData?.Email}</p>
@@ -451,40 +431,52 @@ const Chating = () => {
                                     <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Topic</h2>
                                 </div>
                                 <div
-                                    className="bg-white w-[100%] rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-row h-full"
+                                    className="bg-white w-[100%] rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-4 h-full"
                                 >
-                                    <div className="flex gap-4 w-[100%]">
-                                        <label htmlFor="fileupload">
-                                            <ImAttachment
-                                                className='text-xl cursor-pointer'
+                                    <div className="flex justify-between">
+                                        <div className="flex gap-4 w-[100%]">
+                                            <label htmlFor="fileupload">
+                                                <ImAttachment
+                                                    className='text-xl cursor-pointer'
+                                                />
+                                                <input
+                                                    type="file"
+                                                    id='fileupload'
+                                                    className='hidden opacity-0 absolute'
+                                                    onChange={(e) => setSelectedFile(e.target.files[0])} // Update state on file select
+                                                />
+                                            </label>
+                                            <textarea
+                                                name=""
+                                                id=""
+                                                rows={'2'}
+                                                value={Query}
+                                                onChange={(e) => { setQuery(e.target.value) }}
+                                                placeholder='Ask my anything......'
+                                                className='border-none outline-none w-[100%] font-para text-base placeholder:text-gray/40'
                                             />
-                                            <input
-                                                type="file"
-                                                id='fileupload'
-                                                className='hidden opacity-0 absolute'
-                                                onChange={(e) => setSelectedFile(e.target.files[0])} // Update state on file select
-                                            />
-                                        </label>
-                                        <textarea
-                                            name=""
-                                            id=""
-                                            rows={'3'}
-                                            value={Query}
-                                            onChange={(e) => { setQuery(e.target.value) }}
-                                            placeholder='Ask my anything......'
-                                            className='border-none outline-none w-[100%] font-para text-base placeholder:text-gray/40'
+                                        </div>
+                                        <img
+                                            src="../../Porp/send.png"
+                                            alt=""
+                                            className={`w-6 h-6 ${Query == "" && !IsDisable && "opacity-35"}`}
+                                            onClick={() => {
+                                                if (Query !== "" && !IsDisable) {
+                                                    UpdateChat()
+                                                }
+                                            }}
                                         />
                                     </div>
-                                    <img
-                                        src="../../Porp/send.png"
-                                        alt=""
-                                        className={`w-6 h-6 ${Query == "" && !IsDisable && "opacity-35"}`}
-                                        onClick={() => {
-                                            if (Query !== "" && !IsDisable) {
-                                                UpdateChat()
-                                            }
-                                        }}
-                                    />
+                                    {Query.length > 0 && <div className="w-full h-full max-h-[22vh] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
+                                        {SearchSugesstonsData?.map((item) => {
+                                            return (
+                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={()=>{setQuery(item)}}>
+                                                    <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>}
+
                                 </div>
                             </div>
                             <button
