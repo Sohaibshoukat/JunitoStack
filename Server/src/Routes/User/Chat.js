@@ -45,7 +45,7 @@ let transporter = nodemailer.createTransport({
 })
 
 
-async function fillChatDetails(message,user_id,department) {
+async function fillChatDetails(message, user_id, department) {
     var placeholders = message.match(/\[(.*?)\]/g);
     placeholders = Array.from(new Set(placeholders))
     if (placeholders) {
@@ -61,16 +61,16 @@ async function fillChatDetails(message,user_id,department) {
                 return res.status(404).json({ success: false, message: "Company not found" });
             }
         }
-        
+
 
         const accountDetails = {
             name: `${user?.FirstName} ${user?.LastName}`,
             company: company?.CompanyName,
             email: company?.ContactEmail,
-            noofemployees: company?.NumEmployee ,
+            noofemployees: company?.NumEmployee,
             companyaddress: company?.Address,
             companydesc: company?.CompanyMoto,
-            department: department ,
+            department: department,
             product: company?.CompanySell,
             targetcustomers: company?.Customers,
             companystructure: company?.Struture,
@@ -85,7 +85,11 @@ async function fillChatDetails(message,user_id,department) {
         let filledMsg = message;
         placeholders.forEach((placeholder) => {
             const key = placeholder.substring(1, placeholder.length - 1).toLowerCase().replace(" ", "").replace("_", "");
+            console.log(key)
+            console.log(accountDetails.department)
             if (accountDetails[key] !== undefined) {
+                console.log(placeholder)
+                console.log(accountDetails[key])
                 filledMsg = filledMsg.replaceAll(placeholder, accountDetails[key]);
             }
         });
@@ -142,32 +146,35 @@ router.post('/searchsuggestion', async (req, res) => {
     }
 });
 
-router.post("/fillPlaceholders",fetchuser, async (req, res) => {
+router.post("/fillPlaceholders", fetchuser, async (req, res) => {
     let query = req.body.message;
-    let department = req.body.department
+    let department = req.body.department;
 
-    let user_id =req.user.id;
+    let user_id = req.user.id;
     try {
         const messages = [
             {
                 role: "system", content: `You are an assistant that maps the placeholders in the given prompt to placholders from this list 
                                             [name, company, email, noofemployees, companyaddress, companydesc, department, product, targetcustomers, 
                                             companystructure, regulations, customerquestions, communicationchannels, feedbackmethod, date, year].
-                                            Placeholder are enclosed in square brackets. If a placeholder is not in the list, you should ignore it.  
-                                            Do NOT answer the question, just reformulate it if needed and otherwise return it as is.` },
+                                            Placeholder are enclosed in square brackets. If a placeholder is not in the list, you should ignore it.
+                                            Wherever you find a placeholder replace it with one of the entities from the above list.
+                                            Do NOT answer the question, just replace unknown placeholders with known placeholders if needed and otherwise return it as is.` },
             { role: "user", content: query }
         ];
         const completions = await openai.chat.completions.create({
             messages: messages,
             model: "gpt-3.5-turbo",
         });
+
         const message = completions.choices[0].message.content;
-        const filledMsg = fillChatDetails(message,user_id,department);
+        const filledMsg =await fillChatDetails(message, user_id, department);
         res.status(200).json({ filledMessage: filledMsg });
 
 
     } catch (error) {
-        console.error(error);
+        console.log(error);
+        res.status(500).json({ error: error.message })
     }
 });
 

@@ -49,11 +49,7 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
         try {
             const NewData = []
 
-            const askData = {
-                query: Query,
-                history: [],
-                role: department
-            }
+ 
 
             const PlaceHolderResponse = await fetch(`${BaseURL}/api/chat/fillPlaceholders`, {
                 method: 'POST',
@@ -61,10 +57,16 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
                     'Content-Type': 'application/json',
                     'auth-token': localStorage.getItem('auth-token')
                 },
-                body: JSON.stringify(askData.query)
+                body: JSON.stringify({ message: Query, department: department })
             });
 
-            console.log(PlaceHolderResponse)
+            const placeholderdata = await PlaceHolderResponse.json()
+
+            const askData = {
+                query: placeholderdata.filledMessage,
+                history: [],
+                role: department
+            }
 
             const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
                 method: 'POST',

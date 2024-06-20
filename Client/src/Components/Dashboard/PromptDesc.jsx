@@ -49,24 +49,23 @@ const PromptDesc = ({ Model, setModel, SelectedID }) => {
         try {
             const NewData = []
 
-            const askData = {
-                query: Query,
-                history: [],
-                role: department
-            }
-
             const PlaceHolderResponse = await fetch(`${BaseURL}/api/chat/fillPlaceholders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'auth-token': localStorage.getItem('auth-token')
                 },
-                body: JSON.stringify({ query: askData.query, department: department })
+                body: JSON.stringify({ message: Query, department: department })
             });
 
             const placeholderdata = await PlaceHolderResponse.json()
-            console.log(placeholderdata)
 
+            const askData = {
+                query: placeholderdata.filledMessage,
+                history: [],
+                role: department
+            }
+            
             const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
                 method: 'POST',
                 headers: {
