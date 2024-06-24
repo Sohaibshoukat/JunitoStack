@@ -1,1 +1,1 @@
-export const BaseURL="https://junitobackend.zypherdigital.com/api/adminAuth"
+export const BaseURL="http://localhost:3000/api/adminAuth"

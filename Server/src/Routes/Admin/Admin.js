@@ -22,9 +22,7 @@ const multer = require('multer');
 
 const PhotosStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(9)
-        return cb(null, './Uploads/ProfilePhoto/Admin');
-        console.log(8)
+        return cb(null, './src/Uploads/ProfilePhoto/Admin');
     },
     filename: function (req, file, cb) {
         return cb(null, `${Date.now()}-${file.originalname}`);

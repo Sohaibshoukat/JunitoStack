@@ -16,9 +16,7 @@ const JWT_KEY = process.env.JWT_KEY;
 
 const PhotosStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(9)
-        return cb(null, './Uploads/ProfilePhoto/User');
-        console.log(8)
+        return cb(null, './src/Uploads/ProfilePhoto/User');
     },
     filename: function (req, file, cb) {
         return cb(null, `${Date.now()}-${file.originalname}`);
@@ -27,17 +25,6 @@ const PhotosStorage = multer.diskStorage({
 
 const PhotosUploader = multer({ storage: PhotosStorage });
 
-
-const CNICStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        return cb(null, "./uploads/UserCNIC");
-    },
-    filename: function (req, file, cb) {
-        return cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
-
-const CNICUploader = multer({ storage: CNICStorage });
 
 
 const transporter = nodemailer.createTransport({

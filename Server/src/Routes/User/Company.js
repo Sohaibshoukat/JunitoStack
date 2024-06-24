@@ -22,7 +22,7 @@ const JWT_KEY = process.env.JWT_KEY;
 
 const PhotosStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        return cb(null, './uploads/UserProfile');
+        return cb(null, './src/Uploads/UserProfile');
     },
     filename: function (req, file, cb) {
         return cb(null, `${Date.now()}-${file.originalname}`);
