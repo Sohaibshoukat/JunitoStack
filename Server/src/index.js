@@ -19,6 +19,10 @@ app.use('/api/user', require('./Routes/User/User'));
 app.use('/api/company', require('./Routes/User/Company'));
 app.use('/api/chat', require('./Routes/User/Chat'));
 
+app.get('/welcome', (req, res) => {
+  res.send('Welcome to Junito Server');
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Junito app listening at http://localhost:${port}`);
