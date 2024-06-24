@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  mongo_db:
+    container_name: database_container
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+    ports:
+      - 27017:27017
+
+  app:
+    build: .
+    container_name: app_container
+    ports:
+      - "4000:3000"
+    environment:
+      APP_NAME: Junito
+      DB_URI: mongodb://mongo_db:27017/Junito
+      PORT: 3000
+    depends_on:
+      - mongo_db
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm start
+
+volumes:
+  mongo_db: {}
