@@ -6,7 +6,8 @@ import TODOModel from '../../../Components/Dashboard/TODOModel';
 
 const ToDos = () => {
     const [todos, setTodos] = useState([]);
-    const [ModelTODO, setModelTODO] = useState(false)
+    const [ModelTODO, setModelTODO] = useState(false);
+    const [filter, setFilter] = useState('all');
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
 
@@ -34,32 +35,62 @@ const ToDos = () => {
     }, []);
 
     useEffect(() => {
-        if(!ModelTODO){
+        if (!ModelTODO) {
             fetchTodos();
         }
     }, [ModelTODO]);
 
+    const filterTodos = (todos, filter) => {
+        const now = new Date();
+        switch (filter) {
+            case 'overdue':
+                return todos.filter(todo => {
+                    console.log(new Date(todo.Deadline))
+                    return new Date(todo.Deadline) < now && !todo.completed
+                });
+            case 'pending':
+                return todos.filter(todo => new Date(todo.Deadline) >= now && !todo.completed);
+            default:
+                return todos;
+        }
+    };
+
+    const filteredTodos = filterTodos(todos, filter);
+
     return (
         <>
-        <TODOModel ModelTODO={ModelTODO} setModelTODO={setModelTODO} />
-        <div className='w-[95%] pt-10 pb-20 lg:w-[90%] font-para m-auto'>
-            <div className="bg-white rounded-lg shadow-shadow2 py-2 md:py-4 px-2 md:px-6">
-                <div className="flex flex-col md:flex-row justify-between items-center">
-                    <h2 className='text-gray text-lg font-bold'>ToDo</h2>
-                    <button
-                        className='bg-gray py-2 px-4 rounded-lg border-2 border-gray hover:bg-transparent text-white hover:text-gray ease-in-out duration-300'
-                        onClick={()=>{setModelTODO(true)}}
-                    >
-                        Add Todo
-                    </button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6 my-6">
-                    {todos.map((item, index) => (
-                        <TODOCart item={item} key={index} fetchTodos={fetchTodos} />
-                    ))}
+            <TODOModel ModelTODO={ModelTODO} setModelTODO={setModelTODO} />
+            <div className='w-[95%] pt-10 pb-20 lg:w-[90%] font-para m-auto'>
+                <div className="bg-white rounded-lg shadow-shadow2 py-2 md:py-4 px-2 md:px-6">
+                    <div className="flex flex-col md:flex-row justify-between items-center">
+                        <h2 className='text-gray text-lg font-bold'>ToDo</h2>
+                        <div className="flex items-center gap-4">
+                            <select 
+                                name="filter" 
+                                id="filter" 
+                                value={filter} 
+                                className='border-2 border-gray rounded-xl py-2 px-2 text-gray font-para font-medium'
+                                onChange={(e) => setFilter(e.target.value)}
+                            >
+                                <option value="all">All ToDo's</option>
+                                <option value="overdue">Overdue ToDo's</option>
+                                <option value="pending">Pending ToDo's</option>
+                            </select>
+                            <button
+                                className='bg-gray py-2 px-4 rounded-lg border-2 border-gray hover:bg-transparent text-white hover:text-gray ease-in-out duration-300'
+                                onClick={() => { setModelTODO(true); }}
+                            >
+                                Add Todo
+                            </button>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6 my-6">
+                        {filteredTodos.map((item, index) => (
+                            <TODOCart item={item} key={index} fetchTodos={fetchTodos} />
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
         </>
     );
 };

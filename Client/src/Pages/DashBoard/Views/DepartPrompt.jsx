@@ -1,17 +1,21 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import AlertContext from '../../../Context/Alert/AlertContext';
 import { BaseURL } from '../../../Data/BaseURL';
 import PromptDetailModel from '../../../Components/Dashboard/PromptDetail/PromptDetailModel';
 import { IoIosSearch } from 'react-icons/io';
 
 const DepartPrompt = () => {
-    const [PromptDetail, setPromptDetail] = useState(false)
+    const [PromptDetail, setPromptDetail] = useState(false);
     const [prompts, setPrompts] = useState([]);
-    const [SelectedId, setSelectedId] = useState(null)
+    const [SelectedId, setSelectedId] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [selectedPotential, setSelectedPotential] = useState("all");
+    const [categories, setCategories] = useState([]);
+    const [potentials, setPotentials] = useState([]);
 
-    const { dep } = useParams()
+    const { dep } = useParams();
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -28,12 +32,26 @@ const DepartPrompt = () => {
             const data = await response.json();
             if (response.ok) {
                 setPrompts(data.Prompts);
+                extractCategoriesAndPotentials(data.Prompts);
             } else {
-                showAlert(data.message || 'Error Getting Prompts', "danger")
+                showAlert(data.message || 'Error Getting Prompts', "danger");
             }
         } catch (error) {
-            showAlert(error.message, "danger")
+            showAlert(error.message, "danger");
         }
+    };
+
+    const extractCategoriesAndPotentials = (prompts) => {
+        const categories = new Set();
+        const potentials = new Set();
+        prompts.forEach(item => {
+            item.List.forEach(prompt => {
+                categories.add(prompt.Category);
+                potentials.add(prompt.Potential);
+            });
+        });
+        setCategories(Array.from(categories));
+        setPotentials(Array.from(potentials));
     };
 
     const handleSearch = (item) => {
@@ -42,6 +60,16 @@ const DepartPrompt = () => {
             item.Type.toLowerCase().includes(query) ||
             item.Category.toLowerCase().includes(query) ||
             item.Potential.toLowerCase().includes(query);
+    };
+
+    const handleFilter = (item) => {
+        if (selectedCategory !== "all" && item.Category !== selectedCategory) {
+            return false;
+        }
+        if (selectedPotential !== "all" && item.Potential !== selectedPotential) {
+            return false;
+        }
+        return true;
     };
 
     return (
@@ -59,6 +87,32 @@ const DepartPrompt = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                </div>
+                <div className="flex gap-2 items-center">
+                    <select
+                        name="categoryFilter"
+                        id="categoryFilter"
+                        className='border-2 border-gray rounded-xl py-2 px-2 text-gray font-para font-medium'
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                        <option value="all">All Categories</option>
+                        {categories.map((category, index) => (
+                            <option value={category} key={index}>{category}</option>
+                        ))}
+                    </select>
+                    <select
+                        name="potentialFilter"
+                        id="potentialFilter"
+                        className='border-2 border-gray rounded-xl py-2 px-2 text-gray font-para font-medium'
+                        value={selectedPotential}
+                        onChange={(e) => setSelectedPotential(e.target.value)}
+                    >
+                        <option value="all">All Potentials</option>
+                        {potentials.map((potential, index) => (
+                            <option value={potential} key={index}>{potential}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
             <div className='flex flex-col py-10 gap-6 w-[90%] md:w-[90%] m-auto overflow-y-scroll md:px-6'>
@@ -79,7 +133,7 @@ const DepartPrompt = () => {
                                 <tbody>
                                     {prompts.map((item, index) => (
                                         <>
-                                            {item?.List?.filter(handleSearch).map((item2, index2) => (
+                                            {item?.List?.filter(handleSearch).filter(handleFilter).map((item2, index2) => (
                                                 <tr
                                                     className="bg-white cursor-pointer border-b font-normal text-base border-slate-200 hover:bg-gray hover:text-white ease-in-out duration-300"
                                                     key={index2}
@@ -105,8 +159,8 @@ const DepartPrompt = () => {
                                                     <td
                                                         className="px-auto md:px-6 py-2 md:py-4"
                                                         onClick={() => {
-                                                            setSelectedId(item2._id)
-                                                            setPromptDetail(true)
+                                                            setSelectedId(item2._id);
+                                                            setPromptDetail(true);
                                                         }}
                                                     >
                                                         <button
@@ -126,7 +180,7 @@ const DepartPrompt = () => {
                 </div>
             </div>
         </>
-    )
+    );
 }
 
-export default DepartPrompt
+export default DepartPrompt;

@@ -3,13 +3,16 @@ import { IoMdClose } from 'react-icons/io'
 import AlertContext from '../../../Context/Alert/AlertContext';
 import { BaseURL } from '../../../Data/BaseURL';
 import ChatContext from '../../../Context/ChatContaxt/ChatContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import BotDepContext from '../../../Context/BotContaxt/BotDepContext';
 import { trimToWords } from '../../../Data/UseFullFunction';
 
 const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
 
     const [Prompt, setPrompt] = useState(null)
+
+    const { dep } = useParams();
+
 
     const navigate = useNavigate()
 
@@ -48,8 +51,7 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
         setIsLoading(true)
         try {
             const NewData = []
-
- 
+            setdepartment(dep)
 
             const PlaceHolderResponse = await fetch(`${BaseURL}/api/chat/fillPlaceholders`, {
                 method: 'POST',
@@ -57,7 +59,7 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
                     'Content-Type': 'application/json',
                     'auth-token': localStorage.getItem('auth-token')
                 },
-                body: JSON.stringify({ message: Query, department: department })
+                body: JSON.stringify({ message: Query, department: dep })
             });
 
             const placeholderdata = await PlaceHolderResponse.json()
@@ -65,7 +67,7 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
             const askData = {
                 query: placeholderdata.filledMessage,
                 history: [],
-                role: department
+                role: dep
             }
 
             const ChatResponse = await fetch(`${BaseURL}/api/chat/ask`, {
@@ -99,7 +101,7 @@ const PromptDetailModel = ({ PromptDetail, setPromptDetail, SelectedId }) => {
                 },
                 body: JSON.stringify({
                     Title: trimToWords(Query),
-                    Department: department,
+                    Department: dep,
                     ChatConversation: NewData
                 })
             });

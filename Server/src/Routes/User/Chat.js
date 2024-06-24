@@ -168,7 +168,7 @@ router.post("/fillPlaceholders", fetchuser, async (req, res) => {
         });
 
         const message = completions.choices[0].message.content;
-        const filledMsg =await fillChatDetails(message, user_id, department);
+        const filledMsg = await fillChatDetails(message, user_id, department);
         res.status(200).json({ filledMessage: filledMsg });
 
 
@@ -422,7 +422,7 @@ router.post('/chat/share', fetchuser, async (req, res) => {
             }
         }
 
-        const { chatId } = req.body;
+        const { chatId, Category } = req.body;
 
 
         // Check if the provided chat ID is valid
@@ -435,11 +435,50 @@ router.post('/chat/share', fetchuser, async (req, res) => {
         const sharedChat = await SharedChat.create({
             User_ID: req.user.id,
             Company: company._id,
-            Chat_id: chatId
+            Chat_id: chatId,
+            Category: Category
         });
 
 
         res.status(201).json({ success: true, message: "Chat shared with company successfully", SharedChat: sharedChat });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.put('/editchat/share/:id', fetchuser, async (req, res) => {
+    try {
+        const userId = req.user.id
+        let user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        let company = await Company.findOne({ Owner_ID: userId });
+        if (!company) {
+            let subuser = await SubUser.findOne({ Own_ID: userId });
+            if (!subuser) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+            company = await Company.findById(subuser.Company_ID);
+            if (!company) {
+                return res.status(404).json({ success: false, message: "Company not found" });
+            }
+        }
+
+        const { Category } = req.body;
+
+        // Create a new shared chat document
+        const sharedChat = await SharedChat.findById(req.params.id);
+
+        sharedChat.Category = Category;
+
+        sharedChat.save()
+
+
+        res.status(201).json({ success: true, message: "Shared Chat Editied Successfully", SharedChat: sharedChat });
 
     } catch (error) {
         console.log(error)
@@ -516,6 +555,27 @@ router.get('/sharedChatList', fetchuser, async (req, res) => {
             .limit(5);
 
         res.status(200).json({ success: true, sharedChats });
+
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/SahredID/:sharedid', fetchuser, async (req, res) => {
+    try {
+        let user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        const sharedid = req.params.sharedid;
+
+        const sharedchat = await SharedChat.findById(sharedid);
+        if (!sharedchat) {
+            return res.status(404).json({ success: false, message: "No Shared Chat found" });
+        }
+
+        res.send({ success: true, sharedchat: sharedchat });
 
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -652,7 +712,7 @@ router.post('/todos/add', fetchuser, async (req, res) => {
         await subUsers.map(async (item) => {
             let subuser = await User.findById(item).select('FirstName LastName Email')
             console.log(subuser)
-            await sendEmailContact(subuser.FirstName, subuser.Email, subuser.LastName)
+            await sendEmailContact(subuser?.FirstName, subuser?.Email, subuser?.LastName)
         })
 
         // Create a new ToDo

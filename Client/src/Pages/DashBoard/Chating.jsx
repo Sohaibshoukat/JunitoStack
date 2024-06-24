@@ -13,6 +13,7 @@ import { FaRegShareSquare } from 'react-icons/fa'
 import BotDepContext from '../../Context/BotContaxt/BotDepContext'
 import { LuListTodo } from 'react-icons/lu'
 import { ImAttachment } from "react-icons/im";
+import ShareModel from '../../Components/Dashboard/ShareModel'
 
 
 const Chating = () => {
@@ -23,12 +24,12 @@ const Chating = () => {
     const [ModelTODO, setModelTODO] = useState(false)
     const [Query, setQuery] = useState('')
     const [SearchSugesstonsData, setSearchSugesstonsData] = useState([])
-    const [isLoadingChat, setisLoadingChat] = useState(false)
     const [Profile, setProfile] = useState(false)
     const [UserData, setUserData] = useState(null)
     const [IsDisable, setIsDisable] = useState(false)
     const [selectedFile, setSelectedFile] = useState(null);
     const [abortController, setAbortController] = useState(null)
+    const [ShareChatModel, setShareChatModel] = useState(false)
 
     const chatcontext = useContext(ChatContext);
     const { ChatsData, setChatsData } = chatcontext
@@ -278,32 +279,7 @@ const Chating = () => {
         }
     }
 
-    const shareChat = async () => {
-        setisLoadingChat(true)
-        try {
-            const response = await fetch(`${BaseURL}/api/chat/chat/share`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'auth-token': localStorage.getItem('auth-token')
-                },
-                body: JSON.stringify({
-                    chatId: id
-                })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setisLoadingChat(false)
-                showAlert(data.message, 'success');
-            } else {
-                setisLoadingChat(false)
-                showAlert(data.message, 'danger');
-            }
-        } catch (error) {
-            setisLoadingChat(false)
-            showAlert(error.message, 'danger');
-        }
-    };
+
 
     const fetchConversation = async () => {
         try {
@@ -373,6 +349,7 @@ const Chating = () => {
         <>
 
             <TODOModel ModelTODO={ModelTODO} setModelTODO={setModelTODO} chatid={id} />
+            {ShareChatModel && <ShareModel ShareChatModel={ShareChatModel} setShareChatModel={setShareChatModel} chatis={id}/>     }
 
             <div className='w-full bg-white py-2 fixed top-0 z-50 items-center px-6 flex justify-between'>
                 <h2 className='text-gray font-bold font-head text-2xl'>Chatbot</h2>
@@ -405,11 +382,9 @@ const Chating = () => {
                     <div className="xl:basis-[70%] w-[97%] md:w-[90%] xl:w-[70%] mx-auto max-h-full overflow-y-auto">
                         <div className="flex gap-4 items-center mb-2 md:mb-4 ">
                             <div
-                                className={`flex gap-2 items-center p-2 border-2 border-gray rounded-2xl w-fit ${isLoadingChat && "opacity-50"} cursor-pointer`}
+                                className={`flex gap-2 items-center p-2 border-2 border-gray rounded-2xl w-fit  cursor-pointer`}
                                 onClick={() => {
-                                    if (!isLoadingChat) {
-                                        shareChat()
-                                    }
+                                    setShareChatModel(true)
                                 }}
                             >
                                 <FaRegShareSquare className='text-lg md:text-2xl text-gray' />
@@ -470,7 +445,7 @@ const Chating = () => {
                                     {Query.length > 0 && <div className="w-full h-full max-h-[22vh] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
                                         {SearchSugesstonsData?.map((item) => {
                                             return (
-                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={()=>{setQuery(item)}}>
+                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={() => { setQuery(item) }}>
                                                     <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
                                                 </div>
                                             )

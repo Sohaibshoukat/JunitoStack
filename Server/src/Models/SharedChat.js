@@ -14,6 +14,10 @@ const SharedChatSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Chat'
     },
+    Category:{
+        type:String,
+        enum:["HR","Marketing","Vertrieb", "Support","Startup","Sales","Agent"]
+    },
     Date: {
         type: Date,
         default: new Date()

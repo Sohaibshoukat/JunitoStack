@@ -9,6 +9,7 @@ import NewYork from '../../Components/Home/NewYork'
 import ContactSec from '../../Components/Contact/ContactSec'
 import Nav from '../../Components/Nav'
 import Footer from '../../Components/Footer'
+import Pricing from '../../Components/Home/Pricing'
 
 
 const Home = () => {
@@ -25,6 +26,8 @@ const Home = () => {
       <Functions />
 
       <Prompts />
+
+      <Pricing/>
 
       <NewYork />
 

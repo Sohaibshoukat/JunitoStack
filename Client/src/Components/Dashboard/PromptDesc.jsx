@@ -134,8 +134,8 @@ const PromptDesc = ({ Model, setModel, SelectedID }) => {
                         </div>
                         <div className="flex flex-col gap-4 max-h-[70%] overflow-y-scroll">
                             <div className="flex flex-col gap-2 md:gap-4">
-                                <h2 className='text-gray font-para text-lg md:text-xl font-bold'>Question</h2>
-                                <p className='ml-2 text-gray text-base font-semibold font-para'>{Prompt?.Info}</p>
+                                <h2 className='text-gray font-para text-lg md:text-xl font-bold'>Headline</h2>
+                                <p className='ml-2 text-gray text-base font-semibold font-para'>{Prompt?.Name}</p>
                             </div>
                             <div className="flex flex-col gap-2 md:gap-4">
                                 <h2 className='text-gray font-para text-lg md:text-xl font-bold'>Prompt</h2>

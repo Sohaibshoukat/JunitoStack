@@ -11,10 +11,14 @@ const NewYork = () => {
 
                     <div className='xl:basis-[45%] md:basis-[50%] lg:w-[50%] flex flex-col items-center'>
                         <h2 className='text-gray font-bold text-xl md:text-xl font-mont lg:text-2xl xl:text-3xl mb-4'>New Work Coaching - SMEs rethought</h2>
-                        <button className='flex flex-row bg-transparent border-2 m-auto my-4 rounded-xl text-gray font-bold text-sm md:text-base font-para border-gray items-center  justify-center gap-2 py-2 px-6 hover:bg-gray hover:text-white ease-in-out duration-300'>
+                        <a
+                            href='https://www.junito.at/book-online'
+                            target='_blank'
+                            className='flex flex-row bg-transparent border-2 m-auto my-4 rounded-xl text-gray font-bold text-sm md:text-base font-para border-gray items-center  justify-center gap-2 py-2 px-6 hover:bg-gray hover:text-white ease-in-out duration-300'
+                        >
                             <FaVideo />
                             Available Online
-                        </button>
+                        </a>
                         <p className='text-black text-sm md:text-base text-left self-start xl:text-base font-para mb-2'>Especially for owners and managers | Shape the future...</p>
                         <div className='flex flex-row justify-center gap-6'>
                             <p className='text-gray text-sm md:text-base xl:text-lg font-para mb-2'>4 hours</p>
