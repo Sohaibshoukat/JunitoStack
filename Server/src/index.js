@@ -3,6 +3,7 @@ const connectToMongo = require("./app");
 const express = require('express');
 var cors = require('cors');
 const PromptImages = require('./Models/PromptImags');
+const path = require('path');
 
 connectToMongo();
 
@@ -18,6 +19,7 @@ app.use('/api/contact', require('./Routes/User/Contact'));
 app.use('/api/user', require('./Routes/User/User'));
 app.use('/api/company', require('./Routes/User/Company'));
 app.use('/api/chat', require('./Routes/User/Chat'));
+app.use('/Upload', express.static(path.join(__dirname, 'Uploads')));
 
 app.get('/welcome', (req, res) => {
   res.send('Welcome to Junito Server');

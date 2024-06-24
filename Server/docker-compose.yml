@@ -19,6 +19,7 @@ services:
       APP_NAME: Junito
       DB_URI: mongodb://mongo_db:27017/Junito
       PORT: 3000
+
     depends_on:
       - mongo_db
     volumes:
