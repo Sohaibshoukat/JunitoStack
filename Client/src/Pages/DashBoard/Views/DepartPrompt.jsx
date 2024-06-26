@@ -14,6 +14,7 @@ const DepartPrompt = () => {
     const [selectedPotential, setSelectedPotential] = useState("all");
     const [categories, setCategories] = useState([]);
     const [potentials, setPotentials] = useState([]);
+    const [isLoading, setisLoading] = useState(true)
 
     const { dep } = useParams();
 
@@ -33,6 +34,7 @@ const DepartPrompt = () => {
             if (response.ok) {
                 setPrompts(data.Prompts);
                 extractCategoriesAndPotentials(data.Prompts);
+                setisLoading(false)
             } else {
                 showAlert(data.message || 'Error Getting Prompts', "danger");
             }
@@ -97,7 +99,7 @@ const DepartPrompt = () => {
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
                         <option value="all">All Categories</option>
-                        {categories.map((category, index) => (
+                        {categories?.map((category, index) => (
                             <option value={category} key={index}>{category}</option>
                         ))}
                     </select>
@@ -109,7 +111,7 @@ const DepartPrompt = () => {
                         onChange={(e) => setSelectedPotential(e.target.value)}
                     >
                         <option value="all">All Potentials</option>
-                        {potentials.map((potential, index) => (
+                        {potentials?.map((potential, index) => (
                             <option value={potential} key={index}>{potential}</option>
                         ))}
                     </select>
@@ -118,7 +120,11 @@ const DepartPrompt = () => {
             <div className='flex flex-col py-10 gap-6 w-[90%] md:w-[90%] m-auto overflow-y-scroll md:px-6'>
                 <div className="bg-white rounded-lg shadow-shadow2 py-3 md:py-4 lg:py-6 px-3 md:px-3 lg:px-6">
                     <div className="my-4">
-                        <div className="relative overflow-x-auto">
+                        {isLoading?
+                        <div className='flex justify-center'>
+                            <img src="../../Loading.gif" alt="" className='w-32 h-32' />
+                        </div> 
+                        :<div className="relative overflow-x-auto">
                             <table className="w-full text-sm font-para text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead className="text-base font-normal uppercase text-slate-300">
                                     <tr>
@@ -175,7 +181,7 @@ const DepartPrompt = () => {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        </div>}
                     </div>
                 </div>
             </div>

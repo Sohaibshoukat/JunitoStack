@@ -338,8 +338,17 @@ const ChatBot = () => {
                                     <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Topic</h2>
                                 </div>
                                 <div
-                                    className="bg-white w-[100%] rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-2 h-full"
+                                    className="bg-white w-[100%] relative rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-2 h-full"
                                 >
+                                    {Query.length > 0 && <div className="w-full max-h-[40vh] absolute bottom-[100%] z-[50] shadow-shadow3 rounded-t-xl left-[0] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
+                                        {SearchSugesstonsData?.map((item) => {
+                                            return (
+                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={()=>{setQuery(item)}}>
+                                                    <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>}
                                     <div className="flex justify-between">
                                         <div className="flex gap-4 w-[100%]">
                                             <label htmlFor="fileupload">
@@ -374,15 +383,7 @@ const ChatBot = () => {
                                             }}
                                         />
                                     </div>
-                                    {Query.length > 0 && <div className="w-full h-full max-h-[22vh] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
-                                        {SearchSugesstonsData?.map((item) => {
-                                            return (
-                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={()=>{setQuery(item)}}>
-                                                    <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>}
+                                    
                                 </div>
                             </div>
                             <button
