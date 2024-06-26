@@ -77,7 +77,7 @@ const sendOTPEmail = async (id, FirstName, LastName, Password, email, res) => {
 ///////
 //API's Start
 /////
-//Create a user 
+//Create a user
 router.post("/createSubuser", fetchuser, async (req, res) => {
     let success = false;
     const errors = validationResult(req);
@@ -454,7 +454,7 @@ router.get('/random', async (req, res) => {
     try {
       const departments = ["HR", "Marketing", "Vertrieb", "Support", "Agentour", "Startup"];
       const randomPrompts = {};
-  
+
       for (const department of departments) {
         const prompts = await Prompts.aggregate([
           { $match: { Department: department } },
@@ -462,7 +462,7 @@ router.get('/random', async (req, res) => {
         ]);
         randomPrompts[department] = prompts[0] || null;
       }
-  
+
       res.json(randomPrompts);
     } catch (err) {
       res.status(500).json({ message: err.message });
