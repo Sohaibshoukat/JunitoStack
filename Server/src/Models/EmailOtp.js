@@ -16,7 +16,6 @@ const EmailSchema = new Schema({
     expireAt:{
         type:Date
     }
-
 })
 
 const otps =mongoose.model("otps",EmailSchema)

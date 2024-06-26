@@ -16,6 +16,7 @@ const FormData = require('form-data');
 
 const OpenAI = require('openai');
 const multer = require("multer");
+const Prompts = require("../../Models/Prompts");
 const pythonServerURL = "https://bizbot.junito.at";
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -52,7 +53,7 @@ async function fillChatDetails(message, user_id, department) {
         const user = await User.findById({ _id: user_id });
         const company = await Company.findOne({ Owner_ID: user_id });
         if (!company) {
-            let subuser = await SubUser.findOne({ Own_ID: userId });
+            let subuser = await SubUser.findOne({ Own_ID: user_id });
             if (!subuser) {
                 return res.status(404).json({ success: false, message: "User not found" });
             }
@@ -124,8 +125,12 @@ router.post('/upload-document', FileUploader.single('fileup'), async (req, res) 
 });
 
 
-router.post('/ask', async (req, res) => {
+router.post('/ask',fetchuser, async (req, res) => {
     try {
+        const user = await User.findById({ _id: req.user.id });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
         const chatDetails = req.body;
         const response = await axios.post(`${pythonServerURL}/chat`, chatDetails);
         res.status(response.status).json(response.data);
@@ -135,9 +140,40 @@ router.post('/ask', async (req, res) => {
     }
 });
 
-router.post('/searchsuggestion', async (req, res) => {
+router.post('/searchsuggestion',fetchuser, async (req, res) => {
     try {
+
+        const user = await User.findById({ _id: req.user.id });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
         const chatDetails = req.body;
+        console.log(chatDetails)
+        const query = chatDetails.data;
+        if (!query) {
+          return res.status(400).send('Query parameter is required');
+        }
+    
+        const suggestions = await Prompts.find({
+          PromptsList: { 
+            $elemMatch: { 
+              value: { $regex: query, $options: 'i' } 
+            } 
+          }
+        })
+        .limit(5)
+        .select({ 'PromptsList.$': 1 }) // Selects only the matching elements of PromptsList
+        .exec();
+
+        if (suggestions.length > 0) {
+            const formattedSuggestions = suggestions.reduce((acc, curr, index) => {
+                acc[`query${index + 1}`] = curr.PromptsList[0].value;
+                return acc;
+            }, {});
+            return res.status(200).json(formattedSuggestions);
+        }
+
         const response = await axios.post(`${pythonServerURL}/searchQuery`, chatDetails);
         res.status(response.status).json(response.data);
     } catch (error) {
