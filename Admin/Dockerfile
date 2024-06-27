@@ -1,9 +1,21 @@
-FROM node:13.12.0-alpine
+FROM node:20-alpine
+
+# Set working directory
 WORKDIR /app
-ENV PATH /app/node_modules/.bin:$PATH
+
+# Add `/app/node_modules/.bin` to $PATH
+# ENV PATH /app/node_modules/.bin:$PATH
+
+# Install dependencies
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm install --silent
-RUN npm install react-scripts@4.0.3 -g --silent
+RUN npm install
+
+# Copy all project files
 COPY . ./
-CMD ["npm", "start"]
+
+# Expose port 6000
+EXPOSE 5173
+
+# Start the application
+CMD ["npm", "run", "dev"]
