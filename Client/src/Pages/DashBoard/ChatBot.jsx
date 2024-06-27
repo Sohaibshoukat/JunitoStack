@@ -49,6 +49,8 @@ const ChatBot = () => {
 
     const NewChatCreate = async () => {
         try {
+            setQuery("")
+
             setIsDisable(true)
             const NewData = ChatsData
 
@@ -62,16 +64,6 @@ const ChatBot = () => {
 
             })
 
-            NewData.push({
-                Type: "User",
-                Query: Query
-            })
-
-            // const askData = {
-            //     query: Query,
-            //     history: [],
-            //     role: department
-            // }
 
             let fileName = null;
 
@@ -128,12 +120,12 @@ const ChatBot = () => {
             const AskDetail = await ChatResponse.json()
 
 
-            NewData.push({
+            NewData[ChatsData.length-1] = {
                 Type: "BizBot",
                 Query: AskDetail.response.content
-            })
+            }
+
             setChatsData(NewData)
-            setQuery("")
 
             const responseSaving = await fetch(`${BaseURL}/api/chat/createnewchat`, {
                 method: 'POST',
@@ -211,6 +203,8 @@ const ChatBot = () => {
     useEffect(() => {
         if (Query !== "") {
             SearchSuggesstion()
+        }else{
+            setSearchSugesstonsData([])
         }
     }, [Query])
 
@@ -309,7 +303,7 @@ const ChatBot = () => {
                                 <div className="text-center flex flex-col gap-3 w-[100%]">
                                     <div className="flex gap-4 justify-center items-end">
                                         <img src="../BizzBot.png" alt="" className='w-6 md:w-12' />
-                                        <h2 className='text-gray font-bold text-xl md:text-xl font-para'>Welcome to {department} BizBot</h2>
+                                        <h2 className='text-gray font-bold text-xl md:text-xl font-para'>Welcome to BizBot</h2>
                                     </div>
                                 </div>
                                 <PromptsSlider Model={Model} setModel={setModel} setSelectedID={setSelectedID} />
@@ -318,7 +312,7 @@ const ChatBot = () => {
                                         <div className="flex flex-col gap-2">
                                             <div className="flex gap-2 items-start">
                                                 <img src="../BizzBot.png" alt="" className='w-6' />
-                                                <h2 className='text-gray font-bold text-lg font-para'>{department} BizBot</h2>
+                                                <h2 className='text-gray font-bold text-lg font-para'>BizBot</h2>
                                             </div>
                                             <p className=' ml-4 text-gray font-para'>How can i help you today!</p>
                                         </div>
@@ -340,15 +334,24 @@ const ChatBot = () => {
                                 <div
                                     className="bg-white w-[100%] relative rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-2 h-full"
                                 >
-                                    {Query.length > 0 && <div className="w-full max-h-[40vh] absolute bottom-[100%] z-[50] shadow-shadow3 rounded-t-xl left-[0] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
-                                        {SearchSugesstonsData?.map((item) => {
-                                            return (
-                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={()=>{setQuery(item)}}>
-                                                    <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>}
+                                    {Query.length > 0 &&
+                                        <div className="w-full max-h-[40vh] absolute bottom-[100%] z-[50] shadow-shadow3 rounded-t-xl left-[0] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
+                                            {SearchSugesstonsData?.length > 0 ?
+                                                <>
+                                                    {SearchSugesstonsData?.map((item) => {
+                                                        return (
+                                                            <div className="bg-gray cursor-pointer  px-4 py-2" onClick={() => { setQuery(item) }}>
+                                                                <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </>
+                                                :
+                                                <div className='w-[20%]'>
+                                                    <img src="../Porp/Loading.gif" alt="" className='object-cover bg-gray rounded-xl px-2' />
+                                                </div>}
+                                        </div>
+                                    }
                                     <div className="flex justify-between">
                                         <div className="flex gap-4 w-[100%]">
                                             <label htmlFor="fileupload">
@@ -362,7 +365,7 @@ const ChatBot = () => {
                                                     onChange={(e) => setSelectedFile(e.target.files[0])} // Update state on file select
                                                 />
                                             </label>
-                                            <textarea
+                                            <input
                                                 name=""
                                                 id=""
                                                 rows={'2'}
@@ -378,12 +381,22 @@ const ChatBot = () => {
                                             className={`w-6 h-6 ${Query == "" && "opacity-35"} ${IsDisable && 'opacity-35'}`}
                                             onClick={() => {
                                                 if (Query !== "" || IsDisable) {
+                                                    const NewData = ChatsData
+                                                    NewData.push({
+                                                        Type: "User",
+                                                        Query: Query
+                                                    })
+                                                    NewData.push({
+                                                        Type: "BizBot",
+                                                        Query: ""
+                                                    })
+                                                    setChatsData(NewData)
                                                     NewChatCreate()
                                                 }
                                             }}
                                         />
                                     </div>
-                                    
+
                                 </div>
                             </div>
                             <button

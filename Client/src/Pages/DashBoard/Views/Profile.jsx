@@ -9,7 +9,7 @@ const ProfilePage = () => {
         Phone: '',
         Age: '',
         Gender: 'Male',
-        ImageShow:null,
+        ImageShow: null,
         ProfilePhoto: null,
     });
     const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +35,7 @@ const ProfilePage = () => {
                     Phone: result.userData.Phone,
                     Age: result.userData.Age,
                     Gender: result.userData.Gender,
-                    ImageShow: result.userData.ProfilePhoto,
+                    ImageShow: result.userData.ProfilePhoto ? `${BaseURL}/${result.userData.ProfilePhoto}` : null,
                 });
             } else {
                 showAlert('Failed to fetch user data', 'danger');
@@ -57,7 +57,7 @@ const ProfilePage = () => {
             setFormData({
                 ...formData,
                 ProfilePhoto: files[0],
-                ImageShow:(URL.createObjectURL(files[0]))
+                ImageShow: URL.createObjectURL(files[0])
             });
         } else {
             setFormData({
@@ -75,7 +75,7 @@ const ProfilePage = () => {
         formDataToSend.append('Age', formData.Age);
         formDataToSend.append('Gender', formData.Gender);
         if (formData.ProfilePhoto) {
-            formDataToSend.append('profimg', formData.ProfilePhoto);
+            formDataToSend.append('ProfilePhoto', formData.ProfilePhoto);
         }
 
         try {
@@ -109,6 +109,7 @@ const ProfilePage = () => {
             Age: '',
             Gender: 'Male',
             ProfilePhoto: null,
+            ImageShow: null,
         });
     };
 
@@ -121,7 +122,9 @@ const ProfilePage = () => {
             <div className="flex flex-col gap-1 font-Para">
                 <p className='text-sm text-darkestgray'>Your Profile Picture</p>
                 <div className="flex items-center gap-6 justify-center w-fit">
-                    {formData.ImageShow&&<img src={formData && `${BaseURL}/${formData.ImageShow}`} alt="" className='w-40 h-36 rounded-full'/>}
+                    <div className="w-52 h-32 rounded-full">
+                    {formData.ImageShow && <img src={formData.ImageShow} alt="" className='object-cover w-full h-full rounded-full' />}
+                    </div>
                     <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-30 px-4 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-[#EDF2F6] dark:hover:bg-bray-800">
                         <div className="flex flex-col items-center justify-center pt-3 pb-2">
                             <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">

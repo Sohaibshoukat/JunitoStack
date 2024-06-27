@@ -3,6 +3,7 @@ const connectToMongo = require("./app");
 const express = require('express');
 var cors = require('cors');
 const path = require('path');
+const PromptImages = require('./Models/PromptImags');
 
 connectToMongo();
 
@@ -23,6 +24,7 @@ app.use('/Upload', express.static(path.join(__dirname, 'Uploads')));
 app.get('/welcome', (req, res) => {
   res.send('Welcome to Junito Server');
 });
+
 
 
 

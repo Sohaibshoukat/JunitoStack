@@ -6,12 +6,13 @@ import AlertContext from '../../Context/Alert/AlertContext';
 import { BaseURL } from '../../Data/BaseURL';
 import { TfiReload } from "react-icons/tfi";
 import BotDepContext from '../../Context/BotContaxt/BotDepContext';
+import "./styleConversation.css"
 
 
-const Conversation = ({ setModelTODO, RegenrateChat }) => {
+const Conversation = ({ RegenrateChat }) => {
 
     const chatcontext = useContext(ChatContext);
-    const { ChatsData } = chatcontext
+    const { setChatsData, ChatsData } = chatcontext
 
     const alertContext = useContext(AlertContext);
     const { showAlert } = alertContext
@@ -79,14 +80,20 @@ const Conversation = ({ setModelTODO, RegenrateChat }) => {
                                         className='w-6 md:w-8 h-auto'
                                     />
                                 }
-                                <h2 className='text-gray text-base lg:text-lg font-bold'>{item.Type == "User" ? "You" : `${department} BizBot`}</h2>
+                                <h2 className='text-gray text-base lg:text-lg font-bold'>{item.Type == "User" ? "You" : `BizBot`}</h2>
                             </div>
                             <div className="text-xs md:text-base ml-10">
                                 {item.Type == "User" ?
                                     <p className='text-black font-normal'>{item?.Query}</p>
                                     :
                                     <>
-                                        <div dangerouslySetInnerHTML={{ __html: item?.Query }} />
+                                        {item?.Query !== "" ?
+                                            <div className='default-html' dangerouslySetInnerHTML={{ __html: item?.Query }} />
+                                            :
+                                            <div className='w-24'>
+                                                <img src="../../Porp/Loading.gif" alt="" className='object-cover bg-gray rounded-xl px-2' />
+                                            </div>
+                                        }
                                     </>
                                 }
                             </div>
@@ -95,7 +102,18 @@ const Conversation = ({ setModelTODO, RegenrateChat }) => {
                                     <div className="bg-white rounded-lg px-2 py-1" onClick={() => copyToClipboard(item?.Query)}>
                                         <IoCopyOutline className='text-base md:text-xl' />
                                     </div>
-                                    {index == ChatsData?.length - 1 && <div className="bg-white rounded-lg px-2 py-1" onClick={() => RegenrateChat(index)}>
+                                    {index == ChatsData?.length - 1 && <div
+                                        className="bg-white rounded-lg px-2 py-1"
+                                        onClick={() => {
+                                            const NewData2 = ChatsData
+                                            NewData2[index] = {
+                                                Type: "BizBot",
+                                                Query: ""
+                                            }
+                                            setChatsData(NewData2)
+                                            RegenrateChat(index)
+                                        }}
+                                    >
                                         <TfiReload className='text-base md:text-xl' />
                                     </div>}
                                 </div>

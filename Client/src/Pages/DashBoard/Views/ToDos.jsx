@@ -65,10 +65,10 @@ const ToDos = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <h2 className='text-gray text-lg font-bold'>ToDo</h2>
                         <div className="flex items-center gap-4">
-                            <select 
-                                name="filter" 
-                                id="filter" 
-                                value={filter} 
+                            <select
+                                name="filter"
+                                id="filter"
+                                value={filter}
                                 className='border-2 border-gray rounded-xl py-2 px-2 text-gray font-para font-medium'
                                 onChange={(e) => setFilter(e.target.value)}
                             >
@@ -84,11 +84,15 @@ const ToDos = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6 my-6">
+                    {filteredTodos?.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6 my-6">
                         {filteredTodos.map((item, index) => (
                             <TODOCart item={item} key={index} fetchTodos={fetchTodos} />
                         ))}
-                    </div>
+                    </div> :
+                        <div className='flex justify-center'>
+                            <img src="../../Loading.gif" alt="Loading..." className='w-24 h-24' />
+                        </div>
+                    }
                 </div>
             </div>
         </>

@@ -370,3 +370,42 @@
 .BotHoverGradient{
   background: linear-gradient(88.9deg, rgba(130, 127, 160, 0.77) 26.63%, rgba(172, 172, 204, 0.4235) 98.84%);
 }
+
+
+
+
+/* defaultStyles.css */
+.default-html p {
+  margin: 1em 0;
+}
+
+.default-html h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+.default-html h2 {
+  font-size: 1.5em;
+  margin: 0.75em 0;
+}
+
+.default-html h3 {
+  font-size: 1.2em;
+  margin: 0.75em 0;
+}
+
+.default-html ul {
+  list-style-type: disc !important;
+  margin-left: 20px;
+}
+
+.default-html ol {
+  list-style-type: decimal;
+  margin-left: 20px;
+}
+
+.default-html li {
+  margin: 0.5em 0;
+}
+
+/* Add more styles as needed */

@@ -63,7 +63,7 @@ const TODOCart = ({ item, fetchTodos }) => {
 
     return (
         <>
-        <TODOEditModel ModelTODO={ModelTODO} setModelTODO={setModelTODO} EditID={EditID} setEditID={setEditID} />
+        <TODOEditModel ModelTODO={ModelTODO} fetchTodos={fetchTodos} setModelTODO={setModelTODO} EditID={EditID} setEditID={setEditID} />
         <div className='border-2 font-para border-[#1C1D22]/10 py-4 px-6 rounded-xl bg-white'>
             <div className="flex flex-col gap-2 md:flex-row justify-between md:items-center mb-6">
                 <h2 className='md:text-base font-bold'>{item?.Title}</h2>

@@ -74,6 +74,7 @@ const TODOEditModel = ({ ModelTODO, setModelTODO, EditID, setEditID }) => {
             const data = await response.json();
             if (response.ok) {
                 showAlert('ToDo updated successfully', 'success');
+                fetchTodos()
                 setModelTODO(false);
                 setEditID(null)
             } else {

@@ -46,13 +46,11 @@ const Chating = () => {
             setQuery("")
             console.log(ChatsData)
             const chatHistory = await ChatsData.map((item) => {
-
                 if (item.Type == "User") {
                     return { role: "user", content: item.Query }
                 } else {
                     return { role: "assistant", content: item.Query }
                 }
-
             })
 
             let fileName = null;
@@ -113,15 +111,10 @@ const Chating = () => {
 
             const NewData = ChatsData
 
-            NewData.push({
-                Type: "User",
-                Query: Query
-            })
-
-            NewData.push({
+            NewData[ChatsData.length - 1] = {
                 Type: "BizBot",
                 Query: AskDetail.response.content
-            })
+            }
 
             setChatsData(NewData)
 
@@ -408,15 +401,24 @@ const Chating = () => {
                                 <div
                                     className="bg-white w-[100%] relative rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-4 h-full"
                                 >
-                                    {Query.length > 0 && <div className="w-full max-h-[40vh] absolute bottom-[100%] z-[50] shadow-shadow3 rounded-t-xl left-[0] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
-                                        {SearchSugesstonsData?.map((item) => {
-                                            return (
-                                                <div className="bg-gray cursor-pointer  px-4 py-2" onClick={() => { setQuery(item) }}>
-                                                    <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>}
+                                    {Query.length > 0 &&
+                                        <div className="w-full max-h-[40vh] absolute bottom-[100%] z-[50] shadow-shadow3 rounded-t-xl left-[0] overflow-y-auto flex gap-2 flex-wrap bg-white px-4 py-4">
+                                            {SearchSugesstonsData?.length > 0 ?
+                                                <>
+                                                    {SearchSugesstonsData?.map((item) => {
+                                                        return (
+                                                            <div className="bg-gray cursor-pointer  px-4 py-2" onClick={() => { setQuery(item) }}>
+                                                                <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </>
+                                                :
+                                                <div className='w-[20%]'>
+                                                    <img src="../../Porp/Loading.gif" alt="" className='object-cover bg-gray rounded-xl px-2' />
+                                                </div>}
+                                        </div>
+                                    }
                                     <div className="flex justify-between">
                                         <div className="flex gap-4 w-[100%]">
                                             <label htmlFor="fileupload">
@@ -430,10 +432,9 @@ const Chating = () => {
                                                     onChange={(e) => setSelectedFile(e.target.files[0])} // Update state on file select
                                                 />
                                             </label>
-                                            <textarea
+                                            <input
                                                 name=""
                                                 id=""
-                                                rows={'2'}
                                                 value={Query}
                                                 onChange={(e) => { setQuery(e.target.value) }}
                                                 placeholder='Ask my anything......'
@@ -446,6 +447,16 @@ const Chating = () => {
                                             className={`w-6 h-6 ${Query == "" && !IsDisable && "opacity-35"}`}
                                             onClick={() => {
                                                 if (Query !== "" && !IsDisable) {
+                                                    const NewData = ChatsData
+                                                    NewData.push({
+                                                        Type: "User",
+                                                        Query: Query
+                                                    })
+                                                    NewData.push({
+                                                        Type: "BizBot",
+                                                        Query: ""
+                                                    })
+                                                    setChatsData(NewData)
                                                     UpdateChat()
                                                 }
                                             }}

@@ -28,15 +28,12 @@ const PhotosUploader = multer({ storage: PhotosStorage });
 
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.hostinger.com",
+    host: 'smtp.gmail.com',
     port: 465,
-    secure: true,
+    secure: true, // true for 465, false for other ports
     auth: {
-        user: "no-reply@earn4views.com",
-        pass: "ZXCVBNM8j@",
-    },
-    tls: {
-        rejectUnauthorized: false,
+        user: 'ipocryptos@gmail.com', // Your Gmail email address
+        pass: 'ixbw rudr efft hedl', // Your Gmail app password or an app-specific password
     },
 });
 
@@ -45,7 +42,7 @@ const sendOTPEmail = async (id, email, res) => {
         const otp = `${Math.floor(1000 + Math.random() * 9000)}`
 
         const mailOptions = {
-            from: "no-reply@earn4views.com",
+            from: "ipocryptos@gmail.com",
             to: email,
             subject: `Verify Your Email`,
             html: `<p>Enter <b>${otp}</b> in the app to verify your email address and complete the proccess of Signup</p>
@@ -65,11 +62,13 @@ const sendOTPEmail = async (id, email, res) => {
             expireAt: new Date(Date.now() + 240000)
         })
 
-        await transporter.sendMail(mailOptions)
+        const response = await transporter.sendMail(mailOptions)
+        console.log(response)
 
         return {
             status: "Pending",
             message: "Verification otp email send",
+            response: response
         };
     } catch (error) {
         return {
@@ -152,7 +151,7 @@ router.post("/createpassword/:id", async (req, res) => {
             return res.status(404).json({ success, error: "No User Found" })
         }
 
-        if (user.ActiveUsed==true) {
+        if (user.ActiveUsed == true) {
             return res.status(404).json({ success, error: "You alreaded Created Password" })
         }
 
@@ -160,9 +159,9 @@ router.post("/createpassword/:id", async (req, res) => {
         const Salt = await bcrypt.genSalt(10);
         const SecPassword = await bcrypt.hash(req.body.Password, Salt)
 
-        const userfield={
-            ActiveUsed:true,
-            Password:SecPassword
+        const userfield = {
+            ActiveUsed: true,
+            Password: SecPassword
         }
 
         const newUser = await User.findByIdAndUpdate(
@@ -351,8 +350,8 @@ router.post("/loginuser", async (req, res) => {
         success = true;
 
         if (!user.Is_Verfied) {
-            await sendOTPEmail(user._id, user.Email);
-            return res.json({ success: true, Email: false, Message: "Email Verification Required", AuthToken });
+            const respponse = await sendOTPEmail(user._id, user.Email);
+            return res.json({ success: true, Email: false, Message: "Email Verification Required", AuthToken, respponse });
         }
 
         res.json({ success, AuthToken, User_Type: user.User_Type })
@@ -434,7 +433,12 @@ router.get("/getProImg", fetchuser, async (req, res) => {
 router.put("/UpdateUser", fetchuser, PhotosUploader.fields([{ name: 'ProfilePhoto', maxCount: 1 }]), async (req, res) => {
     try {
         const { FirstName, LastName, Phone, Age, Gender } = req.body;
-        let path = req.file ? req.file.path : null;
+        let path = req.files && req.files.ProfilePhoto ? req.files.ProfilePhoto[0].path : null;
+        if (path) {
+            path = path.replace(/^src\\/, ''); // Remove 'src\' from the beginning of the path
+        }
+
+        console.log(path)
 
         const newUser = {};
         if (FirstName) newUser.FirstName = FirstName;
@@ -635,21 +639,21 @@ router.put('/updatecompany', fetchuser, async (req, res) => {
 
         console.log(companyData)
 
-        const NewData={
-            CompanyName:companyData?.CompanyName,
-            Address:companyData?.Address,
-            CompanyMoto:companyData?.CompanyDescription,
-            NumEmployee:companyData?.NumEmployee,
-            CompanySell:companyData?.CompanySell,
-            ContactEmail:companyData?.ContactEmail,
-            CollectiveAgreement:companyData?.CollectiveAgreement,
-            Customers:companyData?.Customers,
-            Struture:companyData?.Structure,
-            dailyoperation:companyData?.DailyOperation,
-            rules:companyData?.Rules,
-            communication:companyData?.Communication,
-            questions:companyData?.Questions,
-            feedback:companyData?.Feedback
+        const NewData = {
+            CompanyName: companyData?.CompanyName,
+            Address: companyData?.Address,
+            CompanyMoto: companyData?.CompanyDescription,
+            NumEmployee: companyData?.NumEmployee,
+            CompanySell: companyData?.CompanySell,
+            ContactEmail: companyData?.ContactEmail,
+            CollectiveAgreement: companyData?.CollectiveAgreement,
+            Customers: companyData?.Customers,
+            Struture: companyData?.Structure,
+            dailyoperation: companyData?.DailyOperation,
+            rules: companyData?.Rules,
+            communication: companyData?.Communication,
+            questions: companyData?.Questions,
+            feedback: companyData?.Feedback
         }
 
         // Find company by owner ID and update it

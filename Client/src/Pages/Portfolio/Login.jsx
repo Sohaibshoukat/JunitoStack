@@ -38,6 +38,12 @@ const Login = () => {
                 return;
             }
 
+            if(data?.Email==false){
+                showAlert('Email not Verified','danger')
+                navigate(`/otpconfirm/${data.AuthToken}`)
+                return;
+            }
+
             showAlert('Login Success','success')
             localStorage.setItem("auth-token", data.AuthToken)
             navigate('/dashboard/chatbot')

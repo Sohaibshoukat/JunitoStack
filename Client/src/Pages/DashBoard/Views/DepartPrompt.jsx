@@ -14,7 +14,7 @@ const DepartPrompt = () => {
     const [selectedPotential, setSelectedPotential] = useState("all");
     const [categories, setCategories] = useState([]);
     const [potentials, setPotentials] = useState([]);
-    const [isLoading, setisLoading] = useState(true)
+    const [isLoading, setisLoading] = useState(null);
 
     const { dep } = useParams();
 
@@ -29,16 +29,20 @@ const DepartPrompt = () => {
 
     const fetchPromptsByDepartment = async () => {
         try {
+            setisLoading(true)
             const response = await fetch(`${BaseURL}/api/company/prompts/${dep}`);
             const data = await response.json();
+            console.log('Fetched data:', data); // Add this line to check the fetched data
             if (response.ok) {
+                setisLoading(false);
                 setPrompts(data.Prompts);
                 extractCategoriesAndPotentials(data.Prompts);
-                setisLoading(false)
             } else {
+                setisLoading(false);
                 showAlert(data.message || 'Error Getting Prompts', "danger");
             }
         } catch (error) {
+            setisLoading(false);
             showAlert(error.message, "danger");
         }
     };
@@ -120,68 +124,71 @@ const DepartPrompt = () => {
             <div className='flex flex-col py-10 gap-6 w-[90%] md:w-[90%] m-auto overflow-y-scroll md:px-6'>
                 <div className="bg-white rounded-lg shadow-shadow2 py-3 md:py-4 lg:py-6 px-3 md:px-3 lg:px-6">
                     <div className="my-4">
-                        {isLoading?
-                        <div className='flex justify-center'>
-                            <img src="../../Loading.gif" alt="" className='w-32 h-32' />
-                        </div> 
-                        :<div className="relative overflow-x-auto">
-                            <table className="w-full text-sm font-para text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead className="text-base font-normal uppercase text-slate-300">
-                                    <tr>
-                                        <th className="px-auto md:px-6 py-2 md:py-4">#</th>
-                                        <th className="px-auto md:px-6 py-2 md:py-4">Name</th>
-                                        <th className="px-auto md:px-6 py-2 md:py-4">Type</th>
-                                        <th className="px-auto md:px-6 py-2 md:py-4">Potential</th>
-                                        <th className="px-auto md:px-6 py-2 md:py-4">Category</th>
-                                        <th className="px-auto md:px-6 py-2 md:py-4">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {prompts.map((item, index) => (
-                                        <>
-                                            {item?.List?.filter(handleSearch).filter(handleFilter).map((item2, index2) => (
-                                                <tr
-                                                    className="bg-white cursor-pointer border-b font-normal text-base border-slate-200 hover:bg-gray hover:text-white ease-in-out duration-300"
-                                                    key={index2}
-                                                >
-                                                    <th className="px-auto md:px-6 py-2 md:py-4">{index2}</th>
-                                                    <td className="px-auto md:px-6 py-2 md:py-4 min-w-max">{item2.Name}</td>
-                                                    <td className="px-auto md:px-6 py-2 md:py-4">
-                                                        <div className={`${item2.Type === 'Conversation' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FEF6E6] border-[#FF8900] text-[#FF8900]"} text-center py-2 px-3 rounded-lg border-2`}>
-                                                            {item2.Type}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-auto md:px-6 py-2 md:py-4">
-                                                        <div className={`
+                        {prompts.length>0 ?
+                            (
+                                <div className="relative overflow-x-auto">
+                                    <table className="w-full text-sm font-para text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                        <thead className="text-base font-normal uppercase text-slate-300">
+                                            <tr>
+                                                <th className="px-auto md:px-6 py-2 md:py-4">#</th>
+                                                <th className="px-auto md:px-6 py-2 md:py-4">Name</th>
+                                                <th className="px-auto md:px-6 py-2 md:py-4">Type</th>
+                                                <th className="px-auto md:px-6 py-2 md:py-4">Potential</th>
+                                                <th className="px-auto md:px-6 py-2 md:py-4">Category</th>
+                                                <th className="px-auto md:px-6 py-2 md:py-4">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {prompts.map((item, index) => (
+                                                <>
+                                                    {item?.List?.filter(handleSearch).filter(handleFilter).map((item2, index2) => (
+                                                        <tr
+                                                            className="bg-white cursor-pointer border-b font-normal text-base border-slate-200 hover:bg-gray hover:text-white ease-in-out duration-300"
+                                                            key={index2}
+                                                        >
+                                                            <th className="px-auto md:px-6 py-2 md:py-4">{index2}</th>
+                                                            <td className="px-auto md:px-6 py-2 md:py-4 min-w-max">{item2.Name}</td>
+                                                            <td className="px-auto md:px-6 py-2 md:py-4">
+                                                                <div className={`${item2.Type === 'Conversation' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FEF6E6] border-[#FF8900] text-[#FF8900]"} text-center py-2 px-3 rounded-lg border-2`}>
+                                                                    {item2.Type}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-auto md:px-6 py-2 md:py-4">
+                                                                <div className={`
                                                         ${item2.Potential === 'Premium' ? "bg-[#F0F9FF] border-[#0095FF] text-[#0095FF]"
-                                                                : item2.Potential === 'High' ? "bg-[#F0FDF4] border-[#00E58F] text-[#00E58F]"
-                                                                    : item2.Potential === 'Medium' ? "bg-[#FBF1FF] border-[#884DFF] text-[#884DFF]"
-                                                                        : "bg-[#FEF6E6] border-[#FF8900] text-[#FF8900]"} text-center w-full py-2 px-3 rounded-lg border-2`}
-                                                        >
-                                                            {item2.Potential}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-auto md:px-6 py-2 md:py-4">{item2.Category}</td>
-                                                    <td
-                                                        className="px-auto md:px-6 py-2 md:py-4"
-                                                        onClick={() => {
-                                                            setSelectedId(item2._id);
-                                                            setPromptDetail(true);
-                                                        }}
-                                                    >
-                                                        <button
-                                                            className='bg-black w-max rounded-lg text-white py-2 px-4 border-2 border-black hover:bg-transparent hover:text-white ease-in-out duration-300'
-                                                        >
-                                                            See More
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                                        : item2.Potential === 'High' ? "bg-[#F0FDF4] border-[#00E58F] text-[#00E58F]"
+                                                                            : item2.Potential === 'Medium' ? "bg-[#FBF1FF] border-[#884DFF] text-[#884DFF]"
+                                                                                : "bg-[#FEF6E6] border-[#FF8900] text-[#FF8900]"} text-center w-full py-2 px-3 rounded-lg border-2`}
+                                                                >
+                                                                    {item2.Potential}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-auto md:px-6 py-2 md:py-4">{item2.Category}</td>
+                                                            <td
+                                                                className="px-auto md:px-6 py-2 md:py-4"
+                                                                onClick={() => {
+                                                                    setSelectedId(item2._id);
+                                                                    setPromptDetail(true);
+                                                                }}
+                                                            >
+                                                                <button
+                                                                    className='bg-black w-max rounded-lg text-white py-2 px-4 border-2 border-black hover:bg-transparent hover:text-white ease-in-out duration-300'
+                                                                >
+                                                                    See More
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </>
                                             ))}
-                                        </>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) :
+                            <div className='flex justify-center'>
+                                <img src="../../Loading.gif" alt="Loading..." className='w-24 h-24' />
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

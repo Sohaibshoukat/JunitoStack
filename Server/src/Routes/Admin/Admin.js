@@ -201,6 +201,11 @@ router.put("/updateadmin", fetchadmin, PhotosUploader.single('profimg'), async (
 
         const { Email, Name, Phone } = req.body;
         let path = req.file ? req.file.path : null;
+        if (path) {
+            path = path.replace(/^src\\/, ''); 
+        }
+
+        console.log(path)
 
         const updatedAdmin = {
             Name,

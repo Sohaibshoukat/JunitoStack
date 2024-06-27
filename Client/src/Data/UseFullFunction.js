@@ -6,6 +6,16 @@ export const trimToWords = (str) => {
   return words.slice(0, 12).join(' ');
 }
 
+export const trimTo35Words = (str) => {
+  if(str){
+    let words = str.trim().split(/\s+/);
+    if (words.length <= 30) {
+      return str;
+    }
+    return words.slice(0, 30).join(' ');
+  }
+}
+
 
 export const getFirstLetter = (str) => {
   console.log(str)
