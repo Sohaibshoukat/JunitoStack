@@ -19,6 +19,7 @@ app.use('/api/contact', require('./Routes/User/Contact'));
 app.use('/api/user', require('./Routes/User/User'));
 app.use('/api/company', require('./Routes/User/Company'));
 app.use('/api/chat', require('./Routes/User/Chat'));
+app.use('/api/transaction', require('./Routes/User/Transaction'));
 app.use('/Upload', express.static(path.join(__dirname, 'Uploads')));
 
 app.get('/welcome', (req, res) => {

@@ -29,6 +29,7 @@ import { BaseURL } from '../Data/BaseURL';
 import PromptBrowsing from './Views/PromptBrowsing';
 import PromptList from './Views/PromptList';
 import EditPrompt from './Views/EditPrompt';
+import PromoCode from './Views/PromoCode';
 
 
 const AdminDashboard = () => {
@@ -91,7 +92,7 @@ const AdminDashboard = () => {
                         <FiChevronDown className='mx-2' />
                         {Profile &&
                             <div className='absolute w-fit flex flex-col gap-2 font-Para text-lg font-medium right-[-20px] bottom-[-200%] shadow-shadow2 bg-white rounded-2xl py-2 px-6'>
-                                <Link 
+                                <Link
                                     to={"/admin-dashboard/admin-profile"}
                                     className='cursor-pointer'
                                 >
@@ -185,6 +186,11 @@ const AdminDashboard = () => {
                         <Route
                             path='/edit-integration-guides/:id'
                             element={<EditIntegrationGuides />}
+                        />
+
+                        <Route
+                            path='/PromoCode'
+                            element={<PromoCode />}
                         />
 
                         <Route

@@ -34,11 +34,34 @@ const OTP = () => {
                 return;
             }
             localStorage.setItem("auth-token", data.AuthToken)
-            navigate('/dashboard/chatbot')
+            
+            navigate(`/checkout/${id}`)
         } catch (error) {
             showAlert(error.message || 'OTP verification failed', 'danger');
         }
     };
+
+    const handleResendOTP = async () => {
+        try {
+            const response = await fetch(`${BaseURL}/api/user/SendOTPagain`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id }),
+            });
+            const data = await response.json();
+            if (!data.success) {
+                showAlert(data.message || 'Failed to resend OTP', 'danger');
+                return;
+            }
+            showAlert(data.message || 'OTP sent successfully', 'success');
+        } catch (error) {
+            showAlert(error.message || 'Failed to resend OTP', 'danger');
+        }
+    };
+
+
     return (
         <>
             <Nav />
@@ -66,6 +89,7 @@ const OTP = () => {
                                     Verify
                                 </button>
                             </div>
+                            <p className='text-lightgray font-para text-sm'>Did not recive OTP <span className='text-gray' onClick={()=>{handleResendOTP()}}>send again</span></p>
                         </div>
                     </div>
                     <div className="basis-[50%] bg-gray w-full h-full flex-col hidden lg:flex gap-10 relative items-center">

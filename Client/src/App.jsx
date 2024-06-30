@@ -23,6 +23,7 @@ import HistoryState from './Context/History/HistoryState'
 import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import CreatePassword from './Pages/Portfolio/CreatePassword'
+import CheckOut from './Pages/Portfolio/CheckOut'
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
                   <Route path="/createpassword/:id" element={<CreatePassword />}></Route>
                   <Route path="/sign-up" element={<Signup />}></Route>
                   <Route path="/otpconfirm/:id" element={<OTP />}></Route>
+                  <Route path="/checkout/:id" element={<CheckOut />}></Route>
                   <Route path="/forget-password" element={<Forgetpassword />}></Route>
                   <Route path="/recover-password/:id" element={<Recoverpassword />}></Route>
                   <Route path="/about" element={<About />}></Route>

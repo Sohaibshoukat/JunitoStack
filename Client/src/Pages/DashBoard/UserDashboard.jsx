@@ -14,6 +14,7 @@ import AlertContext from '../../Context/Alert/AlertContext';
 import ProfilePage from './Views/Profile';
 import Setting from './Views/Setting';
 import Main from './Views/ProfileMain';
+import PaySubUser from './Views/PaySubUser';
 
 
 
@@ -110,6 +111,7 @@ const UserDashboard = () => {
                             <Route path="/" element={<Home />}></Route>
                             <Route path="/faq" element={<FAQ />}></Route>
                             <Route path="/users" element={<User />}></Route>
+                            <Route path="/paysubUser" element={<PaySubUser />}></Route>
                             <Route path="/prompts-browsing" element={<Prompts />}></Route>
                             <Route path="/shared" element={<SharedChat />}></Route>
                             <Route path="/to-do" element={<ToDos />}></Route>

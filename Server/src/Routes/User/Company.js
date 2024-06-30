@@ -13,6 +13,7 @@ const SubUser = require("../../Models/SubUser");
 const Prompts = require("../../Models/Prompts");
 const FAQ = require("../../Models/FAQ");
 const PromptImages = require("../../Models/PromptImags");
+const Transaction = require("../../Models/Transaction");
 
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -124,6 +125,23 @@ router.post("/createSubuser", fetchuser, async (req, res) => {
         })
 
 
+        let transaction = await Transaction.findOne({ User_ID: req.user.id });
+
+        if (transaction.subUsers.length <= 0) {
+            transaction.subUsers.push({
+                User: user._id,
+                Status: "Paid"
+            })
+            transaction.save()
+        } else {
+            transaction.subUsers.push({
+                User: user._id,
+                Status: "UnPaid"
+            })
+            transaction.save()
+        }
+
+
         const response = await sendOTPEmail(user._id, owner.FirstName, owner.LastName, req.body.Password, req.body.Email, res);
 
 
@@ -179,9 +197,9 @@ router.put("/editSubuser/:subuserId", fetchuser, async (req, res) => {
 
 router.delete("/deleteSubuser/:subuserId", fetchuser, async (req, res) => {
     try {
-        let owner = await User.findById(req.user.id);
+        const owner = await User.findById(req.user.id);
         if (!owner) {
-            return res.status(404).json({ success: false, message: "You Have no Access" });
+            return res.status(404).json({ success: false, message: "You have no access" });
         }
 
         const subuserId = req.params.subuserId;
@@ -191,14 +209,21 @@ router.delete("/deleteSubuser/:subuserId", fetchuser, async (req, res) => {
             return res.status(404).json({ success: false, message: "Subuser not found" });
         }
 
-
-
-        // Check if the user has permission to edit this subuser
         if (subuser.User_ID.toString() !== req.user.id) {
-            return res.status(403).json({ success: false, message: "You do not have permission to edit this subuser" });
+            return res.status(403).json({ success: false, message: "You do not have permission to delete this subuser" });
         }
 
-        let user = await User.findByIdAndDelete(subuser.Own_ID);
+        // Find and update transactions
+        await Transaction.updateMany(
+            { "subUsers.User": subuserId },
+            {
+                $pull: { subUsers: { User: subuserId } },
+                $inc: { Amount: -50 }
+            }
+        );
+
+        // Delete the subuser and the user
+        const user = await User.findByIdAndDelete(subuser.Own_ID);
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
@@ -264,9 +289,31 @@ router.get('/subUser', fetchuser, async (req, res) => {
             return res.status(404).json({ success: false, message: "You Have no Access" });
         }
 
-        let users = await SubUser.find({ User_ID: req.user.id }).populate('Own_ID', 'FirstName LastName Email Phone ProfilePhoto Status')
+        // Get the sub-users
+        let subUsers = await SubUser.find({ User_ID: req.user.id })
+            .populate('Own_ID', 'FirstName LastName Email Phone ProfilePhoto Status');
 
-        res.send({ success: true, SubUsers: users });
+        // Get transactions for the user
+        let transactions = await Transaction.find({ User_ID: req.user.id });
+
+        // Map through subUsers to add status from transactions
+        let subUserDetails = subUsers.map(subUser => {
+            let transaction = transactions.find(tr => 
+                tr.subUsers.some(su => su.User.equals(subUser.Own_ID._id))
+            );
+
+            // Get the status of the subUser from the transaction
+            let status = transaction ? 
+                transaction.subUsers.find(su => su.User.equals(subUser.Own_ID._id)).Status : 
+                'No Transaction';
+
+            return {
+                ...subUser._doc,
+                TransactionStatus: status
+            };
+        });
+
+        res.send({ success: true, SubUsers: subUserDetails });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
@@ -452,21 +499,21 @@ router.get('/promptsrandom/:department', async (req, res) => {
 
 router.get('/random', async (req, res) => {
     try {
-      const departments = ["HR", "Marketing", "Vertrieb", "Support", "Agentour", "Startup"];
-      const randomPrompts = {};
+        const departments = ["HR", "Marketing", "Vertrieb", "Support", "Agentour", "Startup"];
+        const randomPrompts = {};
 
-      for (const department of departments) {
-        const prompts = await Prompts.aggregate([
-          { $match: { Department: department } },
-          { $sample: { size: 1 } }
-        ]);
-        randomPrompts[department] = prompts[0] || null;
-      }
+        for (const department of departments) {
+            const prompts = await Prompts.aggregate([
+                { $match: { Department: department } },
+                { $sample: { size: 1 } }
+            ]);
+            randomPrompts[department] = prompts[0] || null;
+        }
 
-      res.json(randomPrompts);
+        res.json(randomPrompts);
     } catch (err) {
-      res.status(500).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-  });
+});
 
 module.exports = router

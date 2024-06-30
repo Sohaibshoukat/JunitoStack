@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { FaRegSave } from 'react-icons/fa'
 import { IoIosSearch, IoMdAdd, IoMdClose } from 'react-icons/io'
 import { BaseURL } from '../../../Data/BaseURL';
+import { useNavigate } from 'react-router-dom'
 import AlertContext from '../../../Context/Alert/AlertContext';
 import AddUserModel from '../../../Components/Dashboard/User/AddUserModel';
 import EditUserModel from '../../../Components/Dashboard/User/EditUserModel';
@@ -14,6 +15,9 @@ const User = () => {
     const [UserModel, setUserModel] = useState(false);
     const [EditModel, setEditModel] = useState(false);
     const [EditId, setEditId] = useState(null);
+    const [PaidUser, setPaidUser] = useState([])
+
+    const navigate = useNavigate()
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -82,19 +86,35 @@ const User = () => {
         fetchUsers();
     }, []);
 
+    const handleCheckboxChange = (subuserId) => {
+        setPaidUser((prevPaidUser) => {
+            if (prevPaidUser.includes(subuserId)) {
+                return prevPaidUser.filter(id => id !== subuserId);
+            } else {
+                return [...prevPaidUser, subuserId];
+            }
+        });
+    };
+
+
     // Filter users based on search query
     const filteredUsers = users.filter(user => {
         const fullName = `${user?.Own_ID?.FirstName} ${user?.Own_ID?.LastName}`.toLowerCase();
         const email = user?.Own_ID?.Email.toLowerCase();
         const status = user?.Own_ID?.Status.toLowerCase();
-    
+
         if (filter === "") {
             return fullName.includes(searchQuery.toLowerCase()) || email.includes(searchQuery.toLowerCase());
         } else {
             return (fullName.includes(searchQuery.toLowerCase()) || email.includes(searchQuery.toLowerCase())) && status === filter.toLowerCase();
         }
     });
-    
+
+    const handlePayKnow = () => {
+        const params = new URLSearchParams({ users: JSON.stringify(PaidUser) });
+        navigate(`/dashboard/paysubUser?${params.toString()}`);
+    }
+
 
     return (
         <>
@@ -138,6 +158,14 @@ const User = () => {
                                     <option value="inactive">InActive</option>
                                 </select>
                             </div>
+                            {PaidUser.length > 0 &&
+                                <button
+                                    className='bg-gray py-1 px-4 rounded-xl text-white border-2 border-gray hover:bg-transparent hover:text-gray font-para font-semibold ease-in-out duration-300'
+                                    onClick={() => { handlePayKnow() }}
+                                >
+                                    Pay Users
+                                </button>
+                            }
                         </div>
                     </div>
                     <div className="my-4">
@@ -145,6 +173,9 @@ const User = () => {
                             <table className='w-full'>
                                 <thead class="text-sm md:text-base font-normal uppercase text-slate-300">
                                     <tr>
+                                        <th class="px-2 md:px-6 py-2 md:py-4">
+
+                                        </th>
                                         <th class="px-2 md:px-6 py-2 md:py-4">
                                             User name
                                         </th>
@@ -158,13 +189,24 @@ const User = () => {
                                             Action
                                         </th>
                                         <th class="px-2 md:px-6 py-2 md:py-4">
-                                            Status
+                                            Transaction Status
+                                        </th>
+                                        <th class="px-2 md:px-6 py-2 md:py-4">
+                                            User Status
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredUsers?.map((item, index) => (
                                         <tr class="bg-white border-b font-medium text-sm md:text-sm border-slate-200" key={index}>
+                                            <th class="px-2 md:px-6 py-2 md:py-4">
+                                                {item?.TransactionStatus == "UnPaid" &&
+                                                    <input
+                                                        type="checkbox"
+                                                        onChange={() => handleCheckboxChange(item?.Own_ID?._id)}
+                                                    />
+                                                }
+                                            </th>
                                             <th class="px-2 md:px-6 py-2 md:py-4">
                                                 <h2 className='w-max'>
                                                     {item?.Own_ID?.FirstName + " " + item?.Own_ID?.LastName}
@@ -200,6 +242,13 @@ const User = () => {
                                                         Delete
                                                     </button>
                                                 </div>
+                                            </td>
+                                            <td class="px-2 md:px-6 py-2 md:py-4">
+                                                <button
+                                                    className={`flex w-max gap-1 font-medium ${item?.TransactionStatus == 'Paid' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
+                                                >
+                                                    {item?.TransactionStatus}
+                                                </button>
                                             </td>
                                             <td class="px-2 md:px-6 py-2 md:py-4">
                                                 <button

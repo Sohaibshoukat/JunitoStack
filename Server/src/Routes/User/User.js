@@ -10,6 +10,9 @@ const multer = require('multer');
 const User = require("../../Models/User");
 const OTP = require("../../Models/EmailOtp");
 const Company = require("../../Models/Company");
+const Transaction = require("../../Models/Transaction");
+const SubUser = require("../../Models/SubUser");
+const dayjs = require('dayjs');
 
 const JWT_KEY = process.env.JWT_KEY;
 
@@ -117,6 +120,14 @@ router.post("/createuser", async (req, res) => {
             Owner_ID: user._id
         })
 
+        let transaction = await Transaction.create({
+            User_ID: user._id,
+            Company_ID: company._id,
+            Amount: 0,
+            subUsers: [],
+            Status: "UnPaid"
+        });
+
 
         const response = await sendOTPEmail(user._id, req.body.Email, res);
 
@@ -137,6 +148,7 @@ router.post("/createuser", async (req, res) => {
     }
 })
 
+//Create Password
 router.post("/createpassword/:id", async (req, res) => {
     let success = false;
     const errors = validationResult(req);
@@ -236,6 +248,7 @@ router.post("/verifyOTP", async (req, res) => {
             }
         }
     } catch (error) {
+        console.log(error)
         res.json({
             success: false,
             message: error.message
@@ -247,7 +260,6 @@ router.post("/verifyOTP", async (req, res) => {
 router.post("/SendOTPagain", async (req, res) => {
     try {
         const { id } = req.body;
-        const password = jwt.verify(token, JWT_KEY);
         const userID = id;
 
         // Delete existing OTP verification document
@@ -332,12 +344,71 @@ router.post("/loginuser", async (req, res) => {
     try {
         let user = await User.findOne({ Email: Email })
         if (!user) {
-            return res.status(400).json({ Message: "Account doesn't Found" })
+            return res.status(400).json({ success: false, message: "Account doesn't Found" })
         }
 
         const passwordCompare = await bcrypt.compare(Password, user.Password)
         if (!passwordCompare) {
-            return res.status(400).json({ Message: "UserName or Password Does not Find" })
+            return res.status(400).json({ success: false, message: "UserName or Password Does not Find" })
+        }
+
+
+
+        const newDa = dayjs();
+
+        if (user.User_Type == "Owner") {
+            let transaction = await Transaction.findOne({ User_ID: user._id });
+            if (transaction.Status == "UnPaid") {
+                return res.status(400).json({
+                    Status: "UnPaid",
+                    type: "User",
+                    message: "You haven't Paid Your Dues",
+                    id: user._id
+                });
+            } else if (dayjs(transaction.ExpiryDate).isBefore(dayjs().add(2, 'day'), 'day')) {
+                return res.status(400).json({
+                    Status: "Expired",
+                    type: "User",
+                    message: "Your Payment is Due. Please pay your dues to continue using the platform.",
+                    id: user._id
+                });
+            }
+            console.log(transaction.ExpiryDate)
+            console.log(new Date())
+        } else {
+            let Owner = await SubUser.findOne({ Own_ID: user._id });
+            let transaction = await Transaction.findOne({ User_ID: Owner.User_ID });
+            const subUser = transaction.subUsers.find(su => {
+                if (su.User.toString() == user._id.toString()) {
+                    return su;
+                }
+            });
+            const transaction22 = await Transaction.findOne({ User_ID: Owner.User_ID });
+            // Current date
+            const currentDate = new Date();
+
+            // Iterate through each subUser
+            transaction22?.subUsers?.forEach(subUser => {
+                const expiryDate = new Date(subUser.ExpiryDate);
+                const timeDiff = expiryDate - currentDate;
+                const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+
+                // Check if the expiry date is within two days
+                if (daysDiff <= 2) {
+                    subUser.Status = "UnPaid";
+                }
+            });
+
+            // Save the updated transaction
+            await transaction22.save();
+            if (!subUser) {
+                return res.status(404).json({ success: false, message: "SubUser not found" });
+            }
+            if (subUser.Status == "UnPaid") {
+                return res.status(400).json({ Status: "UnPaid", type: "SubUser", message: "Your Payment is Pending contact your company owner", id: user._id });
+            } else if (dayjs(transaction.ExpiryDate).isSame(newDa.add(2, 'day'))) {
+                return res.status(400).json({ Status: "Expired", type: "SubUser", message: "Your Payment is Expired contact your company", id: user._id });
+            }
         }
 
         const Payload = {
@@ -351,17 +422,16 @@ router.post("/loginuser", async (req, res) => {
 
         if (!user.Is_Verfied) {
             const respponse = await sendOTPEmail(user._id, user.Email);
-            return res.json({ success: true, Email: false, Message: "Email Verification Required", AuthToken, respponse });
+            return res.json({ success: true, Email: false, message: "Email Verification Required", AuthToken: user.id, respponse });
         }
 
-        res.json({ success, AuthToken, User_Type: user.User_Type })
+        res.json({ success, AuthToken, User_Type: user.User_Type, id:user.id })
 
     } catch (error) {
         console.error(error)
         res.status(500).send('error occured')
     }
 })
-
 
 //Upload Profile Image
 router.put("/UpProImg", fetchuser, PhotosUploader.single('Proimg'), async (req, res) => {
@@ -400,6 +470,26 @@ router.get("/getuser", fetchuser, async (req, res) => {
             const userData = { ...user.toObject(), ProfilePhoto: undefined };
             res.json({ success: true, userData: userData });
 
+        } else {
+            res.json({ success: true, userData: user });
+        }
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('error occured')
+    }
+})
+
+router.get("/getbyid/:id", async (req, res) => {
+    try {
+        let userid = req.params.id;
+        const user = await User.findById({ _id: userid });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        if (!user.ProfilePhoto) {
+            const userData = { ...user.toObject(), ProfilePhoto: undefined };
+            res.json({ success: true, userData: userData });
         } else {
             res.json({ success: true, userData: user });
         }

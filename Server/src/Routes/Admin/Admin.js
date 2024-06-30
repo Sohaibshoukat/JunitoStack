@@ -17,6 +17,7 @@ const Emails = require("../../Models/Email");
 const Company = require("../../Models/Company");
 const Chat = require("../../Models/Chat");
 const multer = require('multer');
+const PromoCode = require("../../Models/PrompoCode");
 
 
 
@@ -202,7 +203,7 @@ router.put("/updateadmin", fetchadmin, PhotosUploader.single('profimg'), async (
         const { Email, Name, Phone } = req.body;
         let path = req.file ? req.file.path : null;
         if (path) {
-            path = path.replace(/^src\\/, ''); 
+            path = path.replace(/^src\\/, '');
         }
 
         console.log(path)
@@ -606,7 +607,7 @@ router.post("/createuser", fetchadmin, async (req, res) => {
             Phone: req.body.Phone,
             Status: "Active",
             User_Type: "Owner",
-            ActiveUsed:false,
+            ActiveUsed: false,
         })
 
 
@@ -887,6 +888,121 @@ router.get('/promptdetail/:prompid', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+
+router.post("/createPromoCode", fetchadmin, async (req, res) => {
+    try {
+        const { OffPercentage, PromoCodevalue, Heading, ExpiryDate } = req.body;
+
+        let admin = await Admin.findById(req.admin.id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        let promoCode = await PromoCode.findOne({ PromoCode: PromoCodevalue });
+        if (promoCode) {
+            return res.status(404).json({ success: false, message: "This Code is Already Assigned" });
+        }
+
+
+        promoCode = await PromoCode.create({
+            OffPercentage,
+            PromoCode: PromoCodevalue,
+            Heading,
+            ExpiryDate
+        });
+        res.status(201).json({ success: true, data: promoCode });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error occurred');
+    }
+});
+
+// Read all promo codes
+router.get("/getAllPromoCodes", fetchadmin, async (req, res) => {
+    try {
+        let admin = await Admin.findById(req.admin.id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+
+
+        const promoCodes = await PromoCode.find();
+        res.status(200).json({ success: true, data: promoCodes });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error occurred');
+    }
+});
+
+// Update a promo code by ID
+router.put("/updatePromoCode/:id", fetchadmin, async (req, res) => {
+    try {
+        const { OffPercentage, PromoCodevalue, ExpiryDate, Heading } = req.body;
+
+        let admin = await Admin.findById(req.admin.id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        const updatedPromoCode = await PromoCode.findByIdAndUpdate(
+            req.params.id,
+            { OffPercentage, PromoCode: PromoCodevalue, Heading, ExpiryDate },
+            { new: true }
+        );
+
+        if (!updatedPromoCode) {
+            return res.status(404).json({ success: false, message: "Promo code not found" });
+        }
+
+        res.status(200).json({ success: true, data: updatedPromoCode });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error occurred');
+    }
+});
+
+// Delete a promo code by ID
+router.delete("/deletePromoCode/:id", fetchadmin, async (req, res) => {
+    try {
+        let admin = await Admin.findById(req.admin.id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        const deletedPromoCode = await PromoCode.findByIdAndDelete(req.params.id);
+        if (!deletedPromoCode) {
+            return res.status(404).json({ success: false, message: "Promo code not found" });
+        }
+
+        res.status(200).json({ success: true, message: "Promo code deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error occurred');
+    }
+});
+
+// Read a promo code by ID
+router.get("/getPromoCode/:id", fetchadmin, async (req, res) => {
+    try {
+        let admin = await Admin.findById(req.admin.id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "You have no access" });
+        }
+
+        const promoCode = await PromoCode.findById(req.params.id);
+        if (!promoCode) {
+            return res.status(404).json({ success: false, message: "Promo code not found" });
+        }
+
+        res.status(200).json({ success: true, data: promoCode });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error occurred');
+    }
+});
+
 
 
 module.exports = router

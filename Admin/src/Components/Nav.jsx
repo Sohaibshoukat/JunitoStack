@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { FaChartPie, FaRegQuestionCircle, FaRegUserCircle, FaUserPlus } from "react-icons/fa";
-import { FaBloggerB } from 'react-icons/fa6'
+import React from 'react';
+import { FaChartPie, FaRegQuestionCircle, FaUserPlus } from "react-icons/fa";
 import { IoBag, IoCartOutline } from "react-icons/io5";
-import { IoIosListBox, IoIosPeople, IoMdSettings } from "react-icons/io";
+import { IoMdSettings } from "react-icons/io";
 import { Link, useNavigate } from 'react-router-dom';
-import { MdBlock } from "react-icons/md"
-import { LiaWpforms } from "react-icons/lia"
+import {RiCoupon2Line} from 'react-icons/ri'
 import { PiSignOut } from "react-icons/pi"
 
 
@@ -27,6 +25,11 @@ const Nav = () => {
             name: 'Registered User',
             Icon: FaUserPlus,
             link: '/admin-dashboard/user-analysis',
+        },
+        {
+            name: 'Promotions',
+            Icon: RiCoupon2Line,
+            link: '/admin-dashboard/PromoCode',
         },
         {
             name: 'Emails',

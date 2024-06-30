@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Nav from '../../Components/Nav';
 import Footer from '../../Components/Footer';
@@ -6,6 +6,7 @@ import AlertContext from '../../Context/Alert/AlertContext';
 import { BaseURL } from '../../Data/BaseURL';
 
 const Login = () => {
+
     const [formData, setFormData] = useState({
         Email: '',
         Password: ''
@@ -22,7 +23,6 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
         try {
             const response = await fetch(`${BaseURL}/api/user/loginuser`, {
                 method: 'POST',
@@ -33,23 +33,59 @@ const Login = () => {
             });
             const data = await response.json();
 
-            if(!data.success){
-                showAlert(data.Message || 'Login failed check credentials','danger')
+            if (data.success==false) {
+                showAlert(data.message || 'Login failed check credentials', 'danger')
                 return;
             }
 
-            if(data?.Email==false){
-                showAlert('Email not Verified','danger')
+            if (data?.Email == false) {
+                showAlert('Email not Verified', 'danger')
                 navigate(`/otpconfirm/${data.AuthToken}`)
                 return;
             }
 
-            showAlert('Login Success','success')
+            if(data?.type=="User"){ 
+
+                if(data?.Status=="UnPaid"){
+                    showAlert(data.message, 'danger')
+                    navigate(`/checkout/${data.id}`)
+                    return;
+                }else if(data?.Status=="Expired"){
+                    showAlert(data.message, 'danger')
+                    navigate(`/checkout/${data.id}`)
+                    return;
+                }
+            }else if(data?.type=="SubUser"){
+                if(data?.Status=="UnPaid"){
+                    showAlert(data.message, 'danger')
+                    return;
+                }else if(data?.Status=="Expired"){
+                    showAlert(data.message, 'danger')
+                    return;
+                }
+            }
+
+            if(data?.User_Type=="Owner"){
+                const response22 = await fetch(`${BaseURL}/api/transaction/CheckSubUser`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId:data.id
+                    }),
+                });
+                const data22 = await response22.json();
+            }
+   
+
+
+            showAlert('Login Success', 'success')
             localStorage.setItem("auth-token", data.AuthToken)
             navigate('/dashboard/chatbot')
         } catch (error) {
             console.log(error)
-            showAlert(error.message,'danger')
+            showAlert(error.message, 'danger')
         }
     };
 
@@ -93,7 +129,7 @@ const Login = () => {
                                         </div>
                                         <p className='text-gray font-medium font-para text-lg'>
                                             <Link to={'/forget-password'}>
-                                            Forgot Password
+                                                Forgot Password
                                             </Link>
                                         </p>
                                     </div>
