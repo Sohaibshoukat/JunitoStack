@@ -81,7 +81,7 @@ const ContactForm2 = () => {
                             id='Company'
                             value={Company}
                             onChange={(e) => { setCompany(e.target.value) }}
-                            placeholder='Company Name'
+                            placeholder='Firma'
                             className='text-para text-black text-base md:text-lg font-para placeholder:text-gray-400 bg-transparent outline-none py-3 px-2 border-b-2 border-black'
                         />
                     </div>
@@ -92,7 +92,7 @@ const ContactForm2 = () => {
                             id='Subject'
                             value={Subject}
                             onChange={(e) => { setSubject(e.target.value) }}
-                            placeholder='Subject'
+                            placeholder='Thema'
                             className='text-para text-black text-base md:text-lg font-para placeholder:text-gray-400 bg-transparent outline-none py-3 px-2 border-b-2 border-black'
                         />
                     </div>
@@ -104,7 +104,7 @@ const ContactForm2 = () => {
                             value={Message}
                             onChange={(e) => { setMessage(e.target.value) }}
                             rows="5"
-                            placeholder='Message'
+                            placeholder='Nachricht'
                             className='text-para text-black text-base md:text-lg font-para placeholder:text-gray-400 bg-transparent outline-none py-3 px-2 border-b-2 border-black'
                         />
                     </div>
@@ -118,7 +118,7 @@ const ContactForm2 = () => {
                         disabled={IsLoading}
                     >
                         <IoIosSend className='text-2xl'/>
-                        Send Message
+                        Nachricht senden
                     </button>
                 </div>
             </div>

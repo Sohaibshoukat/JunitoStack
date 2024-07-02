@@ -6,7 +6,7 @@ const Why = () => {
     return (
         <div className='relative my-8'>
             <div className='w-[90%] md:w-[90%] xl:w-[80%] m-auto relative'>
-                <h1 className='font-head text-center text-gray text-lg md:text-xl lg:text-2xl xl:text-4xl font-bold'>Why JUNITO?</h1>
+                <h1 className='font-head text-center text-gray text-lg md:text-xl lg:text-2xl xl:text-4xl font-bold'>Warum JUNITO der richtige Partner ist                </h1>
                 <div className="py-8 md:py-16">
                     <div className='flex flex-col lg:flex-row justify-between gap-16'>
                         {WhyUs.map((item, index) => (

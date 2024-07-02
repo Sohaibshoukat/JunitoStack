@@ -50,8 +50,8 @@ const ContactForm = () => {
         <>
             <div className={``}>
                 <div className='border-b-2 pb-10 border-[#3A3A3A]  flex flex-col gap-4'>
-                    <h2 className='font-mont text-gray font-bold text-xl md:text-2xl lg:text-3xl'>Let us know your concerns.</h2>
-                    <p className='font-para text-xl text-slate-400 '>First please give us some context.</p>
+                    <h2 className='font-mont text-gray font-bold text-xl md:text-2xl lg:text-3xl'>Kontaktieren Sie uns heute noch und erfahren Sie mehr über die Vorteile von BizBot für Ihr Business.                    </h2>
+                    <p className='font-para text-xl text-slate-400 '>Bitte teilen Sie uns Ihre Wünsche mit.                    </p>
                 </div>
                 <div className="flex flex-col gap-4 mt-10">
                     <div className="flex flex-col gap-1">
@@ -81,7 +81,7 @@ const ContactForm = () => {
                     </div>
                     <div className="flex flex-col gap-1">
 
-                        <label htmlFor="Name" className='text-gray font-para text-base font-bold'>Message</label>
+                        <label htmlFor="Name" className='text-gray font-para text-base font-bold'>Nachricht                        </label>
                         <textarea
                             cols="30"
                             name='Message'
@@ -89,7 +89,7 @@ const ContactForm = () => {
                             value={Message}
                             onChange={(e) => { setMessage(e.target.value) }}
                             rows="5"
-                            placeholder='Message'
+                            placeholder='Nachricht'
                             className='text-para text-black text-base outline-none md:text-lg font-para placeholder:text-gray-400 bg-light rounded-xl py-3 px-4 shadow-shadow2'
                         />
                     </div>
@@ -98,7 +98,7 @@ const ContactForm = () => {
                         onClick={handleFormSubmit}
                         disabled={IsLoading}
                     >
-                        Make a reservation
+                        Nachricht abschicken 
                     </button>
                 </div>
             </div>

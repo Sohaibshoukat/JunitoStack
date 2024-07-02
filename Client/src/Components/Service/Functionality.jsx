@@ -4,19 +4,19 @@ const Functionality = () => {
 
     const data=[
         {
-            name:"To-Do List",
+            name:"Effizientere Arbeitsprozesse für KMUs und Selbständige",
             icon:"./Features/f21.png"
         },
         {
-            name:"Prompt Browsing",
+            name:"Moderne Arbeitsweisen dank New Work",
             icon:"./Features/f22.png"
         },
         {
-            name:"Owner",
+            name:"Der JUNITO BizBot: Ihr digitaler Mitarbeiter",
             icon:"./Features/f23.png"
         },
         {
-            name:"Sub User",
+            name:"Mehr unter www.junito.at oder buchen Sie sofort ein gratis Erstgespräch",
             icon:"./Features/f24.png"
         },
     ]
@@ -25,10 +25,10 @@ const Functionality = () => {
         <div className='w-[90%] 2xl:w-[80%]  m-auto flex flex-col gap-8'>
             <div className="flex flex-col lg:flex-row gap-4 md:gap-8 items-center">
                 <div className="flex flex-col gap-4 basis-[50%]">
-                    <h1 className=' text-gray text-base mdtext-lg font-light font-para'>FUNCTIONALITIES</h1>
-                    <h1 className=' text-black text-xl md:text-2xl lg:text-3xl font-bold font-play'>Where our functionalities add value to your product</h1>
+                    <h1 className=' text-gray text-base mdtext-lg font-light uppercase font-para'>Lösungen                </h1>
+                    <h1 className=' text-black text-xl md:text-2xl lg:text-3xl font-bold font-play'>Sie sind ein KMU oder Selbständiger und möchten effizienter arbeiten?                    </h1>
                 </div>
-                <p className='basis-[50%] font-para text-sm md:text-base text-black'>Helping companies & individuals identify key solutions for their target markets. We boost their ability to create products. Our business model saves clients time and money. Don't reinvent the wheel.</p>
+                <p className='basis-[50%] font-para text-sm md:text-base text-black'>Mit JUNITO setzen Sie auf praxisnahe Beratung und intelligente Tools, die Ihre Geschäftsprozesse optimieren, Ihnen New Work näherbringen und Ihnen den Weg in die digitale Zukunft ebnen.                </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-between my-10 md:my-20">
                 {data.map((item,index)=>(
@@ -36,7 +36,7 @@ const Functionality = () => {
                         <div className='bg-gray p-3 rounded-full w-fit'>
                             <img src={item.icon} alt="" className='w-[25px] h-[25px]' />
                         </div>
-                        <h2 className='font-para text-gray text-base md:text-xl text-center lg:text-2xl font-bold'>{item.name}</h2>
+                        <h2 className='font-para text-gray text-sm md:text-base text-center lg:text-2xl font-bold'>{item.name}</h2>
                     </div>
                 ))}
             </div>

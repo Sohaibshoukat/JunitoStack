@@ -11,9 +11,8 @@ const About = () => {
                         <img src="./Banner/BannerAbout.png" alt="" className='w-[80%] m-auto' />
                     </div>
                     <div className='xl:basis-[45%] md:basis-[50%] lg:w-[50%]'>
-                        <h2 className='text-gray font-bold text-xl md:text-2xl font-mont lg:text-3xl xl:text-4xl mb-4'>About us</h2>
-                        <p className='text-black text-xs md:text-sm xl:text-base font-para mb-2'>Lorem ipsum dolor sit amet consectetur. Tempus amet placerat senectus tincidunt quis hendrerit proin et. Ipsum tempor euismod enim pulvinar iaculis auctor turpis nulla. Accumsan tortor massa metus enim lobortis aliquam egestas vel tellus. Augue porta non cursus mi condimentum quam. Sit quam donec odio quam dolor elementum elementum aliquet aliquam. Senectus tempor turpis euismod malesuada velit.</p>
-                        <p className='text-black text-xs md:text-sm xl:text-base font-para'>Vulputate adipiscing pharetra pretium turpis justo orci nisl sagittis egestas. Ultrices volutpat dolor vitae amet justo in placerat quis scelerisque. A nunc volutpat amet molestie sit. Mattis molestie tristique lorem porta mattis leo neque. Sagittis lorem in tincidunt morbi viverra congue dictumst. Mattis mi nunc non dignissim morbi etiam.</p>
+                        <h2 className='text-gray font-bold text-xl md:text-2xl font-mont lg:text-3xl xl:text-4xl mb-4'>JUNITO – Ihr Partner für die Zukunft der Arbeitswelt</h2>
+                        <p className='text-black text-xs md:text-sm xl:text-base font-para mb-2'>Bei JUNITO sind wir stolz darauf, KMUs in Österreich, Deutschland und der Schweiz mit modernster Technologie zu unterstützen. Mit unserer umfassenden Erfahrung und einem tiefen Verständnis für die Bedürfnisse kleiner und mittlerer Unternehmen, bieten wir maßgeschneiderte Lösungen, die Ihr Geschäft voranbringen. Besuchen Sie uns auf junito.at für weitere Informationen.</p>
                     </div>
 
                 </div>

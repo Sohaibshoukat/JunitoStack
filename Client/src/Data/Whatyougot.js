@@ -4,19 +4,19 @@ import { BsUsbSymbol } from "react-icons/bs";
 
 export const WhyUs = [
     {
-        Heading: "Tailor-made, future-oriented solutions",
-        Para: "We don't believe in one-size-fits-all solutions. Instead, we offer personalized solutions to ensure you achieve outstanding and sustainable results.",
+        Heading: "Individuell und Zukunftsorientiert:",
+        Para: "Wir bieten keine Lösungen von der Stange. Jede Beratung und jedes Tool wird individuell auf Ihre Bedürfnisse zugeschnitten, um nachhaltige und herausragende Ergebnisse zu erzielen.",
         Image: FaLightbulb,
 
     },
     {
-        Heading: "Clear facts, clear results",
-        Para: "We believe in data-driven decisions. Our analyzes and employee surveys provide you with valuable and in-depth insights. This allows you to take targeted measures to improve.",
+        Heading: "Budgetfreundlich und Effizient:",
+        Para: "Unsere Dienstleistungen sind auf Ihr Budget abgestimmt. Keine Standardpreise – nur maßgeschneiderte Lösungen, die das beste Preis-Leistungsverhältnis für Ihr KMU bieten.",
         Image: FaNotesMedical,
     },
     {
-        Heading: "We are flexible",
-        Para: "We don't believe in one-size-fits-all solutions. Instead, we offer personalized solutions to ensure you achieve outstanding and sustainable results.",
+        Heading: "Datenbasierte Entscheidungen:",
+        Para: "Mit unseren tiefgreifenden Analysen erhalten Sie klare Fakten und wertvolle Einblicke. Treffen Sie fundierte Entscheidungen und ergreifen Sie gezielte Maßnahmen zur Verbesserung Ihrer Prozesse und Arbeitsweisen.",
         Image: BsUsbSymbol,
     }
 ]

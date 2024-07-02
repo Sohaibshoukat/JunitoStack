@@ -14,10 +14,10 @@ const Service = () => {
     <Nav/>
     <Banner/>
     <Functionality/>
-    <Servicecomp/>
-    <Features/>
+    {/* <Servicecomp/> */}
+    {/* <Features/> */}
     <Contact/>
-    <Feature2/>
+    {/* <Feature2/> */}
     <Footer/>
     </>
   )

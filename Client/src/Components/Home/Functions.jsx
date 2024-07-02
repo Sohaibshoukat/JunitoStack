@@ -11,73 +11,40 @@ import { trimTo35Words, trimToWords } from '../../Data/UseFullFunction';
 
 const Functions = () => {
 
-    const [HR, setHR] = useState()
-    const [Marketing, setMarketing] = useState()
-    const [Startup, setStartup] = useState()
-    const [Vertrieb, setVertrieb] = useState()
-    const [SupportData, setSupportData] = useState()
-    const [Assistent, setAssitent] = useState()
-
-    const AletContext = useContext(AlertContext);
-    const { showAlert } = AletContext;
-
-    const fetchPrompts = async () => {
-        try {
-            const response = await fetch(`${BaseURL}/api/company/random`);
-            if (response.ok) {
-                const data = await response.json();
-                setHR(data.HR?.PromptsList[0]?.value)
-                setMarketing(data.Marketing?.PromptsList[0]?.value)
-                setStartup(data.Startup?.PromptsList[0]?.value)
-                setVertrieb(data.Vertrieb?.PromptsList[0]?.value)
-                setSupportData(data.Support?.PromptsList[0]?.value)
-                setAssitent(data?.Agentour?.PromptsList[0]?.value)
-            } else {
-                showAlert('Failed to fetch prompts', 'danger');
-            }
-        } catch (error) {
-            showAlert(error.message, 'danger');
-        }
-    };
-
-    useEffect(() => {
-        fetchPrompts();
-    }, []);
-
     const FeatureData = [
         {
             Head: "HR",
-            desc: HR,
+            desc: "Von der Erstellung von Stellenbeschreibungen bis zur Entwicklung von Mitarbeiterentwicklungsplänen – BizBot übernimmt Ihre HR-Aufgaben effizient und zuverlässig.",
             ICON: './Functions/HR.png'
         },
         {
             Head: "Marketing",
-            desc: Marketing,
+            desc: "Definieren Sie effektive Strategien, führen Sie Keyword-Recherchen durch und erstellen Sie Contentpläne für Social Media – BizBot unterstützt Sie in allen Marketingfragen.",
             ICON: './Functions/Social.png'
         },
         {
             Head: "Support",
-            desc: SupportData,
+            desc: "Schnelle und effiziente Kundenbetreuung rund um die Uhr – BizBot sorgt für zufriedene Kunden und entlastet Ihr Support-Team.",
             ICON: './Functions/Support.png'
         },
         {
             Head: "Startup",
-            desc: Startup,
+            desc: "Skalieren Sie Ihr Geschäft mit Leichtigkeit. BizBot hilft Ihnen, Ihre Prozesse zu optimieren und Ihre Ziele zu erreichen.",
             ICON: './Functions/HR.png'
         },
         {
             Head: "Vertrieb",
-            desc: Vertrieb,
+            desc: "Entwickeln Sie überzeugende Vertriebsstrategien und formulieren Sie ansprechende Angebote, die Ihre Wettbewerber übertreffen – mit BizBot sind Sie immer einen Schritt voraus.",
             ICON: './Functions/HR.png'
         },
         {
-            Head: "Agent",
-            desc: "Lorem ipsum dolor sit amet consectetur. Eu massa magna tristique facilisis. Quisque condimentum volutpat duis morbi amet odio dolor nibh. Nibh metus in consectetur non diam dapibus. Et fusce proin egestas commodo. Justo morbi justo lacus ac nisi amet. Et duis a sed tortor nibh eu nullam. Vitae sit duis eleifend congue a egestas lacus. Massa arcu at aliquam leo erat felis metus id sapien. Neque pretium vulputate nisl venenatis neque consequat mi netus.",
+            Head: "Agentur",
+            desc: "Ob kreative Kampagnen oder detaillierte Berichte – BizBot unterstützt Agenturen bei der Umsetzung ihrer Projekte.",
             ICON: './Functions/HR.png'
         },
         {
-            Head: "Assistent",
-            desc: "Lorem ipsum dolor sit amet consectetur. Eu massa magna tristique facilisis. Quisque condimentum volutpat duis morbi amet odio dolor nibh. Nibh metus in consectetur non diam dapibus. Et fusce proin egestas commodo. Justo morbi justo lacus ac nisi amet. Et duis a sed tortor nibh eu nullam. Vitae sit duis eleifend congue a egestas lacus. Massa arcu at aliquam leo erat felis metus id sapien. Neque pretium vulputate nisl venenatis neque consequat mi netus.",
+            Head: "Assistenz",
+            desc: "Verwalten Sie Ihre Termine, organisieren Sie Ihre E-Mails und behalten Sie den Überblick über wichtige Aufgaben – BizBot ist Ihr digitaler Assistent.",
             ICON: './Functions/HR.png'
         }
     ]
@@ -86,8 +53,8 @@ const Functions = () => {
             <div className='absolute w-[100%] md:w-[70%] bg-gray -z-0 h-[100%]'></div>
             <div className='flex flex-col md:flex-row  items-center py-12 md:py-20 gap-16'>
                 <div className='lg:basis-[30%] xl:basis-[30%] relative z-10 w-[90%] md:w-auto md:ml-20'>
-                    <h1 className='text-lg md:text-xl font-mont lg:text-2xl xl:text-4xl font-bold md:max-w-[70%] text-white mb-5 xl:mb-8'>Functionalities</h1>
-                    <p className='font-para text-sm text-white'>Embark on a journey of innovation with our AI chatbot companions. From personalized customer interactions to seamless automation solutions, we're here to shape the future of communication, one conversation at a time.</p>
+                    <h1 className='text-lg md:text-xl font-mont lg:text-2xl xl:text-4xl font-bold md:max-w-[70%] text-white mb-5 xl:mb-8'>BizBot, Ihr vielseitiger Helfer                    </h1>
+                    <p className='font-para text-sm text-white'>BizBot unterstützt Sie in allen wichtigen Geschäftsbereichen und sorgt dafür, dass Ihre Abläufe reibungslos und effizient funktionieren. Von HR über Marketing bis hin zum Vertrieb – BizBot deckt fast alle Bedürfnisse ab und passt sich flexibel an Ihre spezifischen Anforderungen an.                    </p>
                 </div>
                 <div className='basis-[60%] w-[80%] md:w-[60%]'>
                     <Swiper
@@ -121,7 +88,6 @@ const Functions = () => {
                                         <h2 className='text-2xl font-mont text-gray font-bold'>{item.Head}</h2>
                                         {item?.desc !== "" && <p className='font-para text-xs md:text-sm'>{trimTo35Words(item?.desc)}</p>}
                                     </div>
-                                    <button className='bg-gray border-2 border-gray rounded-xl py-2 hover:bg-transparent hover:text-gray px-6 text-white text-lg ease-in-out duration-300'>Read More</button>
                                 </div>
                             </SwiperSlide>
                         ))}

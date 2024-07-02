@@ -11,21 +11,26 @@ const Banner = () => {
         </div>
         <div className='flex flex-col justify-center px-6 text-left gap-2 z-10 relative lg:gap-4 md:px-10 xl:px-20 m-auto lg:w-1/2 '>
           <img src="./Banner/Banner2.png" alt="" className='absolute -top-[10%] md:-top-[20%] left-[30%] w-[150px] md:w-[200px]' />
-          <h1 className=' text-gray text-xl md:text-2xl xl:text-3xl font-bold font-para  mb-0 xl:mb-2'>Thomas Schwabl - FOUNDER</h1>
+          <h1 className=' text-gray text-xl md:text-2xl xl:text-3xl font-bold font-para  mb-0 xl:mb-2'>Thomas Schwabl - Gründer          </h1>
           <p
             className=' text-black font-para text-sm md:text-base font-normal  mb-0 xl:mb-2'
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin consectetur justo quis euismod vehicula. Quisque diam dui, imperdiet et hendrerit in, accumsan tempus erat.
+            Als ich die Herausforderungen kleiner und mittlerer Unternehmen (KMUs) genauer betrachtete, wurde mir klar, dass es eine dringend benötigte Lösung für die zunehmende Komplexität und die wachsenden Anforderungen in der Geschäftswelt geben muss. Der BizBot entstand aus dem Wunsch, KMUs eine einfache und effektive Möglichkeit zu bieten, ihre täglichen Aufgaben zu bewältigen und ihre Effizienz zu steigern.
           </p>
           <p
             className=' text-black font-para text-sm md:text-base font-normal  mb-0 xl:mb-2'
           >
-            Nullam ornare blandit urna, eu pulvinar elit faucibus eget. Sed justo mauris, ultricies eu urna at, gravida commodo mauris. Quisque ac felis ac sapien dictum gravida aliquet ac purus. Donec sit amet ex vel ex sollicitudin posuere at et metus. Duis sodales ligula nisi, molestie lacinia ex rhoncus vel.
+            Ich wollte ein Tool schaffen, das KMUs nicht nur Zeit spart, sondern ihnen auch Zugang zu modernster Technologie ermöglicht – ohne die Notwendigkeit eines IT-Experten. Mit BizBot erhalten Unternehmen einen digitalen Assistenten, der sie in allen Geschäftsbereichen unterstützt und ihnen hilft, ihre Ziele schneller und kosteneffizienter zu erreichen.
           </p>
           <p
             className=' text-black font-para text-sm md:text-base font-normal  mb-0 xl:mb-2'
           >
-            Nullam ornare blandit urna, eu pulvinar elit faucibus eget. Sed justo mauris, ultricies eu urna at, gravida commodo mauris. Quisque ac felis ac sapien dictum gravida aliquet ac purus. Donec sit amet ex vel ex sollicitudin posuere at et metus. Duis sodales ligula nisi, molestie lacinia ex rhoncus vel.
+            Mit über 7000 Prompts im Hintergrund stellt BizBot sicher, dass jede Anfrage mit der besten und präzisesten Lösung beantwortet wird. Dies gibt Unternehmen die Flexibilität und das Vertrauen, sich auf ihre Kernkompetenzen zu konzentrieren, während BizBot den Rest übernimmt.
+          </p>
+          <p
+            className=' text-black font-para text-sm md:text-base font-normal  mb-0 xl:mb-2'
+          >
+            Lassen Sie uns gemeinsam die Tradition bewahren und gleichzeitig eine moderne Erfolgsgeschichte schreiben.
           </p>
         </div>
         <div

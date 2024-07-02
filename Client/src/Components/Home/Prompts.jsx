@@ -71,8 +71,8 @@ const Prompts = () => {
     return (
         <div className='relative my-8'>
             <div className='w-[90%] md:w-[90%] xl:w-[80%] m-auto relative'>
-                <h1 className='font-head text-center text-gray text-lg md:text-xl lg:text-2xl xl:text-4xl font-bold mb-4'>Prompts</h1>
-                <p className='font-para text-base md:text-lg text-center'>We are providing you several prompts to give you slight information.</p>
+                <h1 className='font-head text-center text-gray text-lg md:text-xl lg:text-2xl xl:text-4xl font-bold mb-4'>Intelligente Unterstützung durch über 7000 Prompts                </h1>
+                <p className='font-para text-base md:text-lg text-center'>BizBot nutzt die Power von über 7000 hinterlegten Prompts, um Ihnen stets die besten und präzisesten Lösungen zu bieten. Erleben Sie, wie BizBot in verschiedenen Kategorien optimal auf Ihre Bedürfnisse eingeht.</p>
                 <div className="py-8 md:py-16">
                     <div className='flex flex-col lg:flex-row justify-between gap-10'>
                         <div className="flex flex-col gap-4  basis-[33.333%]">

@@ -47,7 +47,7 @@ const Nav = () => {
                             hover:bg-accence  duration-300 ease-in-out
                         '>
                             <FaUserCircle className='text-xl' />
-                            Login/Register
+                            Login/Registrierung
                         </div>
                     </Link>
                 </div>
@@ -80,7 +80,7 @@ const Nav = () => {
                                     hover:bg-accence font-para  duration-300 ease-in-out
                                     '>
                                         <FaUserCircle className='text-xl' />
-                                        Login/Register
+                                        Login/Registrierung
                                     </div>
                                 </Link>
                             </div>

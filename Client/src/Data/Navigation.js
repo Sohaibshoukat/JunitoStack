@@ -1,6 +1,10 @@
 export const NavMenu=[
     {
-        Name:"About Us",
+        Name:"BizBot",
+        Link:'/'
+    },
+    {
+        Name:"Über uns",
         Link:"/about"
     },
     {
@@ -8,7 +12,7 @@ export const NavMenu=[
         Link:"/service"
     },
     {
-        Name:"Contact Us",
+        Name:"Kontakt",
         Link:"/contact"
     }
 ]

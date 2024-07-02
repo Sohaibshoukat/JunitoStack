@@ -5,9 +5,9 @@ import { FaArrowRight } from 'react-icons/fa'
 const ContactSec = () => {
 
     const Dataset = [
-        "Fill out the support form",
-        "You wait, we'll get started",
-        "Get your solution"
+        "Erstellen Sie Ihr Konto in wenigen Minuten.",
+        "Passen Sie BizBot an Ihre spezifischen Bedürfnisse an.",
+        "Erleben Sie sofortige Effizienzsteigerungen und Kosteneinsparungen."
     ]
 
     return (
@@ -42,9 +42,8 @@ const ContactSec = () => {
                             <div className="bg-gray text-white rounded-2xl px-4">
                                 <div className="flex flex-col-reverse md:flex-row items-center justify-between">
                                     <div className="basis-[60%] py-8">
-                                        <h2 className=' font-head text-lg md:text-xl lg:text-2xl font-bold mb-4'>Special Request?</h2>
-                                        <p className='font-para text-sm md:text-base lg:text-lg font-normal'>Is your page not accessible or is displayed completely incorrectly?</p>
-                                        <p className='font-para text-sm md:text-base lg:text-lg font-normal'>Then call us directly!</p>
+                                        <h2 className=' font-head text-lg md:text-xl lg:text-2xl font-bold mb-4'>Überzeugt</h2>
+                                        <p className='font-para text-sm md:text-base lg:text-lg font-normal'>„Machen Sie den ersten Schritt in Richtung digitaler Transformation mit dem JUNITO BizBot – Ihrem verlässlichen Partner für nachhaltigen Geschäftserfolg.“                                        </p>
                                     </div>
                                     <div className="basis-[50%] -mt-10 md:-mt-20">
                                         <img src="./Owner.png" alt="" className='w-[100%] h-[100%]' />

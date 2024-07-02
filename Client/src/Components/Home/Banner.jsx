@@ -30,16 +30,17 @@ const Banner = () => {
                 className=" flex flex-col md:flex-row gap-16 md:gap-0 justify-between items-center xl:h-[120vh] 2xl:h-[100vh] h-[100%] relative pt-28 pb-16 md:pt-28 md:pb-11 2xl:py-0  FadeIn"
             >
                 <div className='flex flex-col justify-center px-6 text-left gap-2 lg:gap-4 md:px-10 xl:px-20 md:w-1/2 '>
-                    <h1 className=' text-gray text-base lg:text-lg xl:text-xl font-light font-head  mb-0 xl:mb-2'>Envisioning the Future</h1>
-                    <h1 className=' text-gray text-2xl xl:text-3xl 2xl:text-4xl font-bold font-head  mb-0 xl:mb-2'>Crafting Tomorrow’s <br/> Ai Narrative</h1>
-                    <p className=' text-black text-sm md:text-base xl:text-lg font-normal  font-Para'>Designed for forward thinking marketing agencies , this template encapsulates ai chatbots for different departments. </p>
+                    <h1 className=' text-gray text-base lg:text-lg xl:text-xl font-light font-head  mb-0 xl:mb-2'>Von täglichen Aufgaben bis hin zu komplexen Unternehmensstrategien</h1>
+                    <h1 className=' text-gray text-2xl xl:text-3xl 2xl:text-4xl font-bold font-head  mb-0 xl:mb-2'>Revolutionieren Sie Ihr Business mit BizBot</h1>
+                    <p className=' text-black text-sm md:text-base xl:text-lg font-normal  font-Para'>Entdecken Sie, wie BizBot durch KI-gesteuerte Automatisierung die Art und Weise, wie Sie Geschäfte machen, verändern kann. Sparen Sie Zeit, reduzieren Sie Kosten und skalieren Sie Ihr Unternehmen ohne den Bedarf an zusätzlichen Ressourcen.</p>
                     <button 
                         className='text-white my-2 text-base lg:text-base font-para px-2 py-2 md:px-6 rounded-xl bg-gray hover:text-black hover:bg-transparent hover:border-gray border-2 w-fit border-gray duration-300 ease-in-out'
                         onClick={()=>{
                             navigate("/sign-up")
                         }}
                     >
-                        Explore AI Solutions
+                        Entdecken Sie KI-Lösungen
+
                     </button>
                 </div>
                 <div 
