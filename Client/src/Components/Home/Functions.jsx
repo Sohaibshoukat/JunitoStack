@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { Autoplay, Pagination } from 'swiper/modules';
+import { Autoplay, Pagination,Navigation } from 'swiper/modules';
 import AlertContext from '../../Context/Alert/AlertContext';
 import { BaseURL } from '../../Data/BaseURL';
 import { trimTo35Words, trimToWords } from '../../Data/UseFullFunction';
@@ -63,6 +63,10 @@ const Functions = () => {
                         pagination={{
                             clickable: true,
                         }}
+                        autoplay={{
+                            delay: 2500,
+                            disableOnInteraction: false,
+                          }}
                         breakpoints={{
                             640: {
                                 slidesPerView: 1,
@@ -77,7 +81,8 @@ const Functions = () => {
                                 spaceBetween: 50,
                             },
                         }}
-                        modules={[Autoplay, Pagination]}
+                        navigation={true}
+                        modules={[Autoplay, Pagination,Navigation]}
                         className="mySwiper"
                     >
                         {FeatureData.map((item, index) => (

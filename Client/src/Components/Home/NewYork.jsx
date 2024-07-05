@@ -12,7 +12,7 @@ const NewYork = () => {
                     <div className='xl:basis-[45%] md:basis-[50%] lg:w-[50%] flex flex-col items-center'>
                         <h2 className='text-gray font-bold text-xl md:text-xl font-mont lg:text-2xl xl:text-3xl mb-4'>New Work Coaching - SMEs rethought</h2>
                         <a
-                            href='https://www.junito.at/book-online'
+                            href='https://www.junito.at/#comp-lrqgcaq8'
                             target='_blank'
                             className='flex flex-row bg-transparent border-2 m-auto my-4 rounded-xl text-gray font-bold text-sm md:text-base font-para border-gray items-center  justify-center gap-2 py-2 px-6 hover:bg-gray hover:text-white ease-in-out duration-300'
                         >

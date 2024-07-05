@@ -141,26 +141,26 @@ const PaySubUser = () => {
                 },
                 onApprove: async (data, actions) => {
                     const order = await actions.order.capture();
-                    const responses = await Promise.all(
-                        users.map(async (item) => {
-                            const response = await fetch(`${BaseURL}/api/transaction/SubUserAdd`, {
-                                method: "PUT",
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    "auth-token": localStorage.getItem('auth-token'),
-                                },
-                                body: JSON.stringify({
-                                    subUserId: item,
-                                    DateCreated: new Date().toISOString(),
-                                    ExpiryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
-                                }),
-                            });
-                            const ResponseData = await response.json();
-                            if (ResponseData.success) {
-                                showAlert("Transaction Completed Successfully", 'success');
-                            }
-                        })
-                    );
+                    console.log(users)
+                    const responses = await fetch(`${BaseURL}/api/transaction/SubUserAdd`, {
+                        method: "PUT",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            "auth-token": localStorage.getItem('auth-token'),
+                        },
+                        body: JSON.stringify({
+                            subUserIds: users,
+                            data: order,
+                            DateCreated: new Date().toISOString(),
+                            ExpiryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
+                            beforediscount: BeforeDiscount,
+                            DiscountPerce: DiscountPerce
+                        }),
+                    });
+                    const ResponseData = await responses.json();
+                    if (ResponseData.success) {
+                        showAlert("Transaction Completed Successfully", 'success');
+                    }
                     navigate("/dashboard/users");
                 },
                 onError: (err) => {

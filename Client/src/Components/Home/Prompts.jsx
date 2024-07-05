@@ -82,7 +82,7 @@ const Prompts = () => {
                                         <img src="./Prompts/SocialMedia.png" alt="" className='m-auto w-[100%] h-[100%]' />
                                     </div>
                                     <div className='bg-[#F2E7FF] rounded-2xl flex flex-col gap-2 w-[100%] py-4 px-6'>
-                                        <h3 className='font-mont text-base font-bold'>Are you ready to take your Marketing experience to the next level?</h3>
+                                        <h3 className='font-mont text-base font-bold'>{Marketing?.Name}</h3>
                                         <p className='font-para text-sm'>{Marketing && trimToWords(Marketing?.Info)}....</p>
                                         <button className='bg-[#1F2429] rounded-full px-5 my-2 self-end py-2 w-fit font-para text-white font-bold text-lg'>Read More</button>
                                     </div>
@@ -109,7 +109,7 @@ const Prompts = () => {
                                         <img src="./Prompts/HR.png" alt="" className='m-auto w-[100%] h-[100%]' />
                                     </div>
                                     <div className='bg-[#FFCAD8] rounded-2xl flex flex-col gap-2 w-[100%] py-4 px-6'>
-                                        <h3 className='font-mont text-base font-bold'>👋 Hey, Are you ready to take your HR experience to the next level?</h3>
+                                        <h3 className='font-mont text-base font-bold'>{HR?.Name}</h3>
                                         <p className='font-para text-sm'>{HR && trimToWords(HR?.Info)}....</p>
                                         <button className='hover:bg-[#1F2429] bg-transparent text-[#1F2429] border-2 border-[#1F2429] rounded-full px-5 my-4 self-start py-2 w-fit font-para hover:text-white font-bold text-sm ease-in-out duration-300'>Book a meeting</button>
                                         <button className='bg-[#1F2429] rounded-full px-5 my-2 self-end py-2 w-fit font-para text-white font-bold text-lg'>Read More</button>
@@ -122,7 +122,7 @@ const Prompts = () => {
                                         <img src="./Prompts/Support.png" alt="" className='m-auto w-[100%] h-[100%]' />
                                     </div>
                                     <div className='bg-[#FCF7E8] rounded-2xl flex flex-col gap-2 w-[100%] py-4 px-6'>
-                                        <h3 className='font-mont text-base font-bold'>How much would you want help from our support?</h3>
+                                        <h3 className='font-mont text-base font-bold'>{SupportData?.Name}</h3>
                                         <p className='font-para text-sm'>{SupportData && trimToWords(SupportData?.Info)}...</p>
                                         <button className='bg-[#1F2429] rounded-full px-5 my-2 self-end py-2 w-fit font-para text-white font-bold text-lg'>Read More</button>
                                     </div>
@@ -136,7 +136,7 @@ const Prompts = () => {
                                         <img src="./Prompts/Vertrieb.png" alt="" className='m-auto w-[100%] h-[100%]' />
                                     </div>
                                     <div className='bg-white rounded-2xl flex flex-col gap-2 w-[100%] py-4 px-6'>
-                                        <h3 className='font-mont text-base font-bold'>Want to test our vertrieb? Let us your email and we will contact you for a demo</h3>
+                                        <h3 className='font-mont text-base font-bold'>{Vertrieb?.Name}</h3>
                                         <div className='border-2 border-[#1F242933] rounded-2xl py-2 px-2 bg-slate-100 flex gap-3'>
                                             <div className='bg-[#c9cacb] p-1 rounded-lg'>
                                                 <IoMdMail className='text-xl text-black' />
@@ -164,8 +164,8 @@ const Prompts = () => {
                                         <img src="./Prompts/Support.png" alt="" className='m-auto w-[100%] h-[100%]' />
                                     </div>
                                     <div className='bg-[#A7F1E1] rounded-2xl flex flex-col gap-2 w-[100%] py-4 px-6'>
-                                        <h3 className='font-mont text-base font-bold'>Would you like to know about our startup 😎 ?</h3>
-                                        <p className='font-para text-sm'>We promise to don’t spam you everyday </p>
+                                        <h3 className='font-mont text-base font-bold'>{Startup?.Name}</h3>
+                                        <p className='font-para text-sm'>{Startup && trimToWords(Startup?.Info)}</p>
 
                                         <div className='border-2 border-[#1F242933] rounded-2xl py-2 px-2 bg-slate-100 flex gap-3'>
                                             <div className='bg-[#c9cacb] p-1 rounded-lg'>

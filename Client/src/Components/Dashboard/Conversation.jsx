@@ -6,7 +6,6 @@ import AlertContext from '../../Context/Alert/AlertContext';
 import { BaseURL } from '../../Data/BaseURL';
 import { TfiReload } from "react-icons/tfi";
 import BotDepContext from '../../Context/BotContaxt/BotDepContext';
-import "./styleConversation.css"
 
 
 const Conversation = ({ RegenrateChat }) => {
@@ -63,7 +62,7 @@ const Conversation = ({ RegenrateChat }) => {
     }, [])
 
     return (
-        <div className='max-h-[65vh] lg:max-h-[80vh] xl:max-h-[60vh] h-[65vh] lg:h-[80vh] xl:h-[60vh] font-para overflow-y-scroll'>
+        <div className='max-h-[65vh] lg:max-h-[80vh] xl:max-h-[60vh] h-[65vh] lg:h-[80vh] xl:h-[80vh] font-para overflow-y-scroll'>
             <div className="flex flex-col gap-4 lg:gap-8">
                 {ChatsData.map((item, index) => (
                     <>

@@ -29,13 +29,17 @@ const TransactionSchema = new Schema({
         }
     ],
     Amount: {
-        type: String,
+        type: Number,
     },
     DateCreated: {
         type: Date,
     },
     ExpiryDate: {
         type: Date
+    },
+    Plan:{
+        type:String,
+        enum:["Monthly","Annually","AdminFree"]
     },
     Status: {
         type: String,

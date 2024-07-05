@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        @font-face {
+            font-family: 'Poppins';
+            src: url('/path/to/local/fonts/Poppins-Regular.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+        }
+
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            padding-top: 2rem;
+        }
+
+        .header, .content, .footer {
+            margin-bottom: 1.5rem;
+        }
+
+        .header img {
+            width: 20%;
+        }
+
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .info-section div {
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-details div, .bank-details div {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 4px;
+        }
+
+        .border-top {
+            border-top: 1px solid black;
+            padding-top: 1rem;
+        }
+
+        .text-underline {
+            text-decoration: underline;
+        }
+
+        .font-bold {
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        h3, h4, h5, h6, p {
+            font-size: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        table th, table td {
+            border: 1px solid black;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <title>Invoice</title>
+</head>
+
+<body>
+    <div class="container" id="Major">
+        <div class="header">
+            <div style="text-align: right;">
+                <img src="https://static.wixstatic.com/media/df6adc_b3d9332af3c04ea98ba6dbca4caba051~mv2.png/v1/fill/w_80,h_80,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/8ca2a09d8b2b42b1a25aa57c711b280b.png" alt="Company Logo">
+            </div>
+            <div class="info-section">
+                <div>
+                    <h2>JUNITO KG - Paracelsusstraße 706 - 5084 Großgmain</h2>
+                    <div class="font-bold">
+                        <h3><%= company.Name %></h3>
+                        <h3>Herrn <%= user.FirstName %> <%= user.LastName %></h3>
+                        <h3><%= user.Address %></h3>
+                        <h3><%= user.City %></h3>
+                        <h3><%= data.payer.address.country_code %></h3>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-underline">So erreichen Sie uns</h2>
+                    <div class="contact-details">
+                        <div>
+                            <h4>E-Mail</h4>
+                            <h4>t.schwabl@junito.at</h4>
+                        </div>
+                        <div>
+                            <h4>Telefon</h4>
+                            <h4>+436765515566</h4>
+                        </div>
+                        <div>
+                            <h4>Steuer-Nr.</h4>
+                            <h4>93 265/9634</h4>
+                        </div>
+                        <div>
+                            <h4>USt-IdNr.</h4>
+                            <h4>ATU77624956</h4>
+                        </div>
+                        <div>
+                            <h4>Datum</h4>
+                            <h4><%= transaction.DateCreated.toISOString().split('T')[0] %></h4>
+                        </div>
+                        <div>
+                            <h4>Rechnung</h4>
+                            <h4><%= data.id %></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div>
+                <h2>Sehr geehrter <%= user.LastName %>,</h2>
+                <h2>nachfolgend berechnen wir Ihnen wie vorab besprochen:</h2>
+            </div>
+            <div>
+                <h1>Rechnung <%= data.id %></h1>
+                <h4>Das Rechnungsdatum entspricht dem Leistungsdatum</h4>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Art-Nr</th>
+                        <th>Bezeichnung</th>
+                        <th>Menge</th>
+                        <th>Einzelpreis</th>
+                        <th>Betrag</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Example row, replicate as needed -->
+                    <tr>
+                        <td>1</td>
+                        <td>2002</td>
+                        <td>Junito BizzBot</td>
+                        <td>1</td>
+                        <td><%= transaction.Amount %> €</td>
+                        <td><%= transaction.Amount %> €</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td>Nettobetrag</td>
+                        <td><%= DiscountPerce %> €</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td>Umsatzsteuer 20%</td>
+                        <td><%= transaction?.taxAmount %> €</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td>Rechnungsbetrag</td>
+                        <td><%= transaction.Amount %> €</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div>
+                <h2>Vielen Dank für Ihren Auftrag!</h2>
+                <h2>Bitte begleichen Sie den offenen Betrag bis zum <%= transaction.ExpiryDate.toISOString().split('T')[0] %>.</h2>
+                <h2>Mit freundlichen Grüßen</h2>
+                <div>
+                    <h2>JUNITO KG</h2>
+                    <h2>Thomas Schwabl</h2>
+                    <h2>Geschäftsführender Gesellschafter</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer border-top">
+            <div class="bank-details">
+                <h2>Bankverbindung</h2>
+                <div>
+                    <h2>JUNITO KG</h2>
+                    <h2>Raiffeisenbank Kitzbühel, bitte geben Sie als Verwendungszweck die Rechnungsnummer an!</h2>
+                    <h2>BIC RZTIAT22263, IBAN AT903626300007012461</h2>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <h2 class="font-bold">Eigentümer</h2>
+                    <h3>Thomas Schwabl</h3>
+                </div>
+                <div>
+                    <h2 class="font-bold">Gerichtsstand</h2>
+                    <h3>Landesgericht Salzburg / Fn569590h</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

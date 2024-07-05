@@ -2,15 +2,18 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { BaseURL } from '../../Data/BaseURL';
 import AlertContext from '../../Context/Alert/AlertContext';
+import Nav from '../../Components/Nav';
+import Footer from '../../Components/Footer';
 
 const CheckOut = () => {
-    const { id } = useParams();
+    const { id,plan } = useParams();
+    
     const [User, setUser] = useState(null);
     const [Company, setCompany] = useState(null);
     const [PromoCode, setPromoCode] = useState('');
     const [DiscountPerce, setDiscountPerce] = useState(0);
-    const [BeforeDiscount, setBeforeDiscount] = useState(99); // Initial total amount
-    const [TotalAmount, setTotalAmount] = useState(99);
+    const [BeforeDiscount, setBeforeDiscount] = useState(plan=="Monthly"?99:990); // Initial total amount
+    const [TotalAmount, setTotalAmount] = useState(plan=="Monthly"?99:990);
 
     const navigate = useNavigate();
     const paypal = useRef();
@@ -89,8 +92,12 @@ const CheckOut = () => {
                             id: id,
                             Amount: amount,
                             DateCreated: new Date().toISOString(),
-                            ExpiryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
-                            Status: "Paid"
+                            ExpiryDate: plan === 'Monthly' ? new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString() : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+                            Status: "Paid",
+                            data:order,
+                            discount:BeforeDiscount,
+                            DiscountPerce:DiscountPerce,
+                            Plan:plan
                         })
                     });
                     const ResponseData = await response.json();
@@ -111,7 +118,9 @@ const CheckOut = () => {
     }, []);
 
     return (
-        <div className='w-[90%] mx-auto my-10'>
+        <>
+        <Nav/>
+        <div className='w-[90%] mx-auto pt-28'>
             <div className="flex justify-between items-center gap-2 font-para my-4">
                 <h2 className='text-xl font-para font-semibold text-gray'>Company</h2>
                 <p className='text-lg font-bold font-para text-black'>{Company?.CompanyName}</p>
@@ -198,6 +207,8 @@ const CheckOut = () => {
                 <div ref={paypal}></div>
             </div>
         </div>
+        <Footer/>
+        </>
     );
 };
 

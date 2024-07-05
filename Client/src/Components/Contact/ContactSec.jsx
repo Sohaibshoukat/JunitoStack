@@ -12,7 +12,7 @@ const ContactSec = () => {
 
     return (
         <div className={`relative h-auto  w-[90%] md:w-[95%] xl:w-[90%] m-auto my-20`}>
-            <h1 className='text-lg md:text-2xl font-mont lg:text-3xl xl:text-4xl font-bold text-center text-gray mb-5 xl:mb-14'>Contact Us</h1>
+            <h1 className='text-lg md:text-2xl font-mont lg:text-3xl xl:text-4xl font-bold text-center text-gray mb-5 xl:mb-14'>Nehmen Sie Ihre Zukunft JETZT in die Hand            </h1>
             <div className={`bg-white p-2 md:p-4 shadow-shadow2 rounded-2xl`}>
                 <div className={`bg-white rounded-2xl py-14 px-2 md:px-6`}>
                     <div className="flex flex-col xl:flex-row gap-20 justify-between">
@@ -21,7 +21,7 @@ const ContactSec = () => {
                         </div>
                         <div className="basis-[60%] flex flex-col gap-8 justify-between">
                             <div className={`flex text-black flex-col gap-8`}>
-                                <h2 className='font-mont text-lg md:text-xl lg:text-2xl font-bold text-gray'>3 steps to solutions</h2>
+                                <h2 className='font-mont text-lg md:text-xl lg:text-2xl font-bold text-gray'>Nur 3 Schritte zu Ihrer Lösung                                </h2>
                                 <div className="flex flex-col md:flex-row gap-2 text-white">
                                     {Dataset.map((item, index) => (
                                         <div

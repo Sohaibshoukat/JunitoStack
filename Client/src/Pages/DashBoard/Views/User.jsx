@@ -8,7 +8,6 @@ import AddUserModel from '../../../Components/Dashboard/User/AddUserModel';
 import EditUserModel from '../../../Components/Dashboard/User/EditUserModel';
 
 const User = () => {
-
     const [users, setUsers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [filter, setfilter] = useState('')
@@ -16,13 +15,15 @@ const User = () => {
     const [EditModel, setEditModel] = useState(false);
     const [EditId, setEditId] = useState(null);
     const [PaidUser, setPaidUser] = useState([])
+    const [loading, setLoading] = useState(false);
+    const [loadingAction, setLoadingAction] = useState(null); // To track which action is loading
 
     const navigate = useNavigate()
-
-    const AletContext = useContext(AlertContext);
-    const { showAlert } = AletContext;
+    const alertContext = useContext(AlertContext);
+    const { showAlert } = alertContext;
 
     const fetchUsers = async () => {
+        setLoading(true);
         try {
             const response = await fetch(`${BaseURL}/api/company/subUser`, {
                 method: 'GET',
@@ -38,10 +39,13 @@ const User = () => {
             }
         } catch (error) {
             showAlert(error.message, 'danger');
+        } finally {
+            setLoading(false);
         }
     };
 
     const deleteUser = async (subuserId) => {
+        setLoadingAction(subuserId);
         try {
             const response = await fetch(`${BaseURL}/api/company/deleteSubuser/${subuserId}`, {
                 method: 'DELETE',
@@ -58,10 +62,13 @@ const User = () => {
             }
         } catch (error) {
             showAlert(error.message, 'danger');
+        } finally {
+            setLoadingAction(null);
         }
     };
 
     const toggleUserStatus = async (subuserId) => {
+        setLoadingAction(subuserId);
         try {
             const response = await fetch(`${BaseURL}/api/company/statusSubuser/${subuserId}`, {
                 method: 'PUT',
@@ -79,6 +86,8 @@ const User = () => {
             }
         } catch (error) {
             showAlert(error.message, 'danger');
+        } finally {
+            setLoadingAction(null);
         }
     };
 
@@ -95,7 +104,6 @@ const User = () => {
             }
         });
     };
-
 
     // Filter users based on search query
     const filteredUsers = users.filter(user => {
@@ -114,7 +122,6 @@ const User = () => {
         const params = new URLSearchParams({ users: JSON.stringify(PaidUser) });
         navigate(`/dashboard/paysubUser?${params.toString()}`);
     }
-
 
     return (
         <>
@@ -168,102 +175,105 @@ const User = () => {
                             }
                         </div>
                     </div>
-                    <div className="my-4">
-                        <div class="w-[100%] overflow-y-scroll">
-                            <table className='w-full'>
-                                <thead class="text-sm md:text-base font-normal uppercase text-slate-300">
-                                    <tr>
-                                        <th class="px-2 md:px-6 py-2 md:py-4">
-
-                                        </th>
-                                        <th class="px-2 md:px-6 py-2 md:py-4">
-                                            User name
-                                        </th>
-                                        <th class="px-2 md:px-6 py-2 md:py-4">
-                                            Phone
-                                        </th>
-                                        <th class="px-2 md:px-6 py-2 md:py-4">
-                                            Email
-                                        </th>
-                                        <th class="px-2 md:px-6 py-2 md:py-4">
-                                            Action
-                                        </th>
-                                        <th class="px-2 md:px-6 py-2 md:py-4">
-                                            Transaction Status
-                                        </th>
-                                        <th class="px-2 md:px-6 py-2 md:py-4">
-                                            User Status
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredUsers?.map((item, index) => (
-                                        <tr class="bg-white border-b font-medium text-sm md:text-sm border-slate-200" key={index}>
-                                            <th class="px-2 md:px-6 py-2 md:py-4">
-                                                {item?.TransactionStatus == "UnPaid" &&
-                                                    <input
-                                                        type="checkbox"
-                                                        onChange={() => handleCheckboxChange(item?.Own_ID?._id)}
-                                                    />
-                                                }
-                                            </th>
-                                            <th class="px-2 md:px-6 py-2 md:py-4">
-                                                <h2 className='w-max'>
-                                                    {item?.Own_ID?.FirstName + " " + item?.Own_ID?.LastName}
-                                                </h2>
-                                            </th>
-                                            <td class="px-2 md:px-6 py-2 md:py-4">
-                                                <h2 className='w-max'>
-                                                    {item?.Own_ID?.Phone}
-                                                </h2>
-                                            </td>
-                                            <td class="px-2 md:px-6 py-2 md:py-4">
-                                                <h2 className='w-max'>
-                                                    {item?.Own_ID?.Email}
-                                                </h2>
-                                            </td>
-                                            <td class="px-2 md:px-6 py-2 md:py-4">
-                                                <div className='flex text-white md:flex-row gap-2'>
-                                                    <button
-                                                        className='flex w-max gap-1 font-medium  bg-[#96A6D2] py-2 px-3 rounded-lg border-2 border-[#1D4ED8] items-center'
-                                                        onClick={() => {
-                                                            setEditId(item._id)
-                                                            setEditModel(true)
-                                                        }}
-                                                    >
-                                                        <FaRegSave className='text-lg' />
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        className='flex w-max gap-1 font-medium  bg-[#EAB374] py-2 px-3 rounded-lg border-2 border-[#D97706] items-center'
-                                                        onClick={() => { deleteUser(item._id) }}
-                                                    >
-                                                        <FaRegSave className='text-lg' />
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td class="px-2 md:px-6 py-2 md:py-4">
-                                                <button
-                                                    className={`flex w-max gap-1 font-medium ${item?.TransactionStatus == 'Paid' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
-                                                >
-                                                    {item?.TransactionStatus}
-                                                </button>
-                                            </td>
-                                            <td class="px-2 md:px-6 py-2 md:py-4">
-                                                <button
-                                                    className={`flex w-max gap-1 font-medium ${item?.Own_ID?.Status == 'Active' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
-                                                    onClick={() => { toggleUserStatus(item._id) }}
-                                                >
-                                                    {item?.Own_ID?.Status}
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                    {loading ? (
+                        <div className="text-center my-4">
+                            <p>Loading users...</p>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="my-4">
+                            <div className="w-[100%] overflow-y-scroll">
+                                <table className='w-full'>
+                                    <thead className="text-sm md:text-base font-normal uppercase text-slate-300">
+                                        <tr>
+                                            <th className="px-2 md:px-6 py-2 md:py-4"></th>
+                                            <th className="px-2 md:px-6 py-2 md:py-4">User name</th>
+                                            <th className="px-2 md:px-6 py-2 md:py-4">Phone</th>
+                                            <th className="px-2 md:px-6 py-2 md:py-4">Email</th>
+                                            <th className="px-2 md:px-6 py-2 md:py-4">Action</th>
+                                            <th className="px-2 md:px-6 py-2 md:py-4">Transaction Status</th>
+                                            <th className="px-2 md:px-6 py-2 md:py-4">User Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredUsers?.map((item, index) => (
+                                            <tr className="bg-white border-b font-medium text-sm md:text-sm border-slate-200" key={index}>
+                                                <th className="px-2 md:px-6 py-2 md:py-4">
+                                                    {item?.TransactionStatus === "UnPaid" &&
+                                                        <input
+                                                            type="checkbox"
+                                                            onChange={() => handleCheckboxChange(item?.Own_ID?._id)}
+                                                        />
+                                                    }
+                                                </th>
+                                                <th className="px-2 md:px-6 py-2 md:py-4">
+                                                    <h2 className='w-max'>
+                                                        {item?.Own_ID?.FirstName + " " + item?.Own_ID?.LastName}
+                                                    </h2>
+                                                </th>
+                                                <td className="px-2 md:px-6 py-2 md:py-4">
+                                                    <h2 className='w-max'>
+                                                        {item?.Own_ID?.Phone}
+                                                    </h2>
+                                                </td>
+                                                <td className="px-2 md:px-6 py-2 md:py-4">
+                                                    <h2 className='w-max'>
+                                                        {item?.Own_ID?.Email}
+                                                    </h2>
+                                                </td>
+                                                <td className="px-2 md:px-6 py-2 md:py-4">
+                                                    <div className='flex text-white md:flex-row gap-2'>
+                                                        <button
+                                                            className='flex w-max gap-1 font-medium bg-[#96A6D2] py-2 px-3 rounded-lg border-2 border-[#1D4ED8] items-center'
+                                                            onClick={() => {
+                                                                setEditId(item._id)
+                                                                setEditModel(true)
+                                                            }}
+                                                            disabled={loadingAction === item._id}
+                                                        >
+                                                            {loadingAction === item._id ? 'Loading...' : (
+                                                                <>
+                                                                    <FaRegSave className='text-lg' />
+                                                                    Edit
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            className='flex w-max gap-1 font-medium bg-[#EAB374] py-2 px-3 rounded-lg border-2 border-[#D97706] items-center'
+                                                            onClick={() => { deleteUser(item._id) }}
+                                                            disabled={loadingAction === item._id}
+                                                        >
+                                                            {loadingAction === item._id ? 'Loading...' : (
+                                                                <>
+                                                                    <FaRegSave className='text-lg' />
+                                                                    Delete
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td className="px-2 md:px-6 py-2 md:py-4">
+                                                    <button
+                                                        className={`flex w-max gap-1 font-medium ${item?.TransactionStatus === 'Paid' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
+                                                    >
+                                                        {item?.TransactionStatus}
+                                                    </button>
+                                                </td>
+                                                <td className="px-2 md:px-6 py-2 md:py-4">
+                                                    <button
+                                                        className={`flex w-max gap-1 font-medium ${item?.Own_ID?.Status === 'Active' ? "bg-[#16C098]/30 border-[#00B087] text-[#008767]" : "bg-[#FFC5C5] border-[#DF0404] text-[#DF0404]"} py-2 px-3 rounded-lg border-2 items-center`}
+                                                        onClick={() => { toggleUserStatus(item._id) }}
+                                                        disabled={loadingAction === item._id}
+                                                    >
+                                                        {loadingAction === item._id ? 'Loading...' : item?.Own_ID?.Status}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

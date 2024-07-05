@@ -692,7 +692,7 @@ const sendEmailContact = async (FirstName, Email, LastName, res) => {
             <h1>Hi ${FirstName} ${LastName} </h1>
             <h3>You have been added to a TODO login to your account to check it out.</h>
 
-            <a href="https://junito.vercel.app/login" target="_blank">Login to your Account</a>
+            <a href="https://future.junito.at/login" target="_blank">Login to your Account</a>
 `
         }
 

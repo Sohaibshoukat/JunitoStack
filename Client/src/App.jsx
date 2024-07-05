@@ -24,6 +24,8 @@ import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import CreatePassword from './Pages/Portfolio/CreatePassword'
 import CheckOut from './Pages/Portfolio/CheckOut'
+import Testing from './Pages/Portfolio/Testing'
+import SelectPlan from './Pages/Portfolio/SelectPlan'
 
 
 function App() {
@@ -43,14 +45,17 @@ function App() {
                   <Route path="/" element={<Home />}></Route>
                   <Route path="/contact" element={<Contact />}></Route>
                   <Route path="/login" element={<Login />}></Route>
+                  <Route path="/testing" element={<Testing />}></Route>
                   <Route path="/createpassword/:id" element={<CreatePassword />}></Route>
                   <Route path="/sign-up" element={<Signup />}></Route>
                   <Route path="/otpconfirm/:id" element={<OTP />}></Route>
-                  <Route path="/checkout/:id" element={<CheckOut />}></Route>
+                  <Route path="/selectplan/:id" element={<SelectPlan />}></Route>
+                  <Route path="/checkout/:id/:plan" element={<CheckOut />}></Route>
                   <Route path="/forget-password" element={<Forgetpassword />}></Route>
                   <Route path="/recover-password/:id" element={<Recoverpassword />}></Route>
                   <Route path="/about" element={<About />}></Route>
                   <Route path="/service" element={<Service />}></Route>
+
                   <Route path="/dashboard/*" element={<UserDashboard />}></Route>
                   <Route path="/dashboard/chatbot" element={<ChatBot />}></Route>
                   <Route path="/dashboard/c/:id" element={<Chating />}></Route>

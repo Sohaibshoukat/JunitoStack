@@ -372,7 +372,7 @@ const Chating = () => {
             </div>
             <div className='bg-[#F0F0F0] min-h-[100vh]'>
                 <div className="flex flex-row max-h-[inherit] items-start gap-4 px-2 md:px-8 pt-16 md:pt-20 pb-5 relative">
-                    <div className="xl:basis-[70%] w-[97%] md:w-[90%] xl:w-[70%] mx-auto max-h-full overflow-y-auto">
+                    <div className="xl:basis-[70%] w-[97%] md:w-[90%] xl:w-[70%] mx-auto max-h-[90vh] min-h-[90vh] overflow-y-auto flex flex-col justify-between">
                         <div className="flex gap-4 items-center mb-2 md:mb-4 ">
                             <div
                                 className={`flex gap-2 items-center p-2 border-2 border-gray rounded-2xl w-fit  cursor-pointer`}

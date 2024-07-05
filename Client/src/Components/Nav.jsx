@@ -18,7 +18,7 @@ const Nav = () => {
                             setDisplay(false)
                         }, 50);
                     }}>
-                        <img src="../Logo.png" alt="" className='w-[50px] md:w-[75px] h-[auto]' />
+                        <img src="../../Logo.png" alt="" className='w-[50px] md:w-[75px] h-[auto]' />
                     </Link>
                 </div>
                 <div className={`${display && 'hidden'} hidden xl:flex gap-4 basis-[50%] justify-center`}>
@@ -41,7 +41,7 @@ const Nav = () => {
                     ))}
                 </div>
                 <div className='hidden xl:block basis-[25%] '>
-                    <Link to={"/login"}>
+                    <Link to={"/testing"}>
                         <div className='
                             bg-gray float-right font-para text-white flex items-center gap-2 py-2 px-4 text-base w-fit rounded-lg font-bold
                             hover:bg-accence  duration-300 ease-in-out
@@ -74,7 +74,7 @@ const Nav = () => {
                                 ))}
                             </div>
                             <div className='xl:hidden md:block'>
-                                <Link to={"/login"}>
+                                <Link to={"/testing"}>
                                     <div className='
                                     bg-white text-black flex items-center gap-2 py-2 px-4 lg:py-4 lg:px-6 text-base w-fit rounded-lg font-extrabold
                                     hover:bg-accence font-para  duration-300 ease-in-out

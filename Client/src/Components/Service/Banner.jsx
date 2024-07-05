@@ -17,7 +17,7 @@ const Banner = () => {
                         Unser Highlight: der JUNITO BizBot – Ihr digitaler Mitarbeiter für automatisierte Routineaufgaben. Sparen Sie Kosten und Zeit, während der BizBot lernt und sich anpasst.
                     </p>
                 </div>
-                <div className='m-auto w-[90%] 2xl:w-[80%]'>
+                <div className='m-auto w-[90%] 2xl:w-[70%]'>
                     <img src="./Banner/ServiceBanner.svg" alt="" />
                 </div>
             </div>

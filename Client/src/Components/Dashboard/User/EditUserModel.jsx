@@ -13,6 +13,8 @@ const EditUserModel = ({ UserModel, setUserModel, fetchUsers, subuserid }) => {
         Password: ''
     });
 
+    const [loading, setLoading] = useState(false);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -33,7 +35,7 @@ const EditUserModel = ({ UserModel, setUserModel, fetchUsers, subuserid }) => {
                     Email:  data?.SubUser?.Own_ID?.Email,
                     Phone:  data?.SubUser?.Own_ID?.Phone,
                     Password:''
-                })
+                });
             } else {
                 showAlert(data.message, 'danger');
             }
@@ -44,14 +46,15 @@ const EditUserModel = ({ UserModel, setUserModel, fetchUsers, subuserid }) => {
 
     useEffect(() => {
         if(subuserid){
-            fetchUser()
+            fetchUser();
         }
-    }, [subuserid])
-    
-    const AletContext = useContext(AlertContext);
-    const { showAlert } = AletContext;
+    }, [subuserid]);
+
+    const alertContext = useContext(AlertContext);
+    const { showAlert } = alertContext;
 
     const handleSubmit = async () => {
+        setLoading(true);
         try {
             const response = await fetch(`${BaseURL}/api/company/editSubuser/${subuserid}`, {
                 method: 'PUT',
@@ -63,14 +66,16 @@ const EditUserModel = ({ UserModel, setUserModel, fetchUsers, subuserid }) => {
             });
             const data = await response.json();
             if (data.success) {
-                showAlert('User created successfully', 'success');
-                fetchUsers()
+                showAlert('User updated successfully', 'success');
+                fetchUsers();
                 setUserModel(false);
             } else {
                 showAlert(data.message, 'danger');
             }
         } catch (error) {
             showAlert(error.message, 'danger');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -144,9 +149,10 @@ const EditUserModel = ({ UserModel, setUserModel, fetchUsers, subuserid }) => {
                         <div className='flex justify-end my-4'>
                             <button
                                 onClick={handleSubmit}
-                                className='font-para items-center text-gray gap-2 flex bg-white border-2 border-white font-semibold rounded-lg py-3 px-4 hover:bg-transparent ease-in-out duration-300 hover:text-white'
+                                disabled={loading}
+                                className={`font-para items-center text-gray gap-2 flex bg-white border-2 border-white font-semibold rounded-lg py-3 px-4 ease-in-out duration-300 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-transparent hover:text-white'}`}
                             >
-                                Update User
+                                {loading ? 'Updating...' : 'Update User'}
                             </button>
                         </div>
                     </div>

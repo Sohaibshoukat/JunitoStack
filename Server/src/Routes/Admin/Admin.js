@@ -18,6 +18,7 @@ const Company = require("../../Models/Company");
 const Chat = require("../../Models/Chat");
 const multer = require('multer');
 const PromoCode = require("../../Models/PrompoCode");
+const Transaction = require("../../Models/Transaction");
 
 
 
@@ -616,6 +617,14 @@ router.post("/createuser", fetchadmin, async (req, res) => {
             Owner_ID: user._id
         })
 
+        let transaction = await Transaction.create({
+            User_ID: user._id,
+            Company_ID: company._id,
+            subUsers: [],
+            Status: "Paid",
+            Plan:"AdminFree"
+        });
+
         const mailOptions = {
             from: "no-reply@earn4views.com",
             to: req.body.Email,
@@ -623,7 +632,7 @@ router.post("/createuser", fetchadmin, async (req, res) => {
             html: `<p>Hi ${user.FirstName + " " + user.LastName},</p>
 <p>Your new account has been created as ${user.FirstName + " " + user.LastName}.</p>
 <p>Please create your password on below link </p>
-    <a href="https://admin-junito.vercel.app/createpassword/${user._id}" target="_blank">Create Password</a>
+    <a href="https://future.junito.at/createpassword/${user._id}" target="_blank">Create Password</a>
     <p>Thank you!</p>
   
 

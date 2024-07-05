@@ -1,1 +1,1 @@
-export const BaseURL="http://localhost:4000/api/adminAuth"
+export const BaseURL="https://junitoserver.junito.at/api/adminAuth"

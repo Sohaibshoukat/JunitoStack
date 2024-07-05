@@ -13,6 +13,16 @@ const port = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
+app.set('view engine', 'ejs'); 
+app.set('views',path.join(__dirname,'views'));
+app.use('/assets',express.static(path.join(__dirname, 'src/assets')));
+// app.use('/public', express.static(path.join(__dirname, 'public')));
+
+
+app.get('/',(req,res)=>{
+  res.render("test",{});
+})
+
 // Define routes
 app.use('/api/adminAuth', require('./Routes/Admin/Admin'));
 app.use('/api/contact', require('./Routes/User/Contact'));

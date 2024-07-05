@@ -1,7 +1,4 @@
 import React, { useContext } from 'react'
-import {
-    CAlert,
-} from '@coreui/react'
 import AlertContext from '../Context/Alert/AlertContext';
 
 export default function Alert(s) {

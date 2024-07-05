@@ -40,7 +40,7 @@ const Login = () => {
 
             if (data?.Email == false) {
                 showAlert('Email not Verified', 'danger')
-                navigate(`/otpconfirm/${data.AuthToken}`)
+                navigate(`/otpconfirm/${data.id}`)
                 return;
             }
 
@@ -48,11 +48,11 @@ const Login = () => {
 
                 if(data?.Status=="UnPaid"){
                     showAlert(data.message, 'danger')
-                    navigate(`/checkout/${data.id}`)
+                    navigate(`/selectplan/${data.id}`)
                     return;
                 }else if(data?.Status=="Expired"){
                     showAlert(data.message, 'danger')
-                    navigate(`/checkout/${data.id}`)
+                    navigate(`/selectplan/${data.id}`)
                     return;
                 }
             }else if(data?.type=="SubUser"){

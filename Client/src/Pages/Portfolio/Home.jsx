@@ -23,11 +23,13 @@ const Home = () => {
 
       <About />
 
-      <Functions />
+      <div id="function">
+        <Functions />
+      </div>
 
       <Prompts />
 
-      <Pricing/>
+      <Pricing />
 
       <NewYork />
 

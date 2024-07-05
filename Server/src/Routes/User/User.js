@@ -66,7 +66,6 @@ const sendOTPEmail = async (id, email, res) => {
         })
 
         const response = await transporter.sendMail(mailOptions)
-        console.log(response)
 
         return {
             status: "Pending",
@@ -172,6 +171,7 @@ router.post("/createpassword/:id", async (req, res) => {
         const SecPassword = await bcrypt.hash(req.body.Password, Salt)
 
         const userfield = {
+            Is_Verfied:true,
             ActiveUsed: true,
             Password: SecPassword
         }
@@ -248,7 +248,6 @@ router.post("/verifyOTP", async (req, res) => {
             }
         }
     } catch (error) {
-        console.log(error)
         res.json({
             success: false,
             message: error.message
@@ -358,7 +357,9 @@ router.post("/loginuser", async (req, res) => {
 
         if (user.User_Type == "Owner") {
             let transaction = await Transaction.findOne({ User_ID: user._id });
-            if (transaction.Status == "UnPaid") {
+            if (transaction.Plan == "AdminFree") {
+
+            } else if (transaction.Status == "UnPaid") {
                 return res.status(400).json({
                     Status: "UnPaid",
                     type: "User",
@@ -373,8 +374,6 @@ router.post("/loginuser", async (req, res) => {
                     id: user._id
                 });
             }
-            console.log(transaction.ExpiryDate)
-            console.log(new Date())
         } else {
             let Owner = await SubUser.findOne({ Own_ID: user._id });
             let transaction = await Transaction.findOne({ User_ID: Owner.User_ID });
@@ -422,10 +421,10 @@ router.post("/loginuser", async (req, res) => {
 
         if (!user.Is_Verfied) {
             const respponse = await sendOTPEmail(user._id, user.Email);
-            return res.json({ success: true, Email: false, message: "Email Verification Required", AuthToken: user.id, respponse });
+            return res.json({ success: true, Email: false, message: "Email Verification Required", AuthToken: user.id, id: user._id, respponse });
         }
 
-        res.json({ success, AuthToken, User_Type: user.User_Type, id:user.id })
+        res.json({ success, AuthToken, User_Type: user.User_Type, id: user.id })
 
     } catch (error) {
         console.error(error)
@@ -451,8 +450,6 @@ router.put("/UpProImg", fetchuser, PhotosUploader.single('Proimg'), async (req, 
         );
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
-        console.log(error);
         res.status(500).send('Error occurred');
     }
 });
@@ -527,8 +524,6 @@ router.put("/UpdateUser", fetchuser, PhotosUploader.fields([{ name: 'ProfilePhot
         if (path) {
             path = path.replace(/^src\\/, ''); // Remove 'src\' from the beginning of the path
         }
-
-        console.log(path)
 
         const newUser = {};
         if (FirstName) newUser.FirstName = FirstName;
@@ -726,8 +721,6 @@ router.put('/updatecompany', fetchuser, async (req, res) => {
     try {
         const userId = req.user.id; // Extract user ID from request
         const companyData = req.body; // Extract data from request body
-
-        console.log(companyData)
 
         const NewData = {
             CompanyName: companyData?.CompanyName,

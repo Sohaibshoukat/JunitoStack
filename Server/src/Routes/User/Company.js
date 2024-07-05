@@ -130,7 +130,9 @@ router.post("/createSubuser", fetchuser, async (req, res) => {
         if (transaction.subUsers.length <= 0) {
             transaction.subUsers.push({
                 User: user._id,
-                Status: "Paid"
+                Status: "Paid",
+                DateCreated: new Date().toISOString(),
+                ExpiryDate: transaction.Plan === 'Monthly' ? new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString() : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
             })
             transaction.save()
         } else {
@@ -213,14 +215,18 @@ router.delete("/deleteSubuser/:subuserId", fetchuser, async (req, res) => {
             return res.status(403).json({ success: false, message: "You do not have permission to delete this subuser" });
         }
 
-        // Find and update transactions
+        // Decrement the amount by 50 for transactions with status "Paid"
         await Transaction.updateMany(
-            { "subUsers.User": subuserId },
-            {
-                $pull: { subUsers: { User: subuserId } },
-                $inc: { Amount: -50 }
-            }
+            { "subUsers.User": subuserId, Status: "Paid" },
+            { $inc: { Amount: -50 } }
         );
+
+        // Remove the subuser from the subUsers array for all transactions
+        const result = await Transaction.updateMany(
+            { "subUsers.User": subuserId },
+            { $pull: { subUsers: { User: subuserId } } }
+        );
+
 
         // Delete the subuser and the user
         const user = await User.findByIdAndDelete(subuser.Own_ID);
@@ -239,6 +245,7 @@ router.delete("/deleteSubuser/:subuserId", fetchuser, async (req, res) => {
         res.status(500).send('Error occurred');
     }
 });
+
 
 router.put("/statusSubuser/:subuserId", fetchuser, async (req, res) => {
     let success = false;
@@ -298,13 +305,13 @@ router.get('/subUser', fetchuser, async (req, res) => {
 
         // Map through subUsers to add status from transactions
         let subUserDetails = subUsers.map(subUser => {
-            let transaction = transactions.find(tr => 
+            let transaction = transactions.find(tr =>
                 tr.subUsers.some(su => su.User.equals(subUser.Own_ID._id))
             );
 
             // Get the status of the subUser from the transaction
-            let status = transaction ? 
-                transaction.subUsers.find(su => su.User.equals(subUser.Own_ID._id)).Status : 
+            let status = transaction ?
+                transaction.subUsers.find(su => su.User.equals(subUser.Own_ID._id)).Status :
                 'No Transaction';
 
             return {

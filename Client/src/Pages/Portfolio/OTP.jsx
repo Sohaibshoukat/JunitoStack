@@ -35,7 +35,7 @@ const OTP = () => {
             }
             localStorage.setItem("auth-token", data.AuthToken)
             
-            navigate(`/checkout/${id}`)
+            navigate(`/selectplan/${id}`)
         } catch (error) {
             showAlert(error.message || 'OTP verification failed', 'danger');
         }

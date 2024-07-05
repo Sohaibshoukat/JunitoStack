@@ -15,10 +15,10 @@ const Functionality = () => {
             name:"Der JUNITO BizBot: Ihr digitaler Mitarbeiter",
             icon:"./Features/f23.png"
         },
-        {
-            name:"Mehr unter www.junito.at oder buchen Sie sofort ein gratis Erstgespräch",
-            icon:"./Features/f24.png"
-        },
+        // {
+        //     name:"Mehr unter www.junito.at oder buchen Sie sofort ein gratis Erstgespräch",
+        //     icon:"./Features/f24.png"
+        // },
     ]
 
     return (
@@ -30,13 +30,13 @@ const Functionality = () => {
                 </div>
                 <p className='basis-[50%] font-para text-sm md:text-base text-black'>Mit JUNITO setzen Sie auf praxisnahe Beratung und intelligente Tools, die Ihre Geschäftsprozesse optimieren, Ihnen New Work näherbringen und Ihnen den Weg in die digitale Zukunft ebnen.                </p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-between my-10 md:my-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-between my-10 md:my-20">
                 {data.map((item,index)=>(
                     <div className="basis-[25%] flex flex-col gap-4 items-center" key={index}>
                         <div className='bg-gray p-3 rounded-full w-fit'>
                             <img src={item.icon} alt="" className='w-[25px] h-[25px]' />
                         </div>
-                        <h2 className='font-para text-gray text-sm md:text-base text-center lg:text-2xl font-bold'>{item.name}</h2>
+                        <h2 className='font-para text-gray text-sm md:text-base text-center lg:text-lg font-bold'>{item.name}</h2>
                     </div>
                 ))}
             </div>
