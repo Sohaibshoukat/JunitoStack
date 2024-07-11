@@ -5,10 +5,16 @@ services:
     container_name: database_container
     image: mongo:latest
     restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     volumes:
-      - mongo_db:/data/db
+      - mongo_data:/data/db
     ports:
       - 27017:27017
+    command: >
+      mongod --auth
 
   app:
     build: .
@@ -16,10 +22,9 @@ services:
     ports:
       - "4000:3000"
     environment:
-      APP_NAME: Junito
-      DB_URI: mongodb://mongo_db:27017/Junito
-      PORT: 3000
-
+      APP_NAME: ${APP_NAME}
+      DB_URI: ${DB_URI}
+      PORT: ${PORT}
     depends_on:
       - mongo_db
     volumes:
@@ -28,4 +33,4 @@ services:
     command: npm start
 
 volumes:
-  mongo_db: {}
+  mongo_data: {}
