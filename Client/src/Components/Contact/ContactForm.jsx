@@ -30,10 +30,8 @@ const ContactForm = () => {
                 setEmail('');
                 setMessage('');
 
-                showAlert("We will be in touch with you soon", "success")
+                showAlert("Danke für Ihre Nachricht, wir werden Sie bald kontaktieren!", "success")
                 setIsLoading(false);
-
-
             }
             else {
                 setIsLoading(false);

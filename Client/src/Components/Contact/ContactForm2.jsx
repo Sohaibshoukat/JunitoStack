@@ -8,6 +8,7 @@ const ContactForm2 = () => {
 
     const [Name, setName] = useState('');
     const [Email, setEmail] = useState('');
+    const [Phone, setPhone] = useState('');
     const [Company, setCompany] = useState(''); // New state for Company
     const [Subject, setSubject] = useState(''); // New state for Subject
     const [Message, setMessage] = useState('');
@@ -22,7 +23,7 @@ const ContactForm2 = () => {
         try {
             const response = await fetch(`${BaseURL}/api/contact/sendMail`, {
                 method: 'POST',
-                body: JSON.stringify({ Name, Email, Company, Subject, Message }), // Include Company and Subject in the request body
+                body: JSON.stringify({ Name, Email, Phone, Company, Subject, Message }), // Include Company and Subject in the request body
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -31,11 +32,12 @@ const ContactForm2 = () => {
             if (data.success) {
                 setName('');
                 setEmail('');
+                setPhone('')
                 setCompany('');
                 setSubject('');
                 setMessage('');
 
-                showAlert("Thank you! Will get back to you soon", "success");
+                showAlert("Danke für Ihre Nachricht, wir werden Sie bald kontaktieren!", "success");
             } else {
                 showAlert("Failed to send message. Please try again later.", "danger");
             }
@@ -71,6 +73,17 @@ const ContactForm2 = () => {
                             value={Email}
                             onChange={(e) => { setEmail(e.target.value) }}
                             placeholder='Email'
+                            className='text-para text-black text-base md:text-lg font-para placeholder:text-gray-400 bg-transparent outline-none py-3 px-2 border-b-2 border-black'
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <input
+                            type="tel"
+                            name='Phone'
+                            id='Phone'
+                            value={Phone}
+                            onChange={(e) => { setPhone(e.target.value) }}
+                            placeholder='Telefonnummer'
                             className='text-para text-black text-base md:text-lg font-para placeholder:text-gray-400 bg-transparent outline-none py-3 px-2 border-b-2 border-black'
                         />
                     </div>
@@ -117,7 +130,7 @@ const ContactForm2 = () => {
                         onClick={handleFormSubmit}
                         disabled={IsLoading}
                     >
-                        <IoIosSend className='text-2xl'/>
+                        <IoIosSend className='text-2xl' />
                         Nachricht senden
                     </button>
                 </div>

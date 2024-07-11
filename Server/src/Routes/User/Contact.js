@@ -17,7 +17,7 @@ let transporter = nodemailer.createTransport({
 })
 
 
-const sendEmail = async (Name, Email, Company, Subject, Message, res) => {
+const sendEmail = async (Name, Email,Phone, Company, Subject, Message, res) => {
     try {
 
         const mailOptions = {
@@ -27,6 +27,7 @@ const sendEmail = async (Name, Email, Company, Subject, Message, res) => {
             html: `
       <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Name:</span> ${Name}</p></div>
       <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Email:</span> ${Email}</p></div>
+      <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Phone:</span> ${Phone}</p></div>
       <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Company:</span> ${Company}</p></div>
       <br/>
       <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Message:</span> ${Message}</p></div>`
@@ -49,14 +50,15 @@ const sendEmail = async (Name, Email, Company, Subject, Message, res) => {
 // Create a user
 router.post("/sendMail", async (req, res) => {
     try {
-        const { Name, Email, Company, Subject, Message } = req.body;
+        const { Name, Email, Phone, Company, Subject, Message } = req.body;
 
-        const response = await sendEmail(Name, Email, Company, Subject, Message);
+        const response = await sendEmail(Name, Email, Phone, Company, Subject, Message);
 
         let savedemail = await Emails.create({
             Email: Email,
             Company: Company,
             Name:Name,
+            Phone:Phone,
             Subject: Subject,
             Status: "Active",
         })

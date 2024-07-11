@@ -42,6 +42,9 @@ const Footer = () => {
                                             <h3 className='text-white text-sm md:text-base font-para font-light'>{item.Name}</h3>
                                         </Link>
                                     ))}
+                                    <a href="https://www.junito.at/about" target='_blank'>
+                                        <h3  className='text-white text-sm md:text-base font-para font-light'>Impressum</h3>
+                                    </a>
                                 </div>
                             </div>
                             <div className='flex flex-col gap-2 mb-8'>

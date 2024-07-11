@@ -5,20 +5,19 @@ const Functionality = () => {
     const data=[
         {
             name:"Effizientere Arbeitsprozesse für KMUs und Selbständige",
-            icon:"./Features/f21.png"
+            icon:"./Features/f21.png",
+            link:"https://www.junito.at/l%C3%B6sungen"
         },
         {
             name:"Moderne Arbeitsweisen dank New Work",
-            icon:"./Features/f22.png"
+            icon:"./Features/f22.png",
+            link:"https://www.junito.at/l%C3%B6sungen"
         },
         {
             name:"Der JUNITO BizBot: Ihr digitaler Mitarbeiter",
-            icon:"./Features/f23.png"
+            icon:"./Features/f23.png",
+            link:"https://future.junito.at"
         },
-        // {
-        //     name:"Mehr unter www.junito.at oder buchen Sie sofort ein gratis Erstgespräch",
-        //     icon:"./Features/f24.png"
-        // },
     ]
 
     return (
@@ -32,12 +31,14 @@ const Functionality = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-between my-10 md:my-20">
                 {data.map((item,index)=>(
+                    <a href={item.link}>
                     <div className="basis-[25%] flex flex-col gap-4 items-center" key={index}>
                         <div className='bg-gray p-3 rounded-full w-fit'>
                             <img src={item.icon} alt="" className='w-[25px] h-[25px]' />
                         </div>
                         <h2 className='font-para text-gray text-sm md:text-base text-center lg:text-lg font-bold'>{item.name}</h2>
                     </div>
+                    </a>
                 ))}
             </div>
         </div>

@@ -8,11 +8,11 @@ export const trimToWords = (str) => {
 
 export const trimTo35Words = (str) => {
   if(str){
-    let words = str.trim().split(/\s+/);
-    if (words.length <= 30) {
+    let words = str?.trim().split(/\s+/);
+    if (words?.length <= 30) {
       return str;
     }
-    return words.slice(0, 30).join(' ');
+    return words?.slice(0, 30)?.join(' ');
   }
 }
 

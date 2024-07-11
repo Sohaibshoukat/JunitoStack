@@ -77,11 +77,11 @@ const Pricing = () => {
         },
     ]
     return (
-        <div className='w-[90%] font-para lg:w-[80%] mx-auto my-10 flex flex-col items-center gap-8'>
-            <h3 className='text-2xl lg:text-4xl font-para font-semibold text-gray text-center'>Unser Preismodell</h3>
-            <div className="flex lg:flex-row flex-col gap-6 justify-between items-end">
+        <div className='w-[95%] font-para lg:w-[90%] mx-auto my-10 flex flex-col items-center gap-8'>
+            <h3 className='text-2xl lg:text-4xl font-para font-semibold text-gray text-center'>Preispläne BizBot</h3>
+            <div className="flex lg:flex-row flex-col gap-6 justify-between items-start">
                 {PricingPlans?.map((item, index) => (
-                    <div className="border-8 border-gray rounded-xl shadow-shadowfaq " key={index}>
+                    <div className="border-8 border-gray rounded-xl shadow-shadowfaq h-full basis-[33.33%] " key={index}>
                         {item?.best && <div className="bg-gray py-4 font-para text-2xl font-medium text-center text-white flex gap-2 items-center justify-center">
                             Am beliebtesten
                             <BsStars />
@@ -90,6 +90,10 @@ const Pricing = () => {
                             <h3 className='text-4xl flex justify-center items-center font-medium'>{item?.price}€<span className='text-[#636363] text-xl'>{item.type == "Monthly" ? "/Monat" : "/Jahr"}</span></h3>
                         </div>
                         <div className="bg-[#F5F5F5] rounded-b-xl py-6 px-6">
+                            <div className="flex flex-col gap-2 mb-4 font-para">
+                                <h2 className='text-base md:text-lg text-gray font-medium'>{item.Point.head}</h2>
+                                <p className='text-sm lg:text-base'>{item.Point.des}</p>
+                            </div>
                             <div className="flex flex-col gap-2">
                                 {item.FeatureData?.map((item, index) => (
                                     <div className="flex gap-2 font-para items-center" key={index}>
@@ -99,6 +103,10 @@ const Pricing = () => {
                                         <h3>{item}</h3>
                                     </div>
                                 ))}
+                            </div>
+                            <div className="flex flex-col gap-2 my-4 font-para">
+                                <h2 className='text-lg text-gray font-medium'>Terms and Conditions:</h2>
+                                <p>{item.term}</p>
                             </div>
                             <button
                                 className='bg-gray rounded-lg font-para text-white text-lg font-medium py-2 w-full my-4 border-2 border-gray hover:bg-transparent hover:text-gray ease-in-out duration-300'

@@ -78,13 +78,13 @@ const UserDashboard = () => {
                 <div className='font-poppins w-[85%]'>
                     <div className='flex flex-row text-custom-black justify-between items-center shadow-md p-2 '>
                         <h1 className='lg:text-xl md:text-lg sm:text-base font-bold'>Dashboard</h1>
-                        <div className="flex flex-row items-center gap-2 cursor-pointer relative" onClick={() => { setProfile(!Profile) }}>
+                        <div className="flex flex-row items-center gap-2 cursor-pointer relative group">
                             <img src={UserData?.ProfilePhoto ? `${BaseURL}/${UserData?.ProfilePhoto}` : "../Porp/User.png"} alt="" className='w-6 h-6 md:w-10 md:h-10 rounded-full' />
                             <div className="flex font-para text-gray flex-col">
                                 <h2 className='text-base font-bold'>{UserData?.FirstName + " " + UserData?.LastName}</h2>
                                 <p className='text-sm hidden md:block'>{UserData?.Email}</p>
                             </div>
-                            {Profile && <div className="flex rounded-xl z-[999999999] right-0 w-[100%] flex-col gap-2 bg-white absolute bottom-[-700%] md:bottom-[-350%] xl:bottom-[-250%] shadow-2xl  font-para text-lg font-medium py-2 px-4">
+                            <div className="group-hover:flex hidden rounded-xl z-[999999999] right-0 w-[100%] flex-col gap-2 bg-white absolute top-[100%] md:top-[100%] xl:bottom-[-250%] shadow-2xl  font-para text-lg font-medium py-2 px-4">
                                 <Link to={"/dashboard/setting/"}>
                                     <h3>Profile</h3>
                                 </Link>
@@ -102,7 +102,7 @@ const UserDashboard = () => {
                                 >
                                     SignOut
                                 </h3>
-                            </div>}
+                            </div>
                         </div>
                     </div>
 

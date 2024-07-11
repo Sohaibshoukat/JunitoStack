@@ -506,7 +506,7 @@ router.get('/promptsrandom/:department', async (req, res) => {
 
 router.get('/random', async (req, res) => {
     try {
-        const departments = ["HR", "Marketing", "Vertrieb", "Support", "Agentour", "Startup"];
+        const departments = ["HR", "Marketing", "Vertrieb", "Support", "Agentur", "Startup"];
         const randomPrompts = {};
 
         for (const department of departments) {
