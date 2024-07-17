@@ -40,8 +40,8 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: "no-reply@earn4views.com",
-        pass: "ZXCVBNM8j@",
+        user: "no-reply@junito.at",
+        pass: "BizBot2024!",
     },
     tls: {
         rejectUnauthorized: false,

@@ -1,9 +1,9 @@
 export const trimToWords = (str) => {
-  let words = str.trim().split(/\s+/);
-  if (words.length <= 12) {
+  let words = str?.trim()?.split(/\s+/);
+  if (words?.length <= 12) {
     return str;
   }
-  return words.slice(0, 12).join(' ');
+  return words?.slice(0, 12)?.join(' ');
 }
 
 export const trimTo35Words = (str) => {

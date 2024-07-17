@@ -44,11 +44,12 @@ router.post('/registertransactions', async (req, res) => {
         DateCreated: req.body.DateCreated,
         ExpiryDate: req.body.ExpiryDate,
         Status: req.body.Status,
-        Plan:req.body.Plan
+        Plan: req.body.Plan
       },
       { new: true }
     );
-    console.log(req.body.data)
+    console.log(req.body)
+
 
     ejs.renderFile(
       path.join(__dirname, '../../views/', 'index.ejs'),
@@ -62,17 +63,17 @@ router.post('/registertransactions', async (req, res) => {
       },
       async (err, data) => {
         if (err) {
-          console.error(err);
-          return res.status(500).send(err);
+          console.log(err);
+          return res.status(500).json({ err, message: "i am here" });
         }
 
         const options = {
           format: 'A4',
-          timeout: 60000, // Increased timeout to 60 seconds
+          timeout: 60000,
           printBackground: true
         };
 
-        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox',"--single-process"] });
         const page = await browser.newPage();
         await page.setContent(data, { waitUntil: 'networkidle0' });
 
@@ -88,7 +89,7 @@ router.post('/registertransactions', async (req, res) => {
           from: "sohaibshoukat94@gmail.com",
           to: user.Email,
           subject: "Junito Payment Invoice",
-          text: "Below is Your Payment Invoice for Junito Platform",
+          text: "Below is Your Payment Invoice for Junito BizzBot Platform",
           attachments: [
             {
               filename: 'Invoice.pdf',
@@ -110,7 +111,7 @@ router.post('/registertransactions', async (req, res) => {
     );
   } catch (error) {
     console.error(error);
-    res.status(400).send(error);
+    res.status(400).json({ message: "catch error", err: error });
   }
 });
 

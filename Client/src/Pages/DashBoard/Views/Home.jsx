@@ -132,8 +132,12 @@ const Home = () => {
       head: "Startup",
       icon: "../BotIcons/todo.png"
     },
+    // {
+    //   head: "Sales",
+    //   icon: "../BotIcons/sales.png"
+    // },
     {
-      head: "Sales",
+      head: "Agentur",
       icon: "../BotIcons/sales.png"
     },
   ]
@@ -356,7 +360,7 @@ const Home = () => {
             <h2 className='text-lg font-para font-bold'>Prompt of the Day</h2>
             <p className='text-slate-400 text-sm'>{promptday?.Category}</p>
           </div>
-          <div className="my-4 bg-white gap-6 flex flex-col md:flex-row rounded-xl py-4 px-6">
+          <div className="my-4 bg-white gap-6 flex flex-col rounded-xl py-4 px-6">
             <div className="flex flex-col gap-2 basis-[50%]">
               <h1 className='text-sm font-medium'>Prompt</h1>
               <p className='text-base font-bold'>{promptday?.Name}</p>
@@ -371,7 +375,7 @@ const Home = () => {
               </button>
             </div>
             <div className="basis-[50%]">
-              <img src={`${BaseURL}${image?.Src}`} alt="" className='object-cover w-full h-full rounded-2xl' />
+              <img src={`${BaseURL}/src/${image?.Src}`} alt="" className='object-cover w-full h-full rounded-2xl' />
             </div>
           </div>
         </div>
@@ -381,7 +385,7 @@ const Home = () => {
             <h2 className='text-gray text-lg font-bold'>ToDos</h2>
             <p className='text-gray font-semibold '>{todos?.length}</p>
           </div>
-          <div className="flex my-6 flex-col gap-2 max-h-80 overflow-y-scroll">
+          <div className="flex my-6 flex-col gap-2 max-h-96 overflow-y-scroll">
             {todos.map((item, index) => (
               <TODOCart item={item} key={index} fetchTodos={fetchTodos} />
             ))}
@@ -392,7 +396,7 @@ const Home = () => {
           <div className="border-b-4 border-gray pb-4">
             <h2 className='text-gray font-para text-lg font-bold'>Shared Chats</h2>
           </div>
-          <div className="flex my-6 font-para flex-col gap-4 max-h-80 overflow-y-scroll">
+          <div className="flex my-6 font-para flex-col gap-4 max-h-96 overflow-y-scroll">
             {Sharedch.map((item, index) => (
               <>
                 <div className="flex gap-2 font-para justify-between cursor-pointer" onClick={() => { setModelOpen(!ModelOpen) }}>
@@ -447,7 +451,7 @@ const Home = () => {
                   className="flex flex-row items-center py-2 px-2 md:px-4 gap-3 cursor-pointer"
                   onClick={() => {
                     setdepartment(item.head)
-                    navigate("/dashboard/chatbot");
+                    navigate(`/dashboard/prompts-browsing/${item.head}`);
                   }}
                 >
                   <div className='bg-[#5458F7]/30 p-2 rounded-xl'>

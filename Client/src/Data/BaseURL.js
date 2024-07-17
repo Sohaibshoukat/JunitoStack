@@ -1,1 +1,1 @@
-export const BaseURL ="https://junitoserver.junito.at"
+export const BaseURL ="https://junitobackend.zypherdigital.com"

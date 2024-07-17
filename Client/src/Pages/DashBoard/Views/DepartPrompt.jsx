@@ -82,7 +82,7 @@ const DepartPrompt = () => {
         <>
             <PromptDetailModel PromptDetail={PromptDetail} setPromptDetail={setPromptDetail} SelectedId={SelectedId} />
 
-            <div className='flex flex-col w-[80%] gap-4 m-auto py-6 font-para'>
+            <div className='flex flex-col w-[90%] gap-4 m-auto py-6 font-para'>
                 <h2 className='text-black font-semibold text-2xl'>Search for specific prompt</h2>
                 <div className="bg-slate-100 rounded-lg py-2 px-2 flex flex-row gap-2 items-center">
                     <IoIosSearch className='text-xl' />
@@ -121,10 +121,10 @@ const DepartPrompt = () => {
                     </select>
                 </div>
             </div>
-            <div className='flex flex-col py-10 gap-6 w-[90%] md:w-[90%] m-auto overflow-y-scroll md:px-6'>
+            <div className='flex flex-col py-10 gap-6 w-[95%] md:w-[95%] m-auto overflow-y-scroll md:px-6'>
                 <div className="bg-white rounded-lg shadow-shadow2 py-3 md:py-4 lg:py-6 px-3 md:px-3 lg:px-6">
                     <div className="my-4">
-                        {prompts.length>0 ?
+                        {prompts.length > 0 ?
                             (
                                 <div className="relative overflow-x-auto">
                                     <table className="w-full text-sm font-para text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -145,6 +145,10 @@ const DepartPrompt = () => {
                                                         <tr
                                                             className="bg-white cursor-pointer border-b font-normal text-base border-slate-200 hover:bg-gray hover:text-white ease-in-out duration-300"
                                                             key={index2}
+                                                            onClick={() => {
+                                                                setSelectedId(item2._id);
+                                                                setPromptDetail(true);
+                                                            }}
                                                         >
                                                             <th className="px-auto md:px-6 py-2 md:py-4">{index2}</th>
                                                             <td className="px-auto md:px-6 py-2 md:py-4 min-w-max">{item2.Name}</td>

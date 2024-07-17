@@ -25,7 +25,7 @@ const openai = new OpenAI({
 const FileStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         console.log(9)
-        return cb(null, './Uploads/ProfilePhoto/User');
+        return cb(null, './src/Uploads/ProfilePhoto/User');
         console.log(8)
     },
     filename: function (req, file, cb) {

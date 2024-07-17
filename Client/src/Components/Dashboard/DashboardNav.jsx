@@ -85,7 +85,13 @@ const DashboardNav = () => {
                             </li>}
                     </Link>
                 ))}
-                <li>
+                <li
+                    className='cursor-pointer'
+                    onClick={() => {
+                        localStorage.removeItem("auth-token")
+                        navigate('/')
+                    }}
+                >
                     <div
                         className={`
                             inline-flex w-full px-2 md:px-4 py-2 md:py-3 gap-4 items-center text-darkgray text-gray justify-center lg:justify-start

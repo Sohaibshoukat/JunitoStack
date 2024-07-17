@@ -120,7 +120,7 @@ const ChatBot = () => {
             const AskDetail = await ChatResponse.json()
 
 
-            NewData[ChatsData.length-1] = {
+            NewData[ChatsData.length - 1] = {
                 Type: "BizBot",
                 Query: AskDetail.response.content
             }
@@ -203,7 +203,7 @@ const ChatBot = () => {
     useEffect(() => {
         if (Query !== "") {
             SearchSuggesstion()
-        }else{
+        } else {
             setSearchSugesstonsData([])
         }
     }, [Query])
@@ -301,9 +301,18 @@ const ChatBot = () => {
                         {ChatsData?.length <= 0 ?
                             <div className='flex flex-col justify-between gap-8 min-h-[80vh]'>
                                 <div className="text-center flex flex-col gap-3 w-[100%]">
-                                    <div className="flex gap-4 justify-center items-end">
-                                        <img src="../BizzBot.png" alt="" className='w-6 md:w-12' />
-                                        <h2 className='text-gray font-bold text-xl md:text-xl font-para'>Welcome to BizBot</h2>
+                                    <div className="flex flex-row justify-between">
+                                        <button
+                                            className='bg-gray py-2 px-4 rounded-lg border-2 border-gray text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 self-end float-right'
+                                            onClick={() => { navigate('/dashboard/') }}
+                                        >
+                                            Dashboard
+                                        </button>
+                                        <div className="flex gap-4 justify-center items-end">
+                                            <img src="../BizzBot.png" alt="" className='w-6 md:w-12' />
+                                            <h2 className='text-gray font-bold text-xl md:text-xl font-para'>Welcome to BizBot</h2>
+                                        </div>
+                                        <div></div>
                                     </div>
                                 </div>
                                 <PromptsSlider Model={Model} setModel={setModel} setSelectedID={setSelectedID} />
@@ -399,17 +408,11 @@ const ChatBot = () => {
 
                                 </div>
                             </div>
-                            <button
-                                className='bg-gray py-2 px-4 rounded-lg border-2 border-gray mt-4 text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 self-end float-right'
-                                onClick={() => { navigate('/dashboard/') }}
-                            >
-                                Dashboard
-                            </button>
                         </div>
                     </div>
                     <div className="basis-[30%] max-h-[85vh] overflow-y-scroll hidden xl:block">
                         <div className="flex flex-col gap-4">
-                            <BizBotDep />
+                            {/* <BizBotDep /> */}
                             <ChatHistory />
                         </div>
                     </div>

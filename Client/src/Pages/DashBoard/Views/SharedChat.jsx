@@ -120,7 +120,7 @@ const SharedChat = () => {
                     <option value={item.head} key={index}>{item.head}</option>
                 ))}
             </select>
-            <div className='grid grid-cols-1 my-10 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 w-[90%] lg:w-[80%] m-auto'>
+            <div className='grid grid-cols-1 my-10 md:grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8 w-[90%] lg:w-[90%] m-auto'>
                 {filteredChats.map((item, index) => (
                     <div className={`flex flex-col justify-between group gap-3 font-para py-2 md:py-4 px-3 md:px-6 bg-white rounded-2xl shadow-shadow3 ease-in-out duration-300 group relative`} key={index}>
                         <div className="absolute  group-hover:flex gap-2 items-center hidden top-[-3%] left-[-3%]">
