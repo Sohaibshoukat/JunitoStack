@@ -73,7 +73,20 @@ router.post('/registertransactions', async (req, res) => {
           printBackground: true
         };
 
-        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox',"--single-process"] });
+        const browser = await puppeteer.launch({
+          executablePath: '/usr/bin/google-chrome',
+          headless: true, 
+          args: [
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-setuid-sandbox',
+            '--no-first-run',
+            '--no-sandbox',
+            '--no-zygote',
+            '--single-process',
+          ],
+        });
+      
         const page = await browser.newPage();
         await page.setContent(data, { waitUntil: 'networkidle0' });
 
@@ -184,7 +197,19 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
           printBackground: true
         };
 
-        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        const browser = puppeteer.launch({
+          executablePath: '/usr/bin/google-chrome',
+          headless: true, 
+          args: [
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-setuid-sandbox',
+            '--no-first-run',
+            '--no-sandbox',
+            '--no-zygote',
+            '--single-process',
+          ],
+        });
         const page = await browser.newPage();
         await page.setContent(data, { waitUntil: 'networkidle0' });
 
