@@ -35,15 +35,18 @@ const FileStorage = multer.diskStorage({
 
 const FileUploader = multer({ storage: FileStorage });
 
-let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+const transporter = nodemailer.createTransport({
+    host: "smtp.world4you.com",
     port: 465,
-    secure: true, // true for 465, false for other ports
+    secure: true,
     auth: {
-        user: 'calviiinho@gmail.com', // Your Gmail email address
-        pass: 'gzsh rwsl nkjq hgdo', // Your Gmail app password or an app-specific password
+        user: "no-reply@junito.at",
+        pass: "BizBot2024!",
     },
-})
+    tls: {
+        rejectUnauthorized: false,
+    },
+});
 
 
 async function fillChatDetails(message, user_id, department) {
@@ -685,7 +688,7 @@ router.delete('/sharedChat/:sharedChatId', fetchuser, async (req, res) => {
 const sendEmailContact = async (FirstName, Email, LastName, res) => {
     try {
         const mailOptions = {
-            from: "sohaibshoukat94@gmail.com",
+            from: "no-reply@junito.at",
             to: Email,
             subject: `Added at Todo`,
             html: `

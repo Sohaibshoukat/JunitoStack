@@ -35,12 +35,12 @@ const PhotosUploader = multer({ storage: PhotosStorage });
 
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.hostinger.com",
+    host: "smtp.world4you.com",
     port: 465,
     secure: true,
     auth: {
-        user: "no-reply@earn4views.com",
-        pass: "ZXCVBNM8j@",
+        user: "no-reply@junito.at",
+        pass: "BizBot2024!",
     },
     tls: {
         rejectUnauthorized: false,
@@ -51,7 +51,7 @@ const sendOTPEmail = async (id, FirstName, LastName, Password, email, res) => {
     try {
 
         const mailOptions = {
-            from: "no-reply@earn4views.com",
+            from: "no-reply@junito.at",
             to: email,
             subject: `Verify Your Email`,
             html: `<p>${FirstName} ${LastName} invited you to join Junito Platform for your company needs</p>

@@ -15,12 +15,15 @@ const ejs = require('ejs');
 const path = require('path');
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
+  host: "smtp.world4you.com",
   port: 465,
-  secure: true, // true for 465, false for other ports
+  secure: true,
   auth: {
-    user: 'ipocryptos@gmail.com', // Your Gmail email address
-    pass: 'ixbw rudr efft hedl', // Your Gmail app password or an app-specific password
+      user: "no-reply@junito.at",
+      pass: "BizBot2024!",
+  },
+  tls: {
+      rejectUnauthorized: false,
   },
 });
 
@@ -99,7 +102,7 @@ router.post('/registertransactions', async (req, res) => {
         console.log("File Created Successfully");
 
         let mailDetails = {
-          from: "sohaibshoukat94@gmail.com",
+          from: "no-reply@junito.at",
           to: user.Email,
           subject: "Junito Payment Invoice",
           text: "Below is Your Payment Invoice for Junito BizzBot Platform",
@@ -221,7 +224,7 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
         console.log("File Created Successfully");
 
         let mailDetails = {
-          from: "sohaibshoukat94@gmail.com",
+          from: "no-reply@junito.at",
           to: user.Email,
           subject: "Junito Payment Invoice",
           text: "Below is Your Payment Invoice for Junito Platform",

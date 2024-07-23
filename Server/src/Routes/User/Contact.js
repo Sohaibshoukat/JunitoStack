@@ -6,15 +6,18 @@ const Emails = require("../../Models/Email");
 
 
 
-let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+const transporter = nodemailer.createTransport({
+    host: "pop3.world4you.com",
     port: 465,
-    secure: true, // true for 465, false for other ports
+    secure: true,
     auth: {
-        user: 'calviiinho@gmail.com', // Your Gmail email address
-        pass: 'gzsh rwsl nkjq hgdo', // Your Gmail app password or an app-specific password
+        user: "no-reply@junito.at",
+        pass: "BizBot2024!",
     },
-})
+    tls: {
+        rejectUnauthorized: false,
+    },
+});
 
 
 const sendEmail = async (Name, Email,Phone, Company, Subject, Message, res) => {
@@ -22,7 +25,7 @@ const sendEmail = async (Name, Email,Phone, Company, Subject, Message, res) => {
 
         const mailOptions = {
             from: Email,
-            to: "sohaibshoukat94@gmail.com",
+            to: "no-reply@junito.at",
             subject: `${Name} | ${Subject}`,
             html: `
       <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Name:</span> ${Name}</p></div>

@@ -36,7 +36,7 @@ const PhotosUploader = multer({ storage: PhotosStorage });
 
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.hostinger.com",
+    host: "smtp.world4you.com",
     port: 465,
     secure: true,
     auth: {
@@ -53,7 +53,7 @@ const sendOTPEmail = async (id, email, res) => {
         const otp = `${Math.floor(1000 + Math.random() * 9000)}`
 
         const mailOptions = {
-            from: "no-reply@earn4views.com",
+            from: "no-reply@junito.at",
             to: email,
             subject: `Verify Your Email`,
             html: `<p>Enter <b>${otp}</b> in the app to verify your email address and complete the proccess</p>
@@ -626,7 +626,7 @@ router.post("/createuser", fetchadmin, async (req, res) => {
         });
 
         const mailOptions = {
-            from: "no-reply@earn4views.com",
+            from: "no-reply@junito.at",
             to: req.body.Email,
             subject: "Congratulation! Your account Created",
             html: `<p>Hi ${user.FirstName + " " + user.LastName},</p>
