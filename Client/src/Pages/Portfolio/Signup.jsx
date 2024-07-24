@@ -118,11 +118,13 @@ const Signup = () => {
                                             "borderBottomLeftRadius": "0.5rem",
                                         }}
                                         inputStyle={{
-                                            height:"100%",
+                                            height: "100%",
                                             "borderRadius": "0.5rem",
                                         }}
                                         value={formData.Phone}
-                                        onChange={handleChange}
+                                        onChange={(phone) => {
+                                            setFormData({ ...formData, Phone: phone });
+                                        }}
                                         required
                                     />
                                     {/* <input

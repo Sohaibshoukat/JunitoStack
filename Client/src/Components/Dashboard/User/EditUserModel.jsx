@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import { BaseURL } from '../../../Data/BaseURL';
 import AlertContext from '../../../Context/Alert/AlertContext';
 
@@ -125,13 +127,38 @@ const EditUserModel = ({ UserModel, setUserModel, fetchUsers, subuserid }) => {
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="Phone" className='text-white'>Phone</label>
-                                <input
-                                    type="text"
+                                <PhoneInput
                                     name="Phone"
+                                    type="text"
+                                    country={"us"}
+                                    enableAreaCodes={true}
+                                    areaCodes={{ us: ["332"] }}
+                                    inputProps={{
+                                        name: "phone",
+                                        country: "us",
+                                        required: true,
+                                        autoFocus: true
+                                    }}
+                                    containerClass={`rounded-lg h-auto w-full`}
+                                    className="h-auto w-full bg-[#EDF2F6] rounded-lg border-none outline-none"
+                                    inputClass='bg-[#EDF2F6] rounded-lg border-none outline-none py-3 px-4'
+                                    buttonStyle={{
+                                        outline:"none",
+                                        backgroundColor:"#EDF2F6",
+                                        "borderTopLeftRadius": "0.5rem",
+                                        "borderBottomLeftRadius": "0.5rem",
+                                    }}
+                                    inputStyle={{
+                                        width:"100%",
+                                        backgroundColor:"#EDF2F6",
+                                        height: "100%",
+                                        "borderRadius": "0.5rem",
+                                    }}
                                     value={formData.Phone}
-                                    onChange={handleChange}
-                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
-                                    placeholder='Please Enter Phone'
+                                    onChange={(phone)=>{
+                                        setFormData({ ...formData, Phone: phone });
+                                    }}
+                                    required
                                 />
                             </div>
                             <div className="flex flex-col gap-1">

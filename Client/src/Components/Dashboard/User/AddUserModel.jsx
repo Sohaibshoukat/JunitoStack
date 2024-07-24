@@ -123,7 +123,9 @@ const AddUserModel = ({ UserModel, setUserModel, fetchUsers }) => {
                                         "borderRadius": "0.5rem",
                                     }}
                                     value={formData.Phone}
-                                    onChange={handleChange}
+                                    onChange={(phone)=>{
+                                        setFormData({ ...formData, Phone: phone });
+                                    }}
                                     required
                                 />
                             </div>
