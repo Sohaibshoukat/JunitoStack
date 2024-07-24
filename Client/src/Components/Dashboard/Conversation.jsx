@@ -62,7 +62,7 @@ const Conversation = ({ RegenrateChat }) => {
     }, [])
 
     return (
-        <div className='max-h-[65vh] lg:max-h-[80vh] xl:max-h-[60vh] h-[65vh] lg:h-[80vh] xl:h-[80vh] font-para overflow-y-scroll'>
+        <div className='max-h-[calc(100vh-250px)] h-[calc(100vh-250px)] font-para overflow-y-scroll'>
             <div className="flex flex-col gap-4 lg:gap-8">
                 {ChatsData.map((item, index) => (
                     <>

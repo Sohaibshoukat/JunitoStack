@@ -84,7 +84,7 @@ const UserDashboard = () => {
                                 <h2 className='text-base font-bold'>{UserData?.FirstName + " " + UserData?.LastName}</h2>
                                 <p className='text-sm hidden md:block'>{UserData?.Email}</p>
                             </div>
-                            <div className="group-hover:flex hidden rounded-xl z-[999999999] right-0 w-[100%] flex-col gap-2 bg-white absolute top-[100%] md:top-[100%] xl:bottom-[-250%] shadow-2xl  font-para text-lg font-medium py-2 px-4">
+                            <div className="group-hover:flex hidden rounded-xl z-[999999999] right-0 w-[100%] flex-col gap-2 bg-white absolute top-[100%] md:top-[100%] shadow-2xl  font-para text-lg font-medium py-2 px-4">
                                 <Link to={"/dashboard/setting/"}>
                                     <h3>Profile</h3>
                                 </Link>

@@ -132,10 +132,10 @@ const Home = () => {
       head: "Startup",
       icon: "../BotIcons/todo.png"
     },
-    // {
-    //   head: "Sales",
-    //   icon: "../BotIcons/sales.png"
-    // },
+    {
+      head: "Assistenz",
+      icon: "../BotIcons/Bots/sales.png"
+    },
     {
       head: "Agentur",
       icon: "../BotIcons/sales.png"
@@ -298,7 +298,7 @@ const Home = () => {
       })
 
       NewData.push({
-        Type: "BizzBot",
+        Type: "BizBot",
         Query: AskDetail.response.content
       })
 
@@ -375,7 +375,7 @@ const Home = () => {
               </button>
             </div>
             <div className="basis-[50%]">
-              <img src={`${BaseURL}/src/${image?.Src}`} alt="" className='object-cover w-full h-full rounded-2xl' />
+              <img src={`${BaseURL}${image?.Src}`} alt="" className='object-cover w-full h-full rounded-2xl' />
             </div>
           </div>
         </div>

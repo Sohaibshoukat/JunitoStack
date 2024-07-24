@@ -374,6 +374,8 @@ router.get('/promptofday', async (req, res) => {
 
         const images = await PromptImages.find({ Department: randomPrompt.Department });
 
+        console.log(images)
+
         const randomIndex2 = Math.floor(Math.random() * 10);
 
 

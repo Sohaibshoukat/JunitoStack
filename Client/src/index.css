@@ -23,3 +23,33 @@ body{
 ::-webkit-scrollbar-track {
   background-color: rgb(212, 212, 212);
 }
+
+
+
+.swiper-button-next, .swiper-rtl .swiper-button-prev {
+  background-color: white !important;
+  border-radius: 50% !important;
+  padding: 20px 20px !important;
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.swiper-button-prev, .swiper-rtl .swiper-button-next{
+  background-color: white !important;
+  border-radius: 50% !important;
+  padding: 20px 20px !important;
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.swiper-button-prev:after, .swiper-button-next:after{
+  font-size: 25px !important;
+  color: black !important;
+   font-weight: 700 !important;
+}
+
+.react-scroll-to-bottom--css-aximi-1n7m0yu{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}

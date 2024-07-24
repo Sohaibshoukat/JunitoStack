@@ -29,8 +29,8 @@ const Prompts = () => {
             Icon: "../BotIcons/Bots/marketing.png"
         },
         {
-            Title: "Sales",
-            Des: "Get to know more about Sales Prompts",
+            Title: "Assistenz",
+            Des: "Get to know more about Assistenz Prompts",
             Icon: "../BotIcons/Bots/sales.png"
         },
         {

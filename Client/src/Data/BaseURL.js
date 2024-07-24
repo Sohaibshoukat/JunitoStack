@@ -1,1 +1,1 @@
-export const BaseURL ="https://junitobackend.zypherdigital.com"
+export const BaseURL ="http://localhost:4000"

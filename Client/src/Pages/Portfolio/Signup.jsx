@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Nav from '../../Components/Nav'
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import Footer from '../../Components/Footer'
 import AlertContext from '../../Context/Alert/AlertContext'
 import { BaseURL } from '../../Data/BaseURL'
@@ -84,7 +86,7 @@ const Signup = () => {
                                         value={formData.LastName}
                                         onChange={handleChange}
                                         placeholder='Dep'
-                                        className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
+                                        className='py-3 text-lg px-4 w-full border-2 border-black/50 rounded-lg'
                                     />
                                 </div>
                                 <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -96,14 +98,41 @@ const Signup = () => {
                                         placeholder='abc@gmail.com'
                                         className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                     />
-                                    <input
+                                    <PhoneInput
+                                        name="Phone"
+                                        type="text"
+                                        country={"us"}
+                                        enableAreaCodes={true}
+                                        areaCodes={{ us: ["332"] }}
+                                        inputProps={{
+                                            name: "phone",
+                                            country: "us",
+                                            required: true,
+                                            autoFocus: true
+                                        }}
+                                        containerClass={`rounded-lg h-auto`}
+                                        className="rounded-lg h-auto"
+                                        inputClass='h-auto px-6 border-2 border-transparent font-pop text-lg rounded-lg  bg-[#E8E8E8] py-2 focus:border-green-500 focus:outline-none'
+                                        buttonStyle={{
+                                            "borderTopLeftRadius": "0.5rem",
+                                            "borderBottomLeftRadius": "0.5rem",
+                                        }}
+                                        inputStyle={{
+                                            height:"100%",
+                                            "borderRadius": "0.5rem",
+                                        }}
+                                        value={formData.Phone}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    {/* <input
                                         type="tel"
                                         name="Phone"
                                         value={formData.Phone}
                                         onChange={handleChange}
                                         placeholder='1234567890'
                                         className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
-                                    />
+                                    /> */}
                                 </div>
                                 <input
                                     type="text"

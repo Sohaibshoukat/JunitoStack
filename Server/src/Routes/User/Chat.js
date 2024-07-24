@@ -24,9 +24,7 @@ const openai = new OpenAI({
 
 const FileStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(9)
         return cb(null, './src/Uploads/ProfilePhoto/User');
-        console.log(8)
     },
     filename: function (req, file, cb) {
         return cb(null, `${Date.now()}-${file.originalname}`);
@@ -89,11 +87,7 @@ async function fillChatDetails(message, user_id, department) {
         let filledMsg = message;
         placeholders.forEach((placeholder) => {
             const key = placeholder.substring(1, placeholder.length - 1).toLowerCase().replace(" ", "").replace("_", "");
-            console.log(key)
-            console.log(accountDetails.department)
             if (accountDetails[key] !== undefined) {
-                console.log(placeholder)
-                console.log(accountDetails[key])
                 filledMsg = filledMsg.replaceAll(placeholder, accountDetails[key]);
             }
         });
@@ -138,7 +132,7 @@ router.post('/ask',fetchuser, async (req, res) => {
         const response = await axios.post(`${pythonServerURL}/chat`, chatDetails);
         res.status(response.status).json(response.data);
     } catch (error) {
-        console.error(error.message);
+        console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -152,7 +146,6 @@ router.post('/searchsuggestion',fetchuser, async (req, res) => {
         }
 
         const chatDetails = req.body;
-        console.log(chatDetails)
         const query = chatDetails.data;
         if (!query) {
           return res.status(400).send('Query parameter is required');
@@ -342,7 +335,6 @@ router.put('/:chatId/regenratechat', fetchuser, async (req, res) => {
             return res.status(404).json({ success: false, message: "Chat not found" });
         }
 
-        console.log(chat?.ChatConversation?.length)
 
         chat.ChatConversation[chat?.ChatConversation?.length - 1] = { Type: "BizBot", Query: Response };
 
@@ -750,7 +742,6 @@ router.post('/todos/add', fetchuser, async (req, res) => {
 
         await subUsers.map(async (item) => {
             let subuser = await User.findById(item).select('FirstName LastName Email')
-            console.log(subuser)
             await sendEmailContact(subuser?.FirstName, subuser?.Email, subuser?.LastName)
         })
 
@@ -829,7 +820,6 @@ router.put('/todos/edit/:id', fetchuser, async (req, res) => {
             await Promise.all(subUsers.map(async (item) => {
                 let subuser = await User.findById(item).select('FirstName LastName Email');
                 if (subuser) {
-                    console.log(subuser);
                     await sendEmailContact(subuser.FirstName, subuser.Email, subuser.LastName);
                 }
             }));
