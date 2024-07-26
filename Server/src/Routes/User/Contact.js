@@ -7,16 +7,13 @@ const Emails = require("../../Models/Email");
 
 
 const transporter = nodemailer.createTransport({
-    host: "pop3.world4you.com",
-    port: 465,
-    secure: true,
+    host: "smtp.world4you.com",
+    port: 587,
+    secure: false,
     auth: {
         user: "no-reply@junito.at",
-        pass: "BizBot2024!",
-    },
-    tls: {
-        rejectUnauthorized: false,
-    },
+        pass: "Scott691980!", 
+    }
 });
 
 
@@ -24,7 +21,7 @@ const sendEmail = async (Name, Email,Phone, Company, Subject, Message, res) => {
     try {
 
         const mailOptions = {
-            from: Email,
+            from: "no-reply@junito.at",
             to: "no-reply@junito.at",
             subject: `${Name} | ${Subject}`,
             html: `
@@ -36,15 +33,17 @@ const sendEmail = async (Name, Email,Phone, Company, Subject, Message, res) => {
       <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Message:</span> ${Message}</p></div>`
         }
 
-        await transporter.sendMail(mailOptions)
+        const response = await transporter.sendMail(mailOptions)
 
         return {
-            status: True
+            response:response,
+            status: true
         };
     } catch (error) {
+        console.log(error)
         return {
             status: "Failed",
-            message: error.message,
+            message: error,
         };
     }
 }
@@ -83,8 +82,8 @@ const sendEmailContact = async (Name, Email, Message, res) => {
     try {
 
         const mailOptions = {
-            from: Email,
-            to: "sohaibshoukat94@gmail.com",
+            from: "no-reply@junito.at",
+            to: "no-reply@junito.at",
             subject: `${Name}`,
             html: `
         <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Name:</span> ${Name}</p></div>
@@ -93,15 +92,17 @@ const sendEmailContact = async (Name, Email, Message, res) => {
         <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Message:</span> ${Message}</p></div>`
         }
 
-        await transporter.sendMail(mailOptions)
+        const response = await transporter.sendMail(mailOptions)
+        console.log(response)
 
         return {
-            status: True
+            response : response,
+            status: true
         };
     } catch (error) {
         return {
             status: "Failed",
-            message: error.message,
+            message: error,
         };
     }
 }
@@ -112,6 +113,13 @@ router.post("/sendcontactMail", async (req, res) => {
         const { Name, Email, Message } = req.body;
 
         const response = await sendEmailContact(Name, Email, Message);
+        console.log(response);
+
+        let savedemail = await Emails.create({
+            Email: Email,
+            Name:Name,
+            Status: "Active",
+        })
 
         if (response.status) {
             res.json({ success: true });
@@ -129,8 +137,8 @@ const sendEmailRead = async (Email, Department, res) => {
     try {
 
         const mailOptions = {
-            from: Email,
-            to: "sohaibshoukat94@gmail.com",
+            from: "no-reply@junito.at",
+            to: "no-reply@junito.at",
             subject: `${Email} | ${Department}`,
             html: `
       <div><p style="font-size:16px"><span style="font-weight:700;font-size:20px">Email:</span> ${Email}</p></div>
@@ -141,7 +149,7 @@ const sendEmailRead = async (Email, Department, res) => {
         await transporter.sendMail(mailOptions)
 
         return {
-            status: True
+            status: true
         };
     } catch (error) {
         return {

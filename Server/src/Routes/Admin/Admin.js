@@ -37,15 +37,12 @@ const PhotosUploader = multer({ storage: PhotosStorage });
 
 const transporter = nodemailer.createTransport({
     host: "smtp.world4you.com",
-    port: 465,
-    secure: true,
+    port: 587, // Use port 587 for STARTTLS or 465 for SSL
+    secure: false,
     auth: {
         user: "no-reply@junito.at",
-        pass: "BizBot2024!",
-    },
-    tls: {
-        rejectUnauthorized: false,
-    },
+        pass: "Scott691980!", 
+    }
 });
 
 const sendOTPEmail = async (id, email, res) => {

@@ -32,15 +32,12 @@ const PhotosUploader = multer({ storage: PhotosStorage });
 
 const transporter = nodemailer.createTransport({
     host: "smtp.world4you.com",
-    port: 465,
-    secure: true,
+    port: 587, // Use port 587 for STARTTLS or 465 for SSL
+    secure: false,
     auth: {
         user: "no-reply@junito.at",
-        pass: "BizBot2024!",
-    },
-    tls: {
-        rejectUnauthorized: false,
-    },
+        pass: "Scott691980!", 
+    }
 });
 
 const sendOTPEmail = async (id, email, res) => {
@@ -69,6 +66,7 @@ const sendOTPEmail = async (id, email, res) => {
         })
 
         const response = await transporter.sendMail(mailOptions)
+        console.log(response)
 
         return {
             status: "Pending",
@@ -76,6 +74,7 @@ const sendOTPEmail = async (id, email, res) => {
             response: response
         };
     } catch (error) {
+        console.log(error)
         return {
             status: "Failed",
             message: error.message,
@@ -281,9 +280,12 @@ router.post("/SendOTPagain", async (req, res) => {
         const email = user.Email;
 
         // Send new OTP email
-        await sendOTPEmail(userID, email);
+        const response = await sendOTPEmail(userID, email);
+
+        console.log(response)
 
         res.json({
+            reponse:response,
             success: true,
             message: "OTP Sent Successfully"
         });

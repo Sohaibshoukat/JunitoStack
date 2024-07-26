@@ -20,6 +20,11 @@ const ContactForm2 = () => {
 
     const handleFormSubmit = async () => {
         setIsLoading(true); // Set loading state to true when form is submitted
+        if (Name == "" || Email == "" | Phone == "" || Company == "" || Subject == "" || Message == "") {
+            showAlert("Empty Fields Not Allowed", 'danger')
+            setIsLoading(false); // Set loading state to true when form is submitted
+            return;
+        }
         try {
             const response = await fetch(`${BaseURL}/api/contact/sendMail`, {
                 method: 'POST',
@@ -123,15 +128,15 @@ const ContactForm2 = () => {
                     </div>
                     <button
                         className={`
-                        rounded-lg mt-2 md:mt-4 py-2 px-4  border-gray hover:text-gray bg-gray text-white  
-                        hover:bg-transparent text-lg flex items-center w-fit gap-4 self-start
+                        rounded-lg mt-2 md:mt-4 py-2 px-4  border-gray ${IsLoading ? "opacity-60" : "hover:bg-transparent hover:text-gray"} bg-gray text-white  
+                         text-lg flex items-center w-fit gap-4 self-start
                         font-semibold font-para border-2 ease-in-out duration-300
                         `}
                         onClick={handleFormSubmit}
                         disabled={IsLoading}
                     >
                         <IoIosSend className='text-2xl' />
-                        Nachricht senden
+                        {IsLoading ? "wird bearbeitet" : "Nachricht abschicken"}
                     </button>
                 </div>
             </div>

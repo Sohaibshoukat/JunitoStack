@@ -64,7 +64,7 @@ const PromptList = () => {
             <div className='flex flex-col py-10 gap-6 w-[90%] md:w-[90%] m-auto overflow-y-scroll md:px-6'>
                 <div className="bg-white rounded-lg shadow-shadow2 py-3 md:py-4 lg:py-6 px-3 md:px-3 lg:px-6">
                     <div className="my-4">
-                        <div className="relative overflow-x-auto">
+                        {prompts.length > 0 ? <div className="relative overflow-x-auto">
                             <table className="w-full text-sm font-para text-left rtl:text-right text-gray-500 dark:text-gray-400">
                                 <thead className="text-base font-normal uppercase text-slate-300">
                                     <tr>
@@ -121,7 +121,10 @@ const PromptList = () => {
                                     ))}
                                 </tbody>
                             </table>
+                        </div> : <div className='flex justify-center'>
+                            <img src="../../Loading.gif" alt="Loading..." className='w-24 h-24' />
                         </div>
+                        }
                     </div>
                 </div>
             </div>

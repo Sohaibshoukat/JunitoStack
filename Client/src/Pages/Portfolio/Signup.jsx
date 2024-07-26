@@ -20,6 +20,7 @@ const Signup = () => {
         Password: '',
         ConfirmPassword: ''
     });
+    const [IsLoading, setIsLoading] = useState(false)
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -30,11 +31,14 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true)
         // Frontend validation
         if (!formData.FirstName || !formData.LastName || !formData.Email || !formData.Phone || !formData.CompanyName || !formData.Password || !formData.ConfirmPassword) {
+            setIsLoading(false)
             showAlert('All fields are required', 'danger');
         }
         if (formData.Password !== formData.ConfirmPassword) {
+            setIsLoading(false)
             showAlert('Passwords do not match', 'danger');
         }
         // Backend API call
@@ -48,11 +52,16 @@ const Signup = () => {
             });
             const data = await response.json();
             if (!data.success) {
+                setIsLoading(false)
                 showAlert(data.error || 'Signup failed', 'danger');
             }
-            showAlert('OTP Email sent to your registerd email', 'success');
-            navigate(`/otpconfirm/${data.AuthToken}`)
+            else {
+                setIsLoading(false)
+                showAlert('OTP Email sent to your registerd email', 'success');
+                navigate(`/otpconfirm/${data.AuthToken}`)
+            }
         } catch (error) {
+            setIsLoading(false)
             showAlert(error.messaage, 'danger');
         }
     };
@@ -78,7 +87,7 @@ const Signup = () => {
                                         value={formData.FirstName}
                                         onChange={handleChange}
                                         placeholder='John'
-                                        className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
+                                        className='py-3 text-lg px-4 basis-[50%] border-2 border-black/50 rounded-lg'
                                     />
                                     <input
                                         type="text"
@@ -86,7 +95,7 @@ const Signup = () => {
                                         value={formData.LastName}
                                         onChange={handleChange}
                                         placeholder='Dep'
-                                        className='py-3 text-lg px-4 w-full border-2 border-black/50 rounded-lg'
+                                        className='py-3 text-lg px-4 basis-[50%] border-2 border-black/50 rounded-lg'
                                     />
                                 </div>
                                 <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -96,7 +105,7 @@ const Signup = () => {
                                         value={formData.Email}
                                         onChange={handleChange}
                                         placeholder='abc@gmail.com'
-                                        className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
+                                        className='py-3 text-lg px-4 border-2 basis-[50%] border-black/50 rounded-lg'
                                     />
                                     <PhoneInput
                                         name="Phone"
@@ -110,15 +119,17 @@ const Signup = () => {
                                             required: true,
                                             autoFocus: true
                                         }}
-                                        containerClass={`rounded-lg h-auto`}
-                                        className="rounded-lg h-auto"
-                                        inputClass='h-auto px-6 border-2 border-transparent font-pop text-lg rounded-lg  bg-[#E8E8E8] py-2 focus:border-green-500 focus:outline-none'
+                                        containerClass={`rounded-lg h-auto basis-[50%]`}
+                                        className="rounded-lg h-auto basis-[50%]"
+                                        inputClass='h-auto px-6 border-2 basis-[50%] border-transparent font-pop text-lg rounded-lg  bg-[#E8E8E8] py-2 focus:border-green-500 focus:outline-none'
                                         buttonStyle={{
                                             "borderTopLeftRadius": "0.5rem",
                                             "borderBottomLeftRadius": "0.5rem",
                                         }}
                                         inputStyle={{
                                             height: "100%",
+                                            flexBasis: "50%",
+                                            width: "100%",
                                             "borderRadius": "0.5rem",
                                         }}
                                         value={formData.Phone}
@@ -127,14 +138,6 @@ const Signup = () => {
                                         }}
                                         required
                                     />
-                                    {/* <input
-                                        type="tel"
-                                        name="Phone"
-                                        value={formData.Phone}
-                                        onChange={handleChange}
-                                        placeholder='1234567890'
-                                        className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
-                                    /> */}
                                 </div>
                                 <input
                                     type="text"
@@ -175,10 +178,11 @@ const Signup = () => {
                                     </p>
                                 </div>
                                 <button
-                                    className='text-white text-lg my-2 md:text-md lg:text-lg font-Para px-2 py-2 md:px-6 rounded-md bg-gray hover:text-black hover:bg-transparent hover:border-gray border-2 w-full border-gray duration-300 ease-in-out'
+                                    className={`text-white text-lg my-2 md:text-md lg:text-lg font-Para px-2 py-2 md:px-6 rounded-md bg-gray ${IsLoading ? "opacity-50" : "hover:text-black hover:bg-transparent hover:border-gray "} border-2 w-full border-gray duration-300 ease-in-out`}
                                     onClick={handleSubmit}
+                                    disabled={IsLoading}
                                 >
-                                    Create account
+                                    {IsLoading ? "Creating..." : "Create account"}
                                 </button>
                                 <p className='text-black font-bold text-center font-para text-lg'>Already have an account?
                                     <Link to={'/login'}>

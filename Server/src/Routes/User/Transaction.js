@@ -9,146 +9,161 @@ const User = require("../../Models/User");
 const Company = require("../../Models/Company");
 const Transaction = require("../../Models/Transaction");
 const PromoCode = require("../../Models/PrompoCode");
-
+const fs = require("fs")
 const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const path = require('path');
 
 const transporter = nodemailer.createTransport({
   host: "smtp.world4you.com",
-  port: 465,
-  secure: true,
+  port: 587, // Use port 587 for STARTTLS or 465 for SSL
+  secure: false,
   auth: {
-      user: "no-reply@junito.at",
-      pass: "BizBot2024!",
-  },
-  tls: {
-      rejectUnauthorized: false,
-  },
+    user: "no-reply@junito.at",
+    pass: "Scott691980!",
+  }
 });
 
 router.post('/registertransactions', async (req, res) => {
+  let success = false;
   try {
-    let userid = req.body.id;
+    const { id: userid, Amount, DateCreated, ExpiryDate, Status, Plan, data, discount, DiscountPerce } = req.body;
+
+    // Validate input data
+    if (!userid || !Amount || !DateCreated || !ExpiryDate || !Status || !Plan) {
+      return res.status(400).json({ success, message: "Missing required fields" });
+    }
+
+    // Find user by ID
     const user = await User.findById(userid);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({ success, message: "User not found" });
     }
 
+    // Find company by Owner_ID
     const company = await Company.findOne({ Owner_ID: userid });
     if (!company) {
-      return res.status(404).json({ success: false, message: "Company not found" });
+      return res.status(404).json({ success, message: "Company not found" });
     }
 
+    // Update or create transaction
     const transaction = await Transaction.findOneAndUpdate(
       { User_ID: userid },
-      {
-        Amount: req.body.Amount,
-        DateCreated: req.body.DateCreated,
-        ExpiryDate: req.body.ExpiryDate,
-        Status: req.body.Status,
-        Plan: req.body.Plan
-      },
-      { new: true }
+      { Amount, DateCreated, ExpiryDate, Status, Plan },
+      { new: true, upsert: true }
     );
-    console.log(req.body)
 
+    success=true;
 
+    // Render HTML for PDF
     ejs.renderFile(
       path.join(__dirname, '../../views/', 'index.ejs'),
-      {
-        user: user,
-        transaction: transaction,
-        company: company,
-        data: req.body.data,
-        discount: req.body.discount,
-        DiscountPerce: req.body.DiscountPerce,
-      },
-      async (err, data) => {
+      { user, transaction, company, data, discount, DiscountPerce },
+      async (err, htmlContent) => {
         if (err) {
-          console.log(err);
-          return res.status(500).json({ err, message: "i am here" });
+          console.error("EJS Rendering Error:", err);
+          return res.status(500).json({ message: "EJS Rendering Error", err, success });
         }
 
-        const options = {
-          format: 'A4',
-          timeout: 60000,
-          printBackground: true
-        };
-
-        const browser = await puppeteer.launch({
-          executablePath: '/usr/bin/google-chrome',
-          headless: true, 
-          args: [
-            '--disable-gpu',
-            '--disable-dev-shm-usage',
-            '--disable-setuid-sandbox',
-            '--no-first-run',
-            '--no-sandbox',
-            '--no-zygote',
-            '--single-process',
-          ],
-        });
-      
-        const page = await browser.newPage();
-        await page.setContent(data, { waitUntil: 'networkidle0' });
-
-
-        await page.waitForSelector('#Major', { timeout: 60000 });
-
-        const pdfBuffer = await page.pdf(options);
-        await browser.close();
-
-        console.log("File Created Successfully");
-
-        let mailDetails = {
-          from: "no-reply@junito.at",
-          to: user.Email,
-          subject: "Junito Payment Invoice",
-          text: "Below is Your Payment Invoice for Junito BizzBot Platform",
-          attachments: [
-            {
-              filename: 'Invoice.pdf',
-              content: pdfBuffer
-            }
-          ]
-        };
-
-        transporter.sendMail(mailDetails, function (err, data) {
-          if (err) {
-            console.error(err);
-            return res.status(500).send(err);
+        try {
+          // Validate Chrome executable path
+          const executablePath = '/usr/bin/google-chrome';
+          if (!fs.existsSync(executablePath)) {
+            console.error(`Chrome executable not found at path: ${executablePath}`);
+            return res.status(500).json({ 
+              message: `Chrome executable not found at path: ${executablePath}`, 
+              success
+            });
           }
 
-          console.log("Email Sent Successfully");
-          res.status(200).send({ success: true, transaction });
-        });
+          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+
+          // Create a new page and set content
+          const page = await browser.newPage();
+          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+          // Wait for the specific selector
+          await page.waitForSelector('#Major', { timeout: 60000 });
+
+          // Generate PDF from the content
+          const pdfBuffer = await page.pdf({
+            format: 'A4',
+            timeout: 60000,
+            printBackground: true
+          });
+
+          // Close the browser
+          await browser.close();
+
+          console.log("File Created Successfully");
+
+          // Prepare email details with attachment
+          const mailDetails = {
+            from: "no-reply@junito.at",
+            to: user.Email,
+            subject: "Junito Payment Invoice",
+            text: "Below is Your Payment Invoice for Junito BizzBot Platform",
+            attachments: [
+              {
+                filename: 'Invoice.pdf',
+                content: pdfBuffer
+              }
+            ]
+          };
+
+          // Send email with the PDF attachment
+          transporter.sendMail(mailDetails, (err, data) => {
+            if (err) {
+              console.error("Email Sending Error:", err);
+              return res.status(500).send({ message: "Email Sending Error", err, success });
+            }
+
+            console.log("Email Sent Successfully");
+            res.status(200).send({ success: true, transaction });
+          });
+
+        } catch (puppeteerError) {
+          console.error("Puppeteer Error:", puppeteerError);
+          return res.status(500).json({
+            message: "Failed to generate PDF or send email",
+            err: puppeteerError.message,
+            success
+          });
+        }
       }
     );
+
   } catch (error) {
-    console.error(error);
-    res.status(400).json({ message: "catch error", err: error });
+    console.error("General Error:", error);
+    res.status(400).json({ message: "Catch Error", err: error.message, success });
   }
 });
 
 
 
+
 router.put('/SubUserAdd', fetchuser, async (req, res) => {
+  let success = false;
   try {
     const userId = req.user.id;
     const { subUserIds, DateCreated, ExpiryDate, beforediscount, DiscountPerce, data } = req.body;
-    console.log(subUserIds);
 
     // Check if the user exists
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({ success, message: "User not found" });
+    }
+
+    // Check if the company exists
+    const company = await Company.findOne({ Owner_ID: userId });
+    if (!company) {
+      return res.status(404).json({ success, message: "Company not found" });
     }
 
     // Check if the transaction exists
     const transaction = await Transaction.findOne({ User_ID: userId });
     if (!transaction) {
-      return res.status(404).json({ success: false, message: "Transaction not found" });
+      return res.status(404).json({ success, message: "Transaction not found" });
     }
 
     let totalAddedAmount = 0;
@@ -158,7 +173,7 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
       // Find the subuser in the transaction
       const subUser = transaction.subUsers.find(su => su.User.toString() === subUserId);
       if (!subUser) {
-        return res.status(404).json({ success: false, message: `SubUser with id ${subUserId} not found` });
+        return res.status(404).json({ success, message: `SubUser with id ${subUserId} not found` });
       }
 
       // Update the status of the subuser to "Paid"
@@ -171,87 +186,106 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
     }
 
     // Update the total transaction amount
-    transaction.Amount = transaction.Amount + totalAddedAmount;
+    transaction.Amount += totalAddedAmount;
 
     // Save the updated transaction
     await transaction.save();
+
+    success = true;
 
     // Render the updated invoice
     ejs.renderFile(
       path.join(__dirname, '../../views/', 'indexsubuser.ejs'),
       {
-        user: user,
-        transaction: transaction,
-        data: data,
+        user,
+        transaction,
+        data,
         subUsers: transaction.subUsers.filter(su => subUserIds.includes(su.User.toString())),
-        beforediscount: beforediscount,
-        DiscountPerce: DiscountPerce,
-        totalAddedAmount: totalAddedAmount
+        beforediscount,
+        DiscountPerce,
+        totalAddedAmount
       },
-      async (err, data) => {
+      async (err, htmlContent) => {
         if (err) {
-          console.error(err);
-          return res.status(500).send(err);
+          console.error("EJS Rendering Error:", err);
+          return res.status(500).json({ message: "EJS Rendering Error", err, success });
         }
 
-        const options = {
-          format: 'A4',
-          timeout: 60000, // Increased timeout to 60 seconds
-          printBackground: true
-        };
-
-        const browser = puppeteer.launch({
-          executablePath: '/usr/bin/google-chrome',
-          headless: true, 
-          args: [
-            '--disable-gpu',
-            '--disable-dev-shm-usage',
-            '--disable-setuid-sandbox',
-            '--no-first-run',
-            '--no-sandbox',
-            '--no-zygote',
-            '--single-process',
-          ],
-        });
-        const page = await browser.newPage();
-        await page.setContent(data, { waitUntil: 'networkidle0' });
-
-        await page.waitForSelector('#Major', { timeout: 60000 });
-
-        const pdfBuffer = await page.pdf(options);
-        await browser.close();
-
-        console.log("File Created Successfully");
-
-        let mailDetails = {
-          from: "no-reply@junito.at",
-          to: user.Email,
-          subject: "Junito Payment Invoice",
-          text: "Below is Your Payment Invoice for Junito Platform",
-          attachments: [
-            {
-              filename: 'Invoice.pdf',
-              content: pdfBuffer
-            }
-          ]
-        };
-
-        transporter.sendMail(mailDetails, function (err, data) {
-          if (err) {
-            console.error(err);
-            return res.status(500).send(err);
+        try {
+          // Validate Chrome executable path
+          const executablePath = '/usr/bin/google-chrome';
+          if (!fs.existsSync(executablePath)) {
+            console.error(`Chrome executable not found at path: ${executablePath}`);
+            return res.status(500).json({ 
+              message: `Chrome executable not found at path: ${executablePath}`, 
+              success
+            });
           }
 
-          console.log("Email Sent Successfully");
-          res.status(200).send({ success: true, transaction });
-        });
+          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+
+          // Create a new page and set content
+          const page = await browser.newPage();
+          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+          // Wait for the specific selector
+          await page.waitForSelector('#Major', { timeout: 60000 });
+
+          // Generate PDF from the content
+          const pdfBuffer = await page.pdf({
+            format: 'A4',
+            timeout: 60000,
+            printBackground: true
+          });
+
+          // Close the browser
+          await browser.close();
+
+          console.log("File Created Successfully");
+
+          // Prepare email details with attachment
+          const mailDetails = {
+            from: "no-reply@junito.at",
+            to: user.Email,
+            subject: "Junito Payment Invoice",
+            text: "Below is Your Payment Invoice for Junito Platform",
+            attachments: [
+              {
+                filename: 'Invoice.pdf',
+                content: pdfBuffer
+              }
+            ]
+          };
+
+          // Send email with the PDF attachment
+          transporter.sendMail(mailDetails, (err, data) => {
+            if (err) {
+              console.error("Email Sending Error:", err);
+              return res.status(500).json({ message: "Email Sending Error", err, success });
+            }
+
+            console.log("Email Sent Successfully");
+            success = true;
+            res.status(200).json({ success, transaction });
+          });
+
+        } catch (puppeteerError) {
+          console.error("Puppeteer Error:", puppeteerError);
+          return res.status(500).json({
+            message: "Failed to generate PDF or send email",
+            err: puppeteerError.message,
+            success
+          });
+        }
       }
     );
+
   } catch (error) {
-    console.error(error);
-    res.status(400).send({ success: false, error: error.message });
+    console.error("General Error:", error);
+    res.status(400).json({ message: "Catch Error", err: error.message, success });
   }
 });
+
 
 
 

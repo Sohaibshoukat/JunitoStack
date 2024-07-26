@@ -24,7 +24,13 @@ const NewYork = () => {
                             <p className='text-gray text-sm md:text-base xl:text-lg font-para mb-2'>4 hours</p>
                             <p className='text-gray text-sm md:text-base xl:text-lg font-para mb-2'>€500</p>
                         </div>
-                        <button className='bg-gray m-auto border-2 border-gray rounded-xl py-2 hover:bg-transparent hover:text-gray px-6 text-white text-lg ease-in-out duration-300'>Request Booking</button>
+                        <a
+                            href='https://www.junito.at/#comp-lrqgcaq8'
+                            target='_blank'
+                             className='bg-gray m-auto border-2 border-gray rounded-xl py-2 hover:bg-transparent hover:text-gray px-6 text-white text-lg ease-in-out duration-300'
+                        >
+                            Request Booking
+                        </a>
                     </div>
                     <div className='xl:basis-[50%] md:basis-[50%] lg:w-[50%] w-[100%] relative'>
                         <div className='w-[60%] h-[60%] absolute -top-2 right-4 xl:right-8 -z-0 rounded-2xl bg-gray'></div>

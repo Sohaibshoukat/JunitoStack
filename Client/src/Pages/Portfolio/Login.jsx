@@ -11,6 +11,7 @@ const Login = () => {
         Email: '',
         Password: ''
     });
+    const [IsLoading, setIsLoading] = useState(false)
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -22,6 +23,7 @@ const Login = () => {
     };
 
     const handleSubmit = async (e) => {
+        setIsLoading(true)
         e.preventDefault();
         try {
             const response = await fetch(`${BaseURL}/api/user/loginuser`, {
@@ -33,57 +35,63 @@ const Login = () => {
             });
             const data = await response.json();
 
-            if (data.success==false) {
+            if (data.success == false) {
+                setIsLoading(false)
                 showAlert(data.message || 'Login failed check credentials', 'danger')
                 return;
             }
 
             if (data?.Email == false) {
+                setIsLoading(false)
                 showAlert('Email not Verified', 'danger')
                 navigate(`/otpconfirm/${data.id}`)
                 return;
             }
 
-            if(data?.type=="User"){ 
-
-                if(data?.Status=="UnPaid"){
+            if (data?.type == "User") {
+                if (data?.Status == "UnPaid") {
+                    setIsLoading(false)
                     showAlert(data.message, 'danger')
                     navigate(`/selectplan/${data.id}`)
                     return;
-                }else if(data?.Status=="Expired"){
+                } else if (data?.Status == "Expired") {
+                    setIsLoading(false)
                     showAlert(data.message, 'danger')
                     navigate(`/selectplan/${data.id}`)
                     return;
                 }
-            }else if(data?.type=="SubUser"){
-                if(data?.Status=="UnPaid"){
+            } else if (data?.type == "SubUser") {
+                if (data?.Status == "UnPaid") {
+                    setIsLoading(false)
                     showAlert(data.message, 'danger')
                     return;
-                }else if(data?.Status=="Expired"){
+                } else if (data?.Status == "Expired") {
+                    setIsLoading(false)
                     showAlert(data.message, 'danger')
                     return;
                 }
             }
 
-            if(data?.User_Type=="Owner"){
+            if (data?.User_Type == "Owner") {
                 const response22 = await fetch(`${BaseURL}/api/transaction/CheckSubUser`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        userId:data.id
+                        userId: data.id
                     }),
                 });
                 const data22 = await response22.json();
             }
-   
 
 
+            setIsLoading(false)
             showAlert('Login Success', 'success')
             localStorage.setItem("auth-token", data.AuthToken)
             navigate('/dashboard/chatbot')
         } catch (error) {
+            setIsLoading(false)
             console.log(error)
             showAlert(error.message, 'danger')
         }
@@ -133,7 +141,13 @@ const Login = () => {
                                             </Link>
                                         </p>
                                     </div>
-                                    <button type="submit" className='text-white text-lg my-2 md:text-md lg:text-lg font-Para px-2 py-2 md:px-6 rounded-md bg-gray hover:text-black hover:bg-transparent hover:border-gray border-2 w-full border-gray duration-300 ease-in-out'>Login</button>
+                                    <button
+                                        type="submit"
+                                        className={`text-white text-lg my-2 md:text-md lg:text-lg font-Para px-2 py-2 md:px-6 rounded-md bg-gray ${IsLoading? "opacity-50": "hover:text-black hover:bg-transparent hover:border-gray"}  border-2 w-full border-gray duration-300 ease-in-out`}
+                                        disabled={IsLoading}
+                                    >
+                                        {IsLoading ? "Processing...." : "Login"}
+                                    </button>
                                     <p className='text-black font-bold text-center font-para text-lg'>Don’t have an account?
                                         <Link to={'/sign-up'}>
                                             <span className='text-gray'>

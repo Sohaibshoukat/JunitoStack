@@ -16,6 +16,12 @@ const ContactForm = () => {
 
 
     const handleFormSubmit = async () => {
+        setIsLoading(true);
+        if (Name == "" || Email == "") {
+            showAlert("Empty Fields Not Allowed", 'danger')
+            setIsLoading(false); // Set loading state to true when form is submitted
+            return;
+        }
         try {
             const response = await fetch(`${BaseURL}/api/contact/sendcontactMail`, {
                 method: 'POST',
@@ -96,7 +102,7 @@ const ContactForm = () => {
                         onClick={handleFormSubmit}
                         disabled={IsLoading}
                     >
-                        Nachricht abschicken 
+                        {IsLoading ? "wird bearbeitet" : "Nachricht abschicken"}
                     </button>
                 </div>
             </div>

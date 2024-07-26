@@ -132,7 +132,8 @@ const UserAnalysis = () => {
             </div>
           </div>
         </div>
-        <div className='bg-transparent overflow-x-scroll font-Para w-full my-2 md:my-6'>
+
+        {userData?.length > 0 ? <div className='bg-transparent overflow-x-scroll font-Para w-full my-2 md:my-6'>
           <table className='max-w-[100vw] w-full overflow-x-scroll border-spacing-y-4 border-separate'>
             <thead>
               <tr>
@@ -198,7 +199,9 @@ const UserAnalysis = () => {
               ))}
             </tbody>
           </table>
-        </div>
+        </div> : <div className='flex justify-center'>
+          <img src="../../Loading.gif" alt="Loading..." className='w-24 h-24' />
+        </div>}
       </div>
     </>
   )

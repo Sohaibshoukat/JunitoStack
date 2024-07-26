@@ -84,14 +84,19 @@ const ToDos = () => {
                             </button>
                         </div>
                     </div>
-                    {filteredTodos?.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6 my-6">
-                        {filteredTodos.map((item, index) => (
-                            <TODOCart item={item} key={index} fetchTodos={fetchTodos} />
-                        ))}
-                    </div> :
-                        <div className='flex justify-center'>
+                    {filteredTodos == null ?
+                        <div className='flex justify-center font-para text-xl font-medium uppercase'>
                             <img src="../../Loading.gif" alt="Loading..." className='w-24 h-24' />
-                        </div>
+                        </div> :
+                        filteredTodos?.length > 0
+                            ? <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-6 my-6">
+                                {filteredTodos.map((item, index) => (
+                                    <TODOCart item={item} key={index} fetchTodos={fetchTodos} />
+                                ))}
+                            </div> :
+                            <div className='flex justify-center font-para text-xl font-medium uppercase'>
+                                <h2>No Todo's</h2>
+                            </div>
                     }
                 </div>
             </div>

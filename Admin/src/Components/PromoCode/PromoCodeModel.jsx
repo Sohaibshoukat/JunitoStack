@@ -50,6 +50,10 @@ const PromoCodeModel = ({ PromoModel, setPromoModel, fetchPromoCodes, EditId, se
 
     const handleSubmit = async () => {
         try {
+            if(formData.Heading=='' || formData.OffPercentage=="" || formData.PromoCodevalue=="" || formData.ExpiryDate==''){
+                showAlert("No Empty Fields Allow");
+                return;
+            }
             const method = EditId ? 'PUT' : 'POST';
             const endpoint = EditId ? `/updatePromoCode/${EditId}` : '/createPromoCode';
             const response = await fetch(`${BaseURL}${endpoint}`, {

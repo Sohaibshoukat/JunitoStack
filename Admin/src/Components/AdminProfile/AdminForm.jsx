@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FaCamera } from "react-icons/fa";
-import image from '../../assets/admin.png';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import AlertContext from '../../Context/Alert/AlertContext';
 import { BaseURL } from '../../Data/BaseURL';
 
@@ -123,13 +124,44 @@ const AdminForm = () => {
                                 >
                                     Phone
                                 </label>
-                                <input
+                                <PhoneInput
+                                    name="Phone"
+                                    type="text"
+                                    country={"us"}
+                                    enableAreaCodes={true}
+                                    areaCodes={{ us: ["332"] }}
+                                    inputProps={{
+                                        name: "phone",
+                                        country: "us",
+                                        required: true,
+                                        autoFocus: true
+                                    }}
+                                    containerClass={`rounded-lg h-auto basis-[50%]`}
+                                    className="rounded-lg h-auto basis-[50%]"
+                                    inputClass='h-auto px-6 border-2 basis-[50%] border-transparent font-pop text-lg rounded-lg  bg-[#E8E8E8] py-2 focus:border-green-500 focus:outline-none'
+                                    buttonStyle={{
+                                        "borderTopLeftRadius": "0.5rem",
+                                        "borderBottomLeftRadius": "0.5rem",
+                                    }}
+                                    inputStyle={{
+                                        height: "100%",
+                                        flexBasis: "50%",
+                                        width: "100%",
+                                        "borderRadius": "0.5rem",
+                                    }}
+                                    value={adminData ? adminData?.Phone : ''}
+                                    onChange={(phone) => {
+                                        setAdminData({ ...adminData, Phone: phone })
+                                    }}
+                                    required
+                                />
+                                {/* <input
                                     type="phone"
                                     placeholder='Enter Phone'
                                     className='border-2 border-gray font-normal bg-transparent py-2 px-4 rounded-xl'
                                     value={adminData ? adminData?.Phone : ''}
                                     onChange={(e) => setAdminData({ ...adminData, Phone: e.target.value })}
-                                />
+                                /> */}
                             </div>
                         </div>
                         <button

@@ -160,8 +160,8 @@ const PaySubUser = () => {
                     const ResponseData = await responses.json();
                     if (ResponseData.success) {
                         showAlert("Transaction Completed Successfully", 'success');
+                        navigate("/dashboard/users");
                     }
-                    navigate("/dashboard/users");
                 },
                 onError: (err) => {
                     console.log(err);
