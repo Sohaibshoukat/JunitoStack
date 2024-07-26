@@ -14,6 +14,8 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const path = require('path');
 
+const ExecutablePath="/usr/bin/google-chrome"
+
 const transporter = nodemailer.createTransport({
   host: "smtp.world4you.com",
   port: 587, // Use port 587 for STARTTLS or 465 for SSL
@@ -67,16 +69,30 @@ router.post('/registertransactions', async (req, res) => {
 
         try {
           // Validate Chrome executable path
-          const executablePath = '/usr/bin/google-chrome';
+          const executablePath = ExecutablePath;
           if (!fs.existsSync(executablePath)) {
             console.error(`Chrome executable not found at path: ${executablePath}`);
-            return res.status(500).json({ 
-              message: `Chrome executable not found at path: ${executablePath}`, 
+            return res.status(500).json({
+              message: `Chrome executable not found at path: ${executablePath}`,
               success
             });
           }
 
-          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+          const browser = await puppeteer.launch({
+            executablePath: executablePath,
+            headless: true,
+            args: [
+              '--disable-gpu',
+              '--disable-dev-shm-usage',
+              '--disable-setuid-sandbox',
+              '--no-first-run',
+              '--no-sandbox',
+              '--no-zygote',
+              '--single-process',
+            ],
+          });
+
+          // const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
           // Create a new page and set content
           const page = await browser.newPage();
@@ -213,16 +229,30 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
 
         try {
           // Validate Chrome executable path
-          const executablePath = '/usr/bin/google-chrome';
+          const executablePath = ExecutablePath;
           if (!fs.existsSync(executablePath)) {
             console.error(`Chrome executable not found at path: ${executablePath}`);
-            return res.status(500).json({ 
-              message: `Chrome executable not found at path: ${executablePath}`, 
+            return res.status(500).json({
+              message: `Chrome executable not found at path: ${executablePath}`,
               success
             });
           }
 
-          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+          const browser = await puppeteer.launch({
+            executablePath: executablePath,
+            headless: true,
+            args: [
+              '--disable-gpu',
+              '--disable-dev-shm-usage',
+              '--disable-setuid-sandbox',
+              '--no-first-run',
+              '--no-sandbox',
+              '--no-zygote',
+              '--single-process',
+            ],
+          });
+
+          // const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
           // Create a new page and set content
           const page = await browser.newPage();
