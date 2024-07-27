@@ -11,6 +11,7 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     volumes:
       - mongo_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     ports:
       - 27017:27017
     command: >
@@ -25,10 +26,13 @@ services:
       APP_NAME: ${APP_NAME}
       DB_URI: ${DB_URI}
       PORT: ${PORT}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      JWT_KEY: ${JWT_KEY}
     depends_on:
       - mongo_db
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules
     working_dir: /usr/src/app
     command: npm start
 
