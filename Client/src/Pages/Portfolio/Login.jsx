@@ -25,6 +25,10 @@ const Login = () => {
     const handleSubmit = async (e) => {
         setIsLoading(true)
         e.preventDefault();
+        if(formData.Email==""||formData.Password==""){
+            showAlert("Please enter all required fields",'danger')
+            return;
+        }
         try {
             const response = await fetch(`${BaseURL}/api/user/loginuser`, {
                 method: 'POST',
