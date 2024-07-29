@@ -898,14 +898,14 @@ router.get('/promptdetail/:prompid', async (req, res) => {
 
 router.post("/createPromoCode", fetchadmin, async (req, res) => {
     try {
-        const { OffPercentage, PromoCodevalue, Heading, ExpiryDate } = req.body;
+        const { OffPercentage, PromoCode, Heading, ExpiryDate } = req.body;
 
         let admin = await Admin.findById(req.admin.id);
         if (!admin) {
             return res.status(404).json({ success: false, message: "You have no access" });
         }
 
-        let promoCode = await PromoCode.findOne({ PromoCode: PromoCodevalue });
+        let promoCode = await PromoCode.findOne({ PromoCode: PromoCode });
         if (promoCode) {
             return res.status(404).json({ success: false, message: "This Code is Already Assigned" });
         }
@@ -913,7 +913,7 @@ router.post("/createPromoCode", fetchadmin, async (req, res) => {
 
         promoCode = await PromoCode.create({
             OffPercentage,
-            PromoCode: PromoCodevalue,
+            PromoCode: PromoCode,
             Heading,
             ExpiryDate
         });
@@ -945,7 +945,7 @@ router.get("/getAllPromoCodes", fetchadmin, async (req, res) => {
 // Update a promo code by ID
 router.put("/updatePromoCode/:id", fetchadmin, async (req, res) => {
     try {
-        const { OffPercentage, PromoCodevalue, ExpiryDate, Heading } = req.body;
+        const { OffPercentage, PromoCode, ExpiryDate, Heading } = req.body;
 
         let admin = await Admin.findById(req.admin.id);
         if (!admin) {
@@ -954,7 +954,7 @@ router.put("/updatePromoCode/:id", fetchadmin, async (req, res) => {
 
         const updatedPromoCode = await PromoCode.findByIdAndUpdate(
             req.params.id,
-            { OffPercentage, PromoCode: PromoCodevalue, Heading, ExpiryDate },
+            { OffPercentage, PromoCode: PromoCode, Heading, ExpiryDate },
             { new: true }
         );
 

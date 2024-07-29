@@ -30,7 +30,7 @@ app.use('/api/user', require('./Routes/User/User'));
 app.use('/api/company', require('./Routes/User/Company'));
 app.use('/api/chat', require('./Routes/User/Chat'));
 app.use('/api/transaction', require('./Routes/User/Transaction'));
-app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));
+app.use('/src/Uploads', express.static(path.join(__dirname, 'Uploads')));
 
 app.get('/welcome', (req, res) => {
   res.send('Welcome to Junito Server');
