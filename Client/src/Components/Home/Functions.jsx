@@ -64,9 +64,9 @@ const Functions = () => {
                             clickable: true,
                         }}
                         autoplay={{
-                            delay: 2500,
+                            delay: 5000,
                             disableOnInteraction: false,
-                          }}
+                        }}
                         breakpoints={{
                             640: {
                                 slidesPerView: 1,
@@ -81,8 +81,7 @@ const Functions = () => {
                                 spaceBetween: 50,
                             },
                         }}
-                        navigation={true}
-                        modules={[Autoplay, Pagination,Navigation]}
+                        modules={[Autoplay, Pagination]}
                         className="mySwiper"
                     >
                         {FeatureData.map((item, index) => (

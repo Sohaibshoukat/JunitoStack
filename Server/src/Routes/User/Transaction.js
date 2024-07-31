@@ -14,7 +14,7 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const path = require('path');
 
-const ExecutablePath="/usr/bin/google-chrome"
+const ExecutablePath = "/usr/bin/google-chrome"
 
 const transporter = nodemailer.createTransport({
   host: "smtp.world4you.com",
@@ -29,7 +29,7 @@ const transporter = nodemailer.createTransport({
 router.post('/registertransactions', async (req, res) => {
   let success = false;
   try {
-    const { id: userid, Amount, DateCreated, ExpiryDate, Status, Plan, data, discount, DiscountPerce } = req.body;
+    const { id: userid, Amount, DateCreated, ExpiryDate, Status, Plan, data, discount, DiscountPerce, SalesTax } = req.body;
 
     // Validate input data
     if (!userid || !Amount || !DateCreated || !ExpiryDate || !Status || !Plan) {
@@ -48,19 +48,21 @@ router.post('/registertransactions', async (req, res) => {
       return res.status(404).json({ success, message: "Company not found" });
     }
 
-    // Update or create transaction
-    const transaction = await Transaction.findOneAndUpdate(
-      { User_ID: userid },
-      { Amount, DateCreated, ExpiryDate, Status, Plan },
-      { new: true, upsert: true }
-    );
+    const transaction = await Transaction.findOne({ User_ID: userid });
+    transaction.Amount += Amount
+    transaction.DateCreated = DateCreated
+    transaction.ExpiryDate = ExpiryDate
+    transaction.Status = Status
+    transaction.Plan = Plan
 
-    success=true;
+    await transaction.save();
+
+    success = true;
 
     // Render HTML for PDF
     ejs.renderFile(
       path.join(__dirname, '../../views/', 'index.ejs'),
-      { user, transaction, company, data, discount, DiscountPerce },
+      { user, transaction, company, data, discount, DiscountPerce, SalesTax },
       async (err, htmlContent) => {
         if (err) {
           console.error("EJS Rendering Error:", err);
@@ -68,31 +70,31 @@ router.post('/registertransactions', async (req, res) => {
         }
 
         try {
-          // Validate Chrome executable path
-          const executablePath = ExecutablePath;
-          if (!fs.existsSync(executablePath)) {
-            console.error(`Chrome executable not found at path: ${executablePath}`);
-            return res.status(500).json({
-              message: `Chrome executable not found at path: ${executablePath}`,
-              success
-            });
-          }
+          // // Validate Chrome executable path
+          // const executablePath = ExecutablePath;
+          // if (!fs.existsSync(executablePath)) {
+          //   console.error(`Chrome executable not found at path: ${executablePath}`);
+          //   return res.status(500).json({
+          //     message: `Chrome executable not found at path: ${executablePath}`,
+          //     success
+          //   });
+          // }
 
-          const browser = await puppeteer.launch({
-            executablePath: executablePath,
-            headless: true,
-            args: [
-              '--disable-gpu',
-              '--disable-dev-shm-usage',
-              '--disable-setuid-sandbox',
-              '--no-first-run',
-              '--no-sandbox',
-              '--no-zygote',
-              '--single-process',
-            ],
-          });
+          // const browser = await puppeteer.launch({
+          //   executablePath: executablePath,
+          //   headless: true,
+          //   args: [
+          //     '--disable-gpu',
+          //     '--disable-dev-shm-usage',
+          //     '--disable-setuid-sandbox',
+          //     '--no-first-run',
+          //     '--no-sandbox',
+          //     '--no-zygote',
+          //     '--single-process',
+          //   ],
+          // });
 
-          // const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
           // Create a new page and set content
           const page = await browser.newPage();
@@ -162,7 +164,7 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
   let success = false;
   try {
     const userId = req.user.id;
-    const { subUserIds, DateCreated, ExpiryDate, beforediscount, DiscountPerce, data } = req.body;
+    const { subUserIds, DateCreated, ExpiryDate, beforediscount, DiscountPerce, data, SalesTax, Amount } = req.body;
 
     // Check if the user exists
     const user = await User.findById(userId);
@@ -219,7 +221,8 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
         subUsers: transaction.subUsers.filter(su => subUserIds.includes(su.User.toString())),
         beforediscount,
         DiscountPerce,
-        totalAddedAmount
+        SalesTax,
+        Amount
       },
       async (err, htmlContent) => {
         if (err) {
@@ -229,30 +232,30 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
 
         try {
           // Validate Chrome executable path
-          const executablePath = ExecutablePath;
-          if (!fs.existsSync(executablePath)) {
-            console.error(`Chrome executable not found at path: ${executablePath}`);
-            return res.status(500).json({
-              message: `Chrome executable not found at path: ${executablePath}`,
-              success
-            });
-          }
+          // const executablePath = ExecutablePath;
+          // if (!fs.existsSync(executablePath)) {
+          //   console.error(`Chrome executable not found at path: ${executablePath}`);
+          //   return res.status(500).json({
+          //     message: `Chrome executable not found at path: ${executablePath}`,
+          //     success
+          //   });
+          // }
 
-          const browser = await puppeteer.launch({
-            executablePath: executablePath,
-            headless: true,
-            args: [
-              '--disable-gpu',
-              '--disable-dev-shm-usage',
-              '--disable-setuid-sandbox',
-              '--no-first-run',
-              '--no-sandbox',
-              '--no-zygote',
-              '--single-process',
-            ],
-          });
+          // const browser = await puppeteer.launch({
+          //   executablePath: executablePath,
+          //   headless: true,
+          //   args: [
+          //     '--disable-gpu',
+          //     '--disable-dev-shm-usage',
+          //     '--disable-setuid-sandbox',
+          //     '--no-first-run',
+          //     '--no-sandbox',
+          //     '--no-zygote',
+          //     '--single-process',
+          //   ],
+          // });
 
-          // const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
           // Create a new page and set content
           const page = await browser.newPage();

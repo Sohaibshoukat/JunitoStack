@@ -82,7 +82,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc00"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent1.jpg",
   "__v": 0
 },
@@ -90,7 +90,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc01"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent2.jpg",
   "__v": 0
 },
@@ -98,7 +98,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc02"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent3.jpg",
   "__v": 0
 },
@@ -106,7 +106,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc03"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent4.jpg",
   "__v": 0
 },
@@ -114,7 +114,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc04"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent5.jpg",
   "__v": 0
 },
@@ -122,7 +122,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc05"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent6.jpg",
   "__v": 0
 },
@@ -130,7 +130,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc06"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent7.jpg",
   "__v": 0
 },
@@ -138,7 +138,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc07"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent8.jpg",
   "__v": 0
 },
@@ -146,7 +146,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc08"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent9.jpg",
   "__v": 0
 },
@@ -154,7 +154,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc09"
   },
-  "Department": "Agent",
+  "Department": "Agentur",
   "Src": "/src/Uploads/Prompts/Agent/agent10.jpg",
   "__v": 0
 },
@@ -162,7 +162,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc0a"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent1.jpg",
   "__v": 0
 },
@@ -170,7 +170,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc0b"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent2.jpg",
   "__v": 0
 },
@@ -178,7 +178,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc0c"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent3.jpg",
   "__v": 0
 },
@@ -186,7 +186,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc0d"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent4.jpg",
   "__v": 0
 },
@@ -194,7 +194,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc0e"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent5.jpg",
   "__v": 0
 },
@@ -202,7 +202,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc0f"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent6.jpg",
   "__v": 0
 },
@@ -210,7 +210,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc10"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent7.jpg",
   "__v": 0
 },
@@ -218,7 +218,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc11"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent8.jpg",
   "__v": 0
 },
@@ -226,7 +226,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc12"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent9.jpg",
   "__v": 0
 },
@@ -234,7 +234,7 @@
   "_id": {
     "$oid": "6661bc2204e6ac8e28dadc13"
   },
-  "Department": "Assistent",
+  "Department": "Assistenz",
   "Src": "/src/Uploads/Prompts/Assistent/assistent10.jpg",
   "__v": 0
 },

@@ -118,6 +118,7 @@ router.post("/createuser", async (req, res) => {
 
         let company = await Company.create({
             CompanyName: req.body.CompanyName,
+            Country:req.body.Country,
             Owner_ID: user._id
         })
 

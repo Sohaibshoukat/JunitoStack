@@ -14,6 +14,7 @@ import AlertContext from '../../Context/Alert/AlertContext'
 import HistoryContext from '../../Context/History/HistoryContext'
 import PromptDetailModel from '../../Components/Dashboard/PromptDetail/PromptDetailModel'
 import { ImAttachment } from 'react-icons/im'
+import { FaFileAlt, FaTimes } from 'react-icons/fa'
 
 const ChatBot = () => {
 
@@ -296,7 +297,7 @@ const ChatBot = () => {
                 </div>
             </div>
             <div className='bg-[#F0F0F0] min-h-[100vh]'>
-                <div className="flex flex-row max-h-[calc(100vh)] min-h-[calc(100vh)] items-start gap-4 px-2 md:px-8 pt-14 md:pt-20 pb-10 relative">
+                <div className="flex flex-row min-h-[calc(100vh)] items-start gap-4 px-2 md:px-8 pt-14 md:pt-20 pb-10 relative">
                     <div className="xl:basis-[70%]  max-h-[calc(100vh)] min-h-[calc(100vh)] overflow-y-auto mx-auto ">
                         {ChatsData?.length <= 0 ?
                             <div className='flex flex-col justify-betwee gap-4 lg:gap-8 min-h-[80vh]'>
@@ -338,7 +339,7 @@ const ChatBot = () => {
                                     onClick={newTopic}
                                 >
                                     <img src="../Porp/chat.png" alt="" srcset="" className='w-4 h-4 md:w-6 md:h-6' />
-                                    <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Topic</h2>
+                                    <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Chat</h2>
                                 </div>
                                 <div
                                     className="bg-white w-[100%] relative rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-2 h-full"
@@ -359,6 +360,15 @@ const ChatBot = () => {
                                                 <div className='w-[20%]'>
                                                     <img src="../Porp/Loading.gif" alt="" className='object-cover bg-gray rounded-xl px-2' />
                                                 </div>}
+                                        </div>
+                                    }
+                                    {selectedFile!=null&&
+                                        <div className="bg-white rounded-lg flex gap-2 text-sm font-para py-2 px-2">
+                                            <FaFileAlt className='text-xl'/>
+                                            {selectedFile?.name}
+                                             <button onClick={() => setSelectedFile(null)}>
+                                                 <FaTimes/>
+                                             </button>
                                         </div>
                                     }
                                     <div className="flex justify-between">
@@ -417,7 +427,6 @@ const ChatBot = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </>
     )

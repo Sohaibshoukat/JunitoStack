@@ -142,7 +142,7 @@ const SharedChat = () => {
                             <div className="bg-red-500/50 border-2 border-red-500 rounded-lg py-2 px-4 font-para w-fit text-white font-semibold">
                                 {item?.Category}
                             </div>
-                            <h2 className='text-lg md:text-xl font-bold'>{item?.Chat_id?.Title}</h2>
+                            <h2 className='text-lg md:text-xl font-bold'>{item?.Heading}</h2>
                             <div className='text-xsm md:text-sm' dangerouslySetInnerHTML={{ __html: truncateHTMLString(item?.Chat_id?.ChatConversation[1]?.Query) }} />
                         </div>
                         <button

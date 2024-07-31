@@ -8,6 +8,9 @@ const CompanySchema = new Schema({
     Address:{
         type:String
     },
+    Country:{
+        type:String
+    },
     CompanyMoto:{
         type:String
     },

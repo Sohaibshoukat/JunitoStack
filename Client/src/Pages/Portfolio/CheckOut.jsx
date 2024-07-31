@@ -4,16 +4,19 @@ import { BaseURL } from '../../Data/BaseURL';
 import AlertContext from '../../Context/Alert/AlertContext';
 import Nav from '../../Components/Nav';
 import Footer from '../../Components/Footer';
+import { taxes } from '../../Data/CountryList';
+
 
 const CheckOut = () => {
-    const { id,plan } = useParams();
+    const { id, plan } = useParams();
     
     const [User, setUser] = useState(null);
     const [Company, setCompany] = useState(null);
     const [PromoCode, setPromoCode] = useState('');
     const [DiscountPerce, setDiscountPerce] = useState(0);
-    const [BeforeDiscount, setBeforeDiscount] = useState(plan=="Monthly"?99:990); // Initial total amount
-    const [TotalAmount, setTotalAmount] = useState(plan=="Monthly"?99:990);
+    const [BeforeDiscount, setBeforeDiscount] = useState(plan === "Monthly" ? 99 : 990); // Initial total amount
+    const [SalesTax, setSalesTax] = useState(0); // New state for Sales Tax
+    const [TotalAmount, setTotalAmount] = useState(plan === "Monthly" ? 99 : 990);
 
     const navigate = useNavigate();
     const paypal = useRef();
@@ -27,14 +30,32 @@ const CheckOut = () => {
                 const data = await response.json();
                 setUser(data.User_ID);
                 setCompany(data.Company_ID);
-                setTotalAmount(BeforeDiscount);
-                renderPaypalButton(BeforeDiscount);
+                
+                const country = data.Company_ID.Country;
+                const taxRate = getTaxRate(country);
+                const salesTax = calculateSalesTax(BeforeDiscount, taxRate);
+
+                setSalesTax(salesTax);
+                const initialTotal = parseFloat(BeforeDiscount) + parseFloat(salesTax);
+                setTotalAmount(initialTotal);
+                renderPaypalButton(initialTotal);
             } else {
                 showAlert('Failed to fetch transaction details', 'danger');
             }
         } catch (error) {
             showAlert(error.message, 'danger');
         }
+    };
+
+    // Function to get the tax rate based on the country
+    const getTaxRate = (country) => {
+        const taxObj = taxes.find(tax => tax.hasOwnProperty(country));
+        return taxObj ? parseFloat(taxObj[country]) : 20; // Default to 20% if country not found
+    };
+
+    // Function to calculate sales tax
+    const calculateSalesTax = (amount, taxRate) => {
+        return (amount * taxRate / 100).toFixed(2);
     };
 
     const applyPromoCode = async () => {
@@ -49,8 +70,12 @@ const CheckOut = () => {
                 const data = await response.json();
                 if (data.success) {
                     const discount = data.data.OffPercentage;
-                    const newTotal = (BeforeDiscount - (BeforeDiscount * discount / 100)).toFixed(2);
+                    const discountedAmount = (BeforeDiscount - (BeforeDiscount * discount / 100)).toFixed(2);
+                    const newSalesTax = calculateSalesTax(discountedAmount, getTaxRate(Company.Country));
+                    const newTotal = parseFloat(discountedAmount) + parseFloat(newSalesTax);
+
                     setDiscountPerce(discount);
+                    setSalesTax(newSalesTax);
                     setTotalAmount(newTotal);
                     showAlert('Promo code applied successfully', 'success');
                     renderPaypalButton(newTotal);
@@ -90,14 +115,15 @@ const CheckOut = () => {
                         },
                         body: JSON.stringify({
                             id: id,
-                            Amount: amount,
+                            Amount: TotalAmount,
                             DateCreated: new Date().toISOString(),
                             ExpiryDate: plan === 'Monthly' ? new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString() : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
                             Status: "Paid",
-                            data:order,
-                            discount:BeforeDiscount,
-                            DiscountPerce:DiscountPerce,
-                            Plan:plan
+                            data: order,
+                            discount: BeforeDiscount,
+                            DiscountPerce: DiscountPerce,
+                            SalesTax: SalesTax, // Include Sales Tax in the API call
+                            Plan: plan
                         })
                     });
                     const ResponseData = await response.json();
@@ -119,95 +145,105 @@ const CheckOut = () => {
 
     return (
         <>
-        <Nav/>
-        <div className='w-[90%] mx-auto pt-28'>
-            <div className="flex justify-between items-center gap-2 font-para my-4">
-                <h2 className='text-xl font-para font-semibold text-gray'>Company</h2>
-                <p className='text-lg font-bold font-para text-black'>{Company?.CompanyName}</p>
-            </div>
-
-            <div className="relative overflow-x-auto">
-                <table className="w-full text-lg text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead className="text-base text-white uppercase bg-gray">
-                        <tr>
-                            <th scope="col" className="px-6 py-3">User Name</th>
-                            <th scope="col" className="px-6 py-3">User Type</th>
-                            <th scope="col" className="px-6 py-3">Email</th>
-                            <th scope="col" className="px-6 py-3">Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                <p className='w-max'>{User?.FirstName} {User?.LastName}</p>
-                            </th>
-                            <td className="px-6 py-4">
-                                <p className='w-max'>{User?.User_Type}</p>
-                            </td>
-                            <td className="px-6 py-4">
-                                <p className='w-max'>{User?.Email}</p>
-                            </td>
-                            <td className="px-6 py-4">
-                                €{BeforeDiscount}
-                            </td>
-                        </tr>
-                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                <p className='w-ma text-xl font-semibold'>Before Discount</p>
-                            </th>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4">
-                                €{BeforeDiscount}
-                            </td>
-                        </tr>
-                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                <p className='w-ma text-xl font-semibold'>Discount Percentage</p>
-                            </th>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4">
-                                {DiscountPerce}%
-                            </td>
-                        </tr>
-                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                <p className='w-ma text-xl font-semibold'>Total</p>
-                            </th>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4">
-                                €{TotalAmount}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div className="flex justify-between my-6 flex-col lg:flex-row gap-10">
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-col font-para gap-2">
-                        <h2 className='text-lg font-semibold'>PromoCode</h2>
-                        <input
-                            type="text"
-                            value={PromoCode}
-                            onChange={(e) => setPromoCode(e.target.value)}
-                            className='border-2 border-gray py-2 px-4 rounded-xl'
-                            placeholder='Enter Promo Code'
-                        />
-                    </div>
-                    <button
-                        onClick={applyPromoCode}
-                        className='bg-gray rounded-lg font-para text-lg font-semibold py-2 px-4 border-2 border-gray text-white hover:bg-transparent hover:text-gray ease-in-out duration-300'
-                    >
-                        Apply Discount
-                    </button>
+            <Nav />
+            <div className='w-[90%] mx-auto pt-28'>
+                <div className="flex justify-between items-center gap-2 font-para my-4">
+                    <h2 className='text-xl font-para font-semibold text-gray'>Company</h2>
+                    <p className='text-lg font-bold font-para text-black'>{Company?.CompanyName}</p>
                 </div>
-                <div ref={paypal}></div>
+
+                <div className="relative overflow-x-auto">
+                    <table className="w-full text-lg text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead className="text-base text-white uppercase bg-gray">
+                            <tr>
+                                <th scope="col" className="px-6 py-3">User Name</th>
+                                <th scope="col" className="px-6 py-3">User Type</th>
+                                <th scope="col" className="px-6 py-3">Email</th>
+                                <th scope="col" className="px-6 py-3">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
+                                    <p className='w-max'>{User?.FirstName} {User?.LastName}</p>
+                                </th>
+                                <td className="px-6 py-4">
+                                    <p className='w-max'>{User?.User_Type}</p>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <p className='w-max'>{User?.Email}</p>
+                                </td>
+                                <td className="px-6 py-4">
+                                    €{BeforeDiscount}
+                                </td>
+                            </tr>
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
+                                    <p className='w-ma text-xl font-semibold'>Price</p>
+                                </th>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4">
+                                    €{BeforeDiscount}
+                                </td>
+                            </tr>
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
+                                    <p className='w-ma text-xl font-semibold'>Discount Percentage</p>
+                                </th>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4">
+                                    {DiscountPerce}%
+                                </td>
+                            </tr>
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
+                                    <p className='w-ma text-xl font-semibold'>Sales Tax</p>
+                                </th>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4">
+                                    {SalesTax} ({getTaxRate(Company?.Country)}%)
+                                </td>
+                            </tr>
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
+                                    <p className='w-ma text-xl font-semibold'>Total</p>
+                                </th>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4">
+                                    €{TotalAmount?.toFixed(2)}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div className="flex justify-between my-6 flex-col lg:flex-row gap-10">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col font-para gap-2">
+                            <h2 className='text-lg font-semibold'>PromoCode</h2>
+                            <input
+                                type="text"
+                                value={PromoCode}
+                                onChange={(e) => setPromoCode(e.target.value)}
+                                className='border-2 border-gray py-2 px-4 rounded-xl'
+                                placeholder='Enter Promo Code'
+                            />
+                        </div>
+                        <button
+                            onClick={applyPromoCode}
+                            className='bg-gray rounded-lg font-para text-lg font-semibold py-2 px-4 border-2 border-gray text-white hover:bg-transparent hover:text-gray ease-in-out duration-300'
+                        >
+                            Apply Discount
+                        </button>
+                    </div>
+                    <div ref={paypal}></div>
+                </div>
             </div>
-        </div>
-        <Footer/>
+            <Footer />
         </>
     );
 };

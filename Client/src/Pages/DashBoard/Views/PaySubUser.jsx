@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BaseURL } from '../../../Data/BaseURL';
 import AlertContext from '../../../Context/Alert/AlertContext';
+import { taxes } from '../../../Data/CountryList';
 
 const PaySubUser = () => {
     const location = useLocation();
@@ -14,6 +15,7 @@ const PaySubUser = () => {
     const [PromoCode, setPromoCode] = useState('');
     const [DiscountPerce, setDiscountPerce] = useState(0);
     const [BeforeDiscount, setBeforeDiscount] = useState(0);
+    const [saleTax, setSalesTax] = useState(0);
 
     const alertContext = useContext(AlertContext);
     const { showAlert } = alertContext;
@@ -86,11 +88,22 @@ const PaySubUser = () => {
 
             setSubUsers(SubUserArray);
             setBeforeDiscount(AmountCal);
-            setTotalAmount(AmountCal);
-            renderPaypalButton(AmountCal);
+            const taxrate = getTaxRate(Company?.Country)
+            console.log(taxrate);
+            setSalesTax(taxrate);
+
+            const newTotal = (AmountCal + (AmountCal * taxrate / 100)).toFixed(2);
+
+            setTotalAmount(newTotal);
+            renderPaypalButton(newTotal);
         } catch (error) {
             showAlert(error.message, 'danger');
         }
+    };
+
+    const getTaxRate = (country) => {
+        const taxObj = taxes.find(tax => tax.hasOwnProperty(country));
+        return taxObj ? parseFloat(taxObj[country]) : 20; // Default to 20% if country not found
     };
 
     const applyPromoCode = async () => {
@@ -105,7 +118,13 @@ const PaySubUser = () => {
                 const data = await response.json();
                 if (data.success) {
                     const discount = data.data.OffPercentage;
-                    const newTotal = (BeforeDiscount - (BeforeDiscount * discount / 100)).toFixed(2);
+                    var newTotal = (BeforeDiscount - (BeforeDiscount * discount / 100))
+                    console.log(newTotal)
+                    const taxrate = getTaxRate(Company?.Country)
+                    console.log(taxrate)
+
+                    newTotal = (newTotal + (newTotal * taxrate / 100)).toFixed(2);
+                    console.log(newTotal)
                     setDiscountPerce(discount);
                     setTotalAmount(newTotal);
                     showAlert('Promo code applied successfully', 'success');
@@ -117,6 +136,7 @@ const PaySubUser = () => {
                 showAlert('Promo code not valid', 'danger');
             }
         } catch (error) {
+            console.log(error);
             showAlert('Error applying promo code', 'danger');
         }
     };
@@ -154,7 +174,9 @@ const PaySubUser = () => {
                             DateCreated: new Date().toISOString(),
                             ExpiryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
                             beforediscount: BeforeDiscount,
-                            DiscountPerce: DiscountPerce
+                            DiscountPerce: DiscountPerce,
+                            SalesTax: saleTax,
+                            Amount: TotalAmount,
                         }),
                     });
                     const ResponseData = await responses.json();
@@ -229,7 +251,15 @@ const PaySubUser = () => {
                             </th>
                             <td className="px-6 py-4"></td>
                             <td className="px-6 py-4"></td>
-                            <td className="px-6 py-4">{DiscountPerce}%</td>
+                            <td className="px-6 py-4">{DiscountPerce} %</td>
+                        </tr>
+                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <p className='w-ma text-xl font-semibold'>Sales tax</p>
+                            </th>
+                            <td className="px-6 py-4"></td>
+                            <td className="px-6 py-4"></td>
+                            <td className="px-6 py-4">{saleTax} %</td>
                         </tr>
                         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -266,23 +296,6 @@ const PaySubUser = () => {
 
                 <div ref={paypal}></div>
             </div>
-            {/* <div className="flex items-center my-4">
-
-                <input
-                    type="text"
-                    placeholder="Enter Promo Code"
-                    value={PromoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                    className="px-4 py-2 border rounded-md mr-4"
-                />
-                <button
-                    onClick={applyPromoCode}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                >
-                    Apply Promo Code
-                </button>
-            </div> */}
-
         </div>
     );
 };

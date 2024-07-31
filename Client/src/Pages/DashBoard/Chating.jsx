@@ -9,7 +9,7 @@ import Conversation from '../../Components/Dashboard/Conversation'
 import ChatContext from '../../Context/ChatContaxt/ChatContext'
 import { BaseURL } from '../../Data/BaseURL'
 import AlertContext from '../../Context/Alert/AlertContext'
-import { FaRegShareSquare } from 'react-icons/fa'
+import { FaFileAlt, FaRegShareSquare, FaTimes } from 'react-icons/fa'
 import BotDepContext from '../../Context/BotContaxt/BotDepContext'
 import { LuListTodo } from 'react-icons/lu'
 import { ImAttachment } from "react-icons/im";
@@ -393,6 +393,12 @@ const Chating = () => {
                                 <LuListTodo className='text-base md:text-xl' />
                                 <h2 className='text-gray text-xs md:text-base font-medium'>Add ToDo</h2>
                             </div>
+                            <div
+                                className='bg-gray text-sm md:text-base py-2 px-2 md:px-4 rounded-lg border-2 border-gray text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 self-end float-right'
+                                onClick={newTopic}
+                            >
+                                <h2 className='font-para text-sm font-medium md:text-base text-white'>New Chat</h2>
+                            </div>
                         </div>
                         <Conversation setModelTODO={setModelTODO} RegenrateChat={RegenrateChat} />
                         <div className='w-full'>
@@ -402,7 +408,7 @@ const Chating = () => {
                                     onClick={newTopic}
                                 >
                                     <img src="../../Porp/chat.png" alt="" srcset="" className='w-4 h-4 md:w-6 md:h-6' />
-                                    <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Topic</h2>
+                                    <h2 className='hidden w-max group-hover:block ease-in-out duration-1000 font-para text-sm font-medium md:text-base text-white'>New Chat</h2>
                                 </div>
                                 <div
                                     className="bg-white w-[100%] relative rounded-xl shadow-shadow3 border-1 border-[#B7B4B4] py-2 md:py-4 px-4 flex flex-col gap-4 h-full"
@@ -423,6 +429,15 @@ const Chating = () => {
                                                 <div className='w-[20%]'>
                                                     <img src="../../Porp/Loading.gif" alt="" className='object-cover bg-gray rounded-xl px-2' />
                                                 </div>}
+                                        </div>
+                                    }
+                                    {selectedFile != null &&
+                                        <div className="bg-white rounded-lg flex gap-2 text-sm font-para py-2 px-2">
+                                            <FaFileAlt className='text-xl' />
+                                            {selectedFile?.name}
+                                            <button onClick={() => setSelectedFile(null)}>
+                                                <FaTimes />
+                                            </button>
                                         </div>
                                     }
                                     <div className="flex justify-between">

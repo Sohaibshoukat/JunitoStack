@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import AlertContext from '../../../Context/Alert/AlertContext';
 import { BaseURL } from '../../../Data/BaseURL';
+import { formatDateForInput } from '../../../Data/DateFunction';
 
 const ProfilePage = () => {
     const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ const ProfilePage = () => {
                     FirstName: result.userData.FirstName,
                     LastName: result.userData.LastName,
                     Phone: result.userData.Phone,
-                    Age: result.userData.Age,
+                    Age: formatDateForInput(result.userData.Age),
                     Gender: result.userData.Gender,
                     ImageShow: result.userData.ProfilePhoto ? `${BaseURL}/${result.userData.ProfilePhoto}` : null,
                 });
@@ -181,7 +182,7 @@ const ProfilePage = () => {
                 <div className="flex flex-col gap-1 font-Para basis-[50%]">
                     <p className='text-sm text-darkestgray'>Age</p>
                     <input
-                        type="number"
+                        type="date"
                         name="Age"
                         value={formData.Age}
                         onChange={handleChange}

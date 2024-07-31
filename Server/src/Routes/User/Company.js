@@ -372,6 +372,8 @@ router.get('/promptofday', async (req, res) => {
 
         const randomIndex2 = Math.floor(Math.random() * 10);
 
+        console.log(randomIndex2)
+
 
         res.send({ prompt: randomPrompt, image: images[randomIndex2] });
     } catch (error) {

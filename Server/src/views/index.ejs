@@ -171,20 +171,20 @@
                         <td>2002</td>
                         <td>Junito BizzBot</td>
                         <td>1</td>
-                        <td><%= transaction.Amount %> €</td>
-                        <td><%= transaction.Amount %> €</td>
+                        <td><%= transaction.Plan=="Monthly" ? "99" : "990" %> €</td>
+                        <td><%= transaction.Plan=="Monthly" ? "99" : "990" %> €</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="4"></td>
                         <td>Nettobetrag</td>
-                        <td><%= DiscountPerce %> €</td>
+                        <td><%= DiscountPerce %> %</td>
                     </tr>
                     <tr>
                         <td colspan="4"></td>
-                        <td>Umsatzsteuer 20%</td>
-                        <td><%= transaction?.taxAmount %> €</td>
+                        <td>Umsatzsteuer</td>
+                        <td><%= SalesTax %> %</td>
                     </tr>
                     <tr>
                         <td colspan="4"></td>

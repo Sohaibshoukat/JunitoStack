@@ -6,6 +6,7 @@ import 'react-phone-input-2/lib/style.css';
 import Footer from '../../Components/Footer'
 import AlertContext from '../../Context/Alert/AlertContext'
 import { BaseURL } from '../../Data/BaseURL'
+import { Countries } from '../../Data/CountryList';
 
 const Signup = () => {
 
@@ -16,11 +17,13 @@ const Signup = () => {
         LastName: '',
         Email: '',
         Phone: '',
+        Country:"",
         CompanyName: '',
         Password: '',
         ConfirmPassword: ''
     });
     const [IsLoading, setIsLoading] = useState(false)
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     const AletContext = useContext(AlertContext);
     const { showAlert } = AletContext;
@@ -36,6 +39,16 @@ const Signup = () => {
         if (!formData.FirstName || !formData.LastName || !formData.Email || !formData.Phone || !formData.CompanyName || !formData.Password || !formData.ConfirmPassword) {
             setIsLoading(false)
             showAlert('All fields are required', 'danger');
+        }
+        if (!termsAccepted) {
+            setIsLoading(false);
+            showAlert('You must agree to the Terms and Conditions', 'danger');
+            return;
+        }
+        if (formData.Password.length < 8) {
+            setIsLoading(false)
+            showAlert('Password must be at least 8 characters long', 'danger');
+            return;
         }
         if (formData.Password !== formData.ConfirmPassword) {
             setIsLoading(false)
@@ -139,14 +152,28 @@ const Signup = () => {
                                         required
                                     />
                                 </div>
-                                <input
-                                    type="text"
-                                    name="CompanyName"
-                                    value={formData.CompanyName}
-                                    onChange={handleChange}
-                                    placeholder='Company Name'
-                                    className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
-                                />
+                                <div className="flex flex-col md:flex-row justify-between gap-4">
+                                    <input
+                                        type="text"
+                                        name="CompanyName"
+                                        value={formData.CompanyName}
+                                        onChange={handleChange}
+                                        placeholder='Company Name'
+                                        className='py-3 text-lg px-4 border-2 basis-[50%] lg:w-[50%] border-black/50 rounded-lg'
+                                    />
+                                    <select
+                                        name="Country"
+                                        id="Country"
+                                        value={formData.Country}
+                                        onChange={handleChange}
+                                        className='py-3 text-lg px-4 border-2 basis-[50%] lg:w-[50%] border-black/50 rounded-lg'
+                                    >
+                                        <option value="">Select Company Country</option>
+                                        {Countries?.map((item, index) => (
+                                            <option key={index} value={item.value}>{item.value}</option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <input
                                     type="password"
                                     name="Password"
@@ -164,12 +191,22 @@ const Signup = () => {
                                     className='py-3 text-lg px-4 border-2 border-black/50 rounded-lg'
                                 />
                                 <div className="flex flex-col gap-2 md:flex-row justify-between md:items-center">
-                                    <div className="flex gap-3 items-center">
-                                        <input
-                                            type="checkbox"
-                                            className='w-5 h-5  border-2 border-black/50 rounded-md'
-                                        />
-                                        <p className='text-black font-medium font-para text-lg'>Remember me</p>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex gap-3 items-center">
+                                            <input
+                                                type="checkbox"
+                                                className='w-5 h-5  border-2 border-black/50 rounded-md'
+                                            />
+                                            <p className='text-black font-medium font-para text-lg'>Remember me</p>
+                                        </div>
+                                        <div className="flex gap-3 items-center">
+                                            <input
+                                                type="checkbox"
+                                                className='w-5 h-5 border-2 border-black/50 rounded-md'
+                                                onChange={(e) => setTermsAccepted(e.target.checked)} // Update terms acceptance state
+                                            />
+                                            <p className='text-black font-medium font-para text-lg'>I agree on <a href="https://www.junito.at/about" target='_blank' className='underline'> Terms and Conditions and Datasecurity conditions</a></p>
+                                        </div>
                                     </div>
                                     <p className='text-gray font-medium font-para text-lg'>
                                         <Link to={'/forget-password'}>

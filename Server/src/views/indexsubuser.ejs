@@ -195,18 +195,18 @@
                     <tr>
                         <td colspan="4"></td>
                         <td>Rabatt</td>
-                        <td><%= (totalAmount * (DiscountPerce / 100))?.toFixed(2) %> €</td>
+                        <td><%= DiscountPerce  %> %</td>
                     </tr>
                     <% } %>
                     <tr>
                         <td colspan="4"></td>
-                        <td>Umsatzsteuer 20%</td>
-                        <td><%= (totalAmount * 0.2)?.toFixed(2) %> €</td>
+                        <td>Umsatzsteuer</td>
+                        <td><%= SalesTax %> %</td>
                     </tr>
                     <tr>
                         <td colspan="4"></td>
                         <td>Rechnungsbetrag</td>
-                        <td><%= ((totalAmount - (DiscountPerce ? totalAmount * (DiscountPerce / 100) : 0)) * 1.2)?.toFixed(2) %> €</td>
+                        <td><%= Amount %> €</td>
                     </tr>
                 </tfoot>
             </table>

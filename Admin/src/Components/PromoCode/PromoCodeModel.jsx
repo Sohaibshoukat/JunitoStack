@@ -65,7 +65,7 @@ const PromoCodeModel = ({ PromoModel, setPromoModel, fetchPromoCodes, EditId, se
                 body: JSON.stringify({
                     Heading: formData.Heading,
                     OffPercentage: formData.OffPercentage,
-                    PromoCode: formData.PromoCodevalue,
+                    PromoCodeValue: formData.PromoCodevalue,
                     ExpiryDate: formData.ExpiryDate,
                 }),
             });

@@ -39,7 +39,7 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: {
         user: "no-reply@junito.at",
-        pass: "Scott691980!", 
+        pass: "Scott691980!",
     }
 });
 
@@ -119,7 +119,7 @@ router.post('/upload-document', FileUploader.single('fileup'), async (req, res) 
 });
 
 
-router.post('/ask',fetchuser, async (req, res) => {
+router.post('/ask', fetchuser, async (req, res) => {
     try {
         const user = await User.findById({ _id: req.user.id });
         if (!user) {
@@ -134,7 +134,7 @@ router.post('/ask',fetchuser, async (req, res) => {
     }
 });
 
-router.post('/searchsuggestion',fetchuser, async (req, res) => {
+router.post('/searchsuggestion', fetchuser, async (req, res) => {
     try {
 
         const user = await User.findById({ _id: req.user.id });
@@ -145,19 +145,19 @@ router.post('/searchsuggestion',fetchuser, async (req, res) => {
         const chatDetails = req.body;
         const query = chatDetails.data;
         if (!query) {
-          return res.status(400).send('Query parameter is required');
+            return res.status(400).send('Query parameter is required');
         }
-    
+
         const suggestions = await Prompts.find({
-          PromptsList: { 
-            $elemMatch: { 
-              value: { $regex: query, $options: 'i' } 
-            } 
-          }
+            PromptsList: {
+                $elemMatch: {
+                    value: { $regex: query, $options: 'i' }
+                }
+            }
         })
-        .limit(5)
-        .select({ 'PromptsList.$': 1 }) // Selects only the matching elements of PromptsList
-        .exec();
+            .limit(5)
+            .select({ 'PromptsList.$': 1 }) // Selects only the matching elements of PromptsList
+            .exec();
 
         if (suggestions.length > 0) {
             const formattedSuggestions = suggestions.reduce((acc, curr, index) => {
@@ -450,7 +450,7 @@ router.post('/chat/share', fetchuser, async (req, res) => {
             }
         }
 
-        const { chatId, Category } = req.body;
+        const { chatId, Category, Heading } = req.body;
 
 
         // Check if the provided chat ID is valid
@@ -461,6 +461,7 @@ router.post('/chat/share', fetchuser, async (req, res) => {
 
         // Create a new shared chat document
         const sharedChat = await SharedChat.create({
+            Heading: Heading,
             User_ID: req.user.id,
             Company: company._id,
             Chat_id: chatId,
@@ -496,12 +497,13 @@ router.put('/editchat/share/:id', fetchuser, async (req, res) => {
             }
         }
 
-        const { Category } = req.body;
+        const { Category, Heading } = req.body;
 
         // Create a new shared chat document
         const sharedChat = await SharedChat.findById(req.params.id);
 
         sharedChat.Category = Category;
+        sharedChat.Heading = Heading;
 
         sharedChat.save()
 

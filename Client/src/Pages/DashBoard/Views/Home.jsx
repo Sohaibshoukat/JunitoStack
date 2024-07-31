@@ -405,7 +405,7 @@ const Home = () => {
                       <FaUserFriends className='text-[#C248AD] text-xl' />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <h2 className='text-black font-bold'>{item?.Chat_id?.Title}</h2>
+                      <h2 className='text-black font-bold'>{item?.Heading}</h2>
                       <p className='text-[#9f9f9f] text-sm'>{item?.Chat_id?.Department}</p>
                     </div>
                   </div>

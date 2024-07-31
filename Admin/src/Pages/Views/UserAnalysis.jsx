@@ -138,7 +138,9 @@ const UserAnalysis = () => {
             <thead>
               <tr>
                 <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left font-medium text-gray-500 uppercase">Company Name</th>
-                <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left w-[30%] font-medium text-gray-500 uppercase">Owner</th>
+                <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left font-medium text-gray-500 uppercase">Company Address</th>
+                <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left font-medium text-gray-500 uppercase">Payments</th>
+                <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left font-medium text-gray-500 uppercase">Owner</th>
                 <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left font-medium text-gray-500 uppercase">Email</th>
                 <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left font-medium text-gray-500 uppercase">SubUsers</th>
                 <th scope="col" className="px-2 md:px-6 py-1 md:py-3 text-left font-medium text-gray-500 uppercase">Status</th>
@@ -151,6 +153,16 @@ const UserAnalysis = () => {
                   <td className="px-2 md:px-6 rounded-l-2xl text-sm md:text-base bg-gray my-3 py-3 text-left ">
                     <div className={`w-max`}>
                       {item?.company?.CompanyName}
+                    </div>
+                  </td>
+                  <td className="px-2 md:px-6 text-sm md:text-base bg-gray my-3 py-3 text-left ">
+                    <div className={`w-max`}>
+                      {item?.company?.Address||"N/A"}
+                    </div>
+                  </td>
+                  <td className="px-2 md:px-6 text-sm md:text-base bg-gray my-3 py-3 text-left ">
+                    <div className={`w-max`}>
+                      {item?.transaction?.Amount}
                     </div>
                   </td>
                   <td className="px-2 md:px-6 bg-gray my-3 text-base md:text-lg font-semibold py-3 text-left w-max min-w-[30%]">

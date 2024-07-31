@@ -6,6 +6,9 @@ const SharedChatSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    Heading:{
+        type:String
+    },
     Company:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Company'

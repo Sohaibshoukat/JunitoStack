@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 
 const ShareModel = ({ ShareChatModel, setShareChatModel, EditID }) => {
     const [DepartmentChat, setDepartmentChat] = useState('HR');
+    const [Heading, setHeading] = useState('')
     const [isLoadingChat, setisLoadingChat] = useState(false);
     const { id } = useParams();
 
@@ -37,7 +38,7 @@ const ShareModel = ({ ShareChatModel, setShareChatModel, EditID }) => {
             }
         }
     };
-    
+
     useEffect(() => {
         fetchSharedChat();
     }, [EditID]);
@@ -56,6 +57,7 @@ const ShareModel = ({ ShareChatModel, setShareChatModel, EditID }) => {
                     body: JSON.stringify({
                         chatId: id,
                         Category: DepartmentChat,
+                        Heading: Heading,
                     }),
                 }
             );
@@ -75,13 +77,34 @@ const ShareModel = ({ ShareChatModel, setShareChatModel, EditID }) => {
     };
 
     const departmentData = [
-        { head: 'HR', icon: '../../BotIcons/hr.png' },
-        { head: 'Marketing', icon: '../../BotIcons/marketing.png' },
-        { head: 'Vertrieb', icon: '../../BotIcons/vertrieb.png' },
-        { head: 'Support', icon: '../../BotIcons/support.png' },
-        { head: 'Startup', icon: '../../BotIcons/todo.png' },
-        { head: 'Sales', icon: '../../BotIcons/sales.png' },
-        { head: 'Agent', icon: '../../BotIcons/vertrieb.png' },
+        {
+            head: "HR",
+            icon: "../BotIcons/hr.png"
+        },
+        {
+            head: "Marketing",
+            icon: "../BotIcons/marketing.png"
+        },
+        {
+            head: "Vertrieb",
+            icon: "../BotIcons/vertrieb.png"
+        },
+        {
+            head: "Support",
+            icon: "../BotIcons/support.png"
+        },
+        {
+            head: "Startup",
+            icon: "../BotIcons/todo.png"
+        },
+        {
+            head: "Assistenz",
+            icon: "../BotIcons/Bots/sales.png"
+        },
+        {
+            head: "Agentur",
+            icon: "../BotIcons/sales.png"
+        },
     ];
 
     return (
@@ -95,6 +118,17 @@ const ShareModel = ({ ShareChatModel, setShareChatModel, EditID }) => {
                             <IoMdClose className="text-white text-4xl" onClick={() => setShareChatModel(false)} />
                         </div>
                         <div className="flex flex-col w-[80%] m-auto font-para gap-4">
+                            <div className="flex flex-col gap-1">
+                                <label htmlFor="" className="text-white">Heading</label>
+                                <input
+                                    type="text"
+                                    value={Heading}
+                                    placeholder='Heading'
+                                    className="bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4"
+                                    onChange={(e) => setHeading(e.target.value)}
+                                />
+
+                            </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="" className="text-white">Share Chat Category</label>
                                 <select
