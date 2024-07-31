@@ -1,5 +1,5 @@
-# Use the official Node.js 18 image as a base image
-FROM node:18
+# Use the official Node.js image as a base image
+FROM node:latest
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
@@ -11,7 +11,8 @@ COPY ./package-lock.json ./
 # Install system dependencies required for Puppeteer and Chrome
 RUN apt-get update && \
     apt-get install -y wget gnupg ca-certificates fonts-liberation libappindicator3-1 \
-    libasound2 libatk-bridge2.0-0 libcups2 libdbus-1-3 libnspr4 libnss3 lsb-release xdg-utils && \
+    libasound2 libatk-bridge2.0-0 libcups2 libdbus-1-3 libnspr4 libnss3 libx11-xcb1 \
+    libxcomposite1 libxdamage1 libxrandr2 xdg-utils && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Google Chrome
