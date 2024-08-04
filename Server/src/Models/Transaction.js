@@ -6,6 +6,12 @@ const TransactionSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    SubscriptionID:{
+        type:String,
+    },
+    Order_ID: {
+        type:String,
+    },
     Company_ID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Company'
@@ -26,6 +32,12 @@ const TransactionSchema = new Schema({
             ExpiryDate: {
                 type: Date
             },
+            SubscriptionID:{
+                type:String,
+            },
+            Order_ID: {
+                type:String,
+            },
         }
     ],
     Amount: {
@@ -39,7 +51,7 @@ const TransactionSchema = new Schema({
     },
     Plan:{
         type:String,
-        enum:["Monthly","Annually","AdminFree"]
+        enum:["Monthly","Annually","AdminFree",""]
     },
     Status: {
         type: String,

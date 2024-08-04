@@ -61,7 +61,6 @@ const Login = () => {
                 } else if (data?.Status == "Expired") {
                     setIsLoading(false)
                     showAlert(data.message, 'danger')
-                    navigate(`/selectplan/${data.id}`)
                     return;
                 }
             } else if (data?.type == "SubUser") {
@@ -74,19 +73,6 @@ const Login = () => {
                     showAlert(data.message, 'danger')
                     return;
                 }
-            }
-
-            if (data?.User_Type == "Owner") {
-                const response22 = await fetch(`${BaseURL}/api/transaction/CheckSubUser`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: data.id
-                    }),
-                });
-                const data22 = await response22.json();
             }
 
 

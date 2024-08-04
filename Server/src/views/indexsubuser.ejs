@@ -175,12 +175,12 @@
                     <% let totalAmount = 0; %>
                     <% subUsers?.forEach((subUser, index) => { %>
                     <tr>
-                        <td><%= index + 1 %></td>
+                        <td><%= 1 %></td>
                         <td><%= data?.id %></td>
                         <td>Subuser Payment</td>
                         <td>1</td>
-                        <td>50.00 €</td>
-                        <td>50.00 €</td>
+                        <td>49.00 €</td>
+                        <td>49.00 €</td>
                     </tr>
                     <% totalAmount += 50; %>
                     <% }); %>
@@ -189,15 +189,8 @@
                     <tr>
                         <td colspan="4"></td>
                         <td>Nettobetrag</td>
-                        <td><%= (beforediscount || totalAmount)?.toFixed(2) %> €</td>
+                        <td>50 €</td>
                     </tr>
-                    <% if (DiscountPerce) { %>
-                    <tr>
-                        <td colspan="4"></td>
-                        <td>Rabatt</td>
-                        <td><%= DiscountPerce  %> %</td>
-                    </tr>
-                    <% } %>
                     <tr>
                         <td colspan="4"></td>
                         <td>Umsatzsteuer</td>
@@ -206,7 +199,7 @@
                     <tr>
                         <td colspan="4"></td>
                         <td>Rechnungsbetrag</td>
-                        <td><%= Amount %> €</td>
+                        <td><%= 49+((SalesTax*49)/100) %> €</td>
                     </tr>
                 </tfoot>
             </table>

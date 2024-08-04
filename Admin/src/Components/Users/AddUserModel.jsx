@@ -2,15 +2,18 @@ import React, { useContext, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import { BaseURL } from '../../Data/BaseURL';
 import AlertContext from '../../Context/Alert/AlertContext';
+import { Countries } from '../../Data/FeaturesData';
 
-const AddUserModel = ({ UserModel, setUserModel,fetchUserData }) => {
+const AddUserModel = ({ UserModel, setUserModel, fetchUserData }) => {
 
     const [formData, setFormData] = useState({
         FirstName: '',
         LastName: '',
-        Company:'',
+        Company: '',
         Email: '',
-        Phone: ''
+        Phone: '',
+        ExpiryDate: '',
+        Country: ""
     });
 
     const handleChange = (e) => {
@@ -36,10 +39,10 @@ const AddUserModel = ({ UserModel, setUserModel,fetchUserData }) => {
                 fetchUserData()
                 setUserModel(false);
             } else {
-                showAlert(data.message,'danger');
+                showAlert(data.message, 'danger');
             }
         } catch (error) {
-            showAlert(error.message,'danger');
+            showAlert(error.message, 'danger');
         }
     };
 
@@ -56,57 +59,82 @@ const AddUserModel = ({ UserModel, setUserModel,fetchUserData }) => {
                         <div className="flex flex-col w-[80%] m-auto font-Para gap-4">
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="FirstName" className='text-white'>First Name</label>
-                                <input 
-                                    type="text" 
-                                    name="FirstName" 
-                                    value={formData.FirstName} 
-                                    onChange={handleChange} 
-                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4' 
-                                    placeholder='Please Enter First Name' 
+                                <input
+                                    type="text"
+                                    name="FirstName"
+                                    value={formData.FirstName}
+                                    onChange={handleChange}
+                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
+                                    placeholder='Please Enter First Name'
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="LastName" className='text-white'>Last Name</label>
-                                <input 
-                                    type="text" 
-                                    name="LastName" 
-                                    value={formData.LastName} 
-                                    onChange={handleChange} 
-                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4' 
-                                    placeholder='Please Enter Last Name' 
+                                <input
+                                    type="text"
+                                    name="LastName"
+                                    value={formData.LastName}
+                                    onChange={handleChange}
+                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
+                                    placeholder='Please Enter Last Name'
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="Email" className='text-white'>Email</label>
-                                <input 
-                                    type="email" 
-                                    name="Email" 
-                                    value={formData.Email} 
-                                    onChange={handleChange} 
-                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4' 
-                                    placeholder='Please Enter Email' 
+                                <input
+                                    type="email"
+                                    name="Email"
+                                    value={formData.Email}
+                                    onChange={handleChange}
+                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
+                                    placeholder='Please Enter Email'
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="Phone" className='text-white'>Phone</label>
-                                <input 
-                                    type="text" 
-                                    name="Phone" 
-                                    value={formData.Phone} 
-                                    onChange={handleChange} 
-                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4' 
-                                    placeholder='Please Enter Phone' 
+                                <input
+                                    type="text"
+                                    name="Phone"
+                                    value={formData.Phone}
+                                    onChange={handleChange}
+                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
+                                    placeholder='Please Enter Phone'
                                 />
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="Compony" className='text-white'>Company Name</label>
-                                <input 
-                                    type="text" 
-                                    name="Company" 
-                                    value={formData.Company} 
-                                    onChange={handleChange} 
-                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4' 
-                                    placeholder='Please Enter Company Name' 
+                                <input
+                                    type="text"
+                                    name="Company"
+                                    value={formData.Company}
+                                    onChange={handleChange}
+                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
+                                    placeholder='Please Enter Company Name'
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label htmlFor="Compony" className='text-white'>Company Country</label>
+                                <select
+                                    name="Country"
+                                    id="Country"
+                                    value={formData.Country}
+                                    onChange={handleChange}
+                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
+                                >
+                                    <option value="">Select Company Country</option>
+                                    {Countries?.map((item, index) => (
+                                        <option key={index} value={item.value}>{item.value}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label htmlFor="Compony" className='text-white'>Free Trial Expiry</label>
+                                <input
+                                    type="date"
+                                    name="ExpiryDate"
+                                    value={formData.ExpiryDate}
+                                    onChange={handleChange}
+                                    className='bg-[#EDF2F6] rounded-lg border-none outline-none py-2 px-4'
                                 />
                             </div>
                         </div>

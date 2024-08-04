@@ -6,22 +6,29 @@ import Nav from '../../Components/Nav';
 import Footer from '../../Components/Footer';
 import { taxes } from '../../Data/CountryList';
 
-
 const CheckOut = () => {
     const { id, plan } = useParams();
-    
+
     const [User, setUser] = useState(null);
     const [Company, setCompany] = useState(null);
     const [PromoCode, setPromoCode] = useState('');
     const [DiscountPerce, setDiscountPerce] = useState(0);
-    const [BeforeDiscount, setBeforeDiscount] = useState(plan === "Monthly" ? 99 : 990); // Initial total amount
-    const [SalesTax, setSalesTax] = useState(0); // New state for Sales Tax
+    const [BeforeDiscount, setBeforeDiscount] = useState(plan === "Monthly" ? 99 : 990);
+    const [SalesTax, setSalesTax] = useState(0);
     const [TotalAmount, setTotalAmount] = useState(plan === "Monthly" ? 99 : 990);
 
     const navigate = useNavigate();
-    const paypal = useRef();
+    const paypalRef = useRef();
     const alertContext = useContext(AlertContext);
     const { showAlert } = alertContext;
+
+    useEffect(() => {
+        fetchTransactionData();
+    }, []);
+
+    useEffect(() => {
+        loadPayPalScript();
+    }, [TotalAmount]);
 
     const fetchTransactionData = async () => {
         try {
@@ -30,7 +37,7 @@ const CheckOut = () => {
                 const data = await response.json();
                 setUser(data.User_ID);
                 setCompany(data.Company_ID);
-                
+
                 const country = data.Company_ID.Country;
                 const taxRate = getTaxRate(country);
                 const salesTax = calculateSalesTax(BeforeDiscount, taxRate);
@@ -38,7 +45,6 @@ const CheckOut = () => {
                 setSalesTax(salesTax);
                 const initialTotal = parseFloat(BeforeDiscount) + parseFloat(salesTax);
                 setTotalAmount(initialTotal);
-                renderPaypalButton(initialTotal);
             } else {
                 showAlert('Failed to fetch transaction details', 'danger');
             }
@@ -78,7 +84,6 @@ const CheckOut = () => {
                     setSalesTax(newSalesTax);
                     setTotalAmount(newTotal);
                     showAlert('Promo code applied successfully', 'success');
-                    renderPaypalButton(newTotal);
                 } else {
                     showAlert(data.message, 'danger');
                 }
@@ -90,58 +95,75 @@ const CheckOut = () => {
         }
     };
 
-    const renderPaypalButton = (amount) => {
-        if (paypal.current) {
-            paypal.current.innerHTML = ''; // Clear previous buttons
+    // Function to dynamically load the PayPal SDK script
+    const loadPayPalScript = () => {
+        const existingScript = document.getElementById('paypal-sdk');
+        if (existingScript) return;
+
+        const script = document.createElement('script');
+        script.src = 'https://www.paypal.com/sdk/js?client-id=AaB_n2qBFaqY0T7ipK6WEYTzYvg4yoMwFIOq-Rp0vDOyyQYai_-vfTkzAXSJh5TtYPZu-Y5Sgf_GsiX3&vault=true&intent=subscription';
+        script.id = 'paypal-sdk';
+        script.onload = renderPaypalButton; // Render button once the script is loaded
+        document.body.appendChild(script);
+    };
+
+    const renderPaypalButton = () => {
+        if (paypalRef.current) {
+            paypalRef.current.innerHTML = ''; // Clear previous buttons
+
+            // Render PayPal subscription button
             window.paypal.Buttons({
-                createOrder: (data, actions) => {
-                    return actions.order.create({
-                        intent: "CAPTURE",
-                        purchase_units: [{
-                            description: "Bizz Bot Junito",
-                            amount: {
-                                currency_code: "EUR",
-                                value: amount
-                            }
-                        }]
+                style: {
+                    shape: 'pill',
+                    color: 'white',
+                    layout: 'vertical',
+                    label: 'subscribe'
+                },
+                createSubscription: function(data, actions) {
+                    return actions.subscription.create({
+                        plan_id: plan === 'Monthly' ? 'P-4YT50923UK892682NM2WMRZQ' : 'P-1AG61244CV737862VM2XDVLI'
                     });
                 },
-                onApprove: async (data, actions) => {
-                    const order = await actions.order.capture();
-                    const response = await fetch(`${BaseURL}/api/transaction/registertransactions`, {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            id: id,
-                            Amount: TotalAmount,
-                            DateCreated: new Date().toISOString(),
-                            ExpiryDate: plan === 'Monthly' ? new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString() : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-                            Status: "Paid",
-                            data: order,
-                            discount: BeforeDiscount,
-                            DiscountPerce: DiscountPerce,
-                            SalesTax: SalesTax, // Include Sales Tax in the API call
-                            Plan: plan
-                        })
-                    });
-                    const ResponseData = await response.json();
-                    if (ResponseData.success) {
-                        showAlert("Transaction completed successfully", 'success');
-                        navigate("/login");
+                onApprove: async function(data, actions) {
+                    console.log(data)
+                    const subscriptionId = data.subscriptionID;
+                    const orderId = data.orderID;
+                    try {
+                        const response = await fetch(`${BaseURL}/api/transaction/registertransactions`, {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                id: id,
+                                Amount: TotalAmount,
+                                DateCreated: new Date().toISOString(),
+                                ExpiryDate: plan === 'Monthly' ? new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString() : new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
+                                Status: "Paid",
+                                subscriptionId: subscriptionId,
+                                orderId: orderId,
+                                discount: BeforeDiscount,
+                                DiscountPerce: DiscountPerce,
+                                SalesTax: SalesTax,
+                                Plan: plan
+                            })
+                        });
+                        const ResponseData = await response.json();
+                        if (ResponseData.success) {
+                            showAlert("Transaction completed successfully", 'success');
+                            navigate("/login");
+                        }
+                    } catch (error) {
+                        showAlert('Error completing the transaction', 'danger');
                     }
                 },
                 onError: (err) => {
-                    console.log(err);
+                    console.error('PayPal error:', err);
+                    showAlert('An error occurred with PayPal. Please try again.', 'danger');
                 }
-            }).render(paypal.current);
+            }).render(paypalRef.current);
         }
     };
-
-    useEffect(() => {
-        fetchTransactionData();
-    }, []);
 
     return (
         <>
@@ -177,70 +199,59 @@ const CheckOut = () => {
                                     €{BeforeDiscount}
                                 </td>
                             </tr>
-                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            {/* <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                    <p className='w-ma text-xl font-semibold'>Price</p>
+                                    <p className='w-max'>Discount</p>
                                 </th>
-                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4">
+                                    <p className='w-max'>{DiscountPerce}%</p>
+                                </td>
                                 <td className="px-6 py-4"></td>
                                 <td className="px-6 py-4">
-                                    €{BeforeDiscount}
+                                    €{((BeforeDiscount * DiscountPerce) / 100).toFixed(2)}
+                                </td>
+                            </tr> */}
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
+                                    <p className='w-max'>Sales Tax</p>
+                                </th>
+                                <td className="px-6 py-4">
+                                    <p className='w-max'>Standard</p>
+                                </td>
+                                <td className="px-6 py-4"></td>
+                                <td className="px-6 py-4">
+                                    €{SalesTax}
                                 </td>
                             </tr>
                             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                 <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                    <p className='w-ma text-xl font-semibold'>Discount Percentage</p>
+                                    <p className='w-max'>Total Amount</p>
                                 </th>
                                 <td className="px-6 py-4"></td>
                                 <td className="px-6 py-4"></td>
                                 <td className="px-6 py-4">
-                                    {DiscountPerce}%
-                                </td>
-                            </tr>
-                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                    <p className='w-ma text-xl font-semibold'>Sales Tax</p>
-                                </th>
-                                <td className="px-6 py-4"></td>
-                                <td className="px-6 py-4"></td>
-                                <td className="px-6 py-4">
-                                    {SalesTax} ({getTaxRate(Company?.Country)}%)
-                                </td>
-                            </tr>
-                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-black">
-                                    <p className='w-ma text-xl font-semibold'>Total</p>
-                                </th>
-                                <td className="px-6 py-4"></td>
-                                <td className="px-6 py-4"></td>
-                                <td className="px-6 py-4">
-                                    €{TotalAmount?.toFixed(2)}
+                                    <p className='font-semibold font-para'>€{TotalAmount}</p>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div className="flex justify-between my-6 flex-col lg:flex-row gap-10">
-                    <div className="flex flex-col gap-4">
-                        <div className="flex flex-col font-para gap-2">
-                            <h2 className='text-lg font-semibold'>PromoCode</h2>
-                            <input
-                                type="text"
-                                value={PromoCode}
-                                onChange={(e) => setPromoCode(e.target.value)}
-                                className='border-2 border-gray py-2 px-4 rounded-xl'
-                                placeholder='Enter Promo Code'
-                            />
-                        </div>
-                        <button
-                            onClick={applyPromoCode}
-                            className='bg-gray rounded-lg font-para text-lg font-semibold py-2 px-4 border-2 border-gray text-white hover:bg-transparent hover:text-gray ease-in-out duration-300'
-                        >
-                            Apply Discount
-                        </button>
-                    </div>
-                    <div ref={paypal}></div>
+                {/* <div className="my-8 flex flex-wrap justify-between gap-2 items-center">
+                    <input
+                        onChange={(e) => setPromoCode(e.target.value)}
+                        type="text"
+                        className="outline-none font-para border border-gray focus:border-primary hover:border-primary text-black text-lg p-3 w-[20rem] max-w-full"
+                        placeholder="Promo Code"
+                    />
+                    <button onClick={applyPromoCode} className='text-lg font-para py-3 px-4 bg-primary text-white bg-gray rounded-lg border-2 border-gray'>
+                        Apply
+                    </button>
+                </div> */}
+
+                <div className="my-8 flex flex-wrap justify-between gap-2 items-center">
+                    <p className='text-lg font-semibold font-para text-black'>Subscribe with PayPal</p>
+                    <div ref={paypalRef}></div>
                 </div>
             </div>
             <Footer />

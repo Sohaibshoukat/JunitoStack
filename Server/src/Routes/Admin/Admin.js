@@ -200,11 +200,7 @@ router.put("/updateadmin", fetchadmin, PhotosUploader.single('profimg'), async (
 
         const { Email, Name, Phone } = req.body;
         let path = req.file ? req.file.path : null;
-        if (path) {
-            path = path.replace(/^src\\/, '');
-        }
 
-        console.log(path)
 
         const updatedAdmin = {
             Name,
@@ -611,6 +607,7 @@ router.post("/createuser", fetchadmin, async (req, res) => {
 
         let company = await Company.create({
             CompanyName: req.body.Company,
+            Country:req.body.Country,
             Owner_ID: user._id
         })
 
@@ -619,6 +616,7 @@ router.post("/createuser", fetchadmin, async (req, res) => {
             Company_ID: company._id,
             subUsers: [],
             Status: "Paid",
+            ExpiryDate:req.body.ExpiryDate,
             Plan:"AdminFree"
         });
 

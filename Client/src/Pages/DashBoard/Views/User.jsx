@@ -118,9 +118,9 @@ const User = () => {
         }
     });
 
-    const handlePayKnow = () => {
+    const handlePayKnow = (id) => {
         const params = new URLSearchParams({ users: JSON.stringify(PaidUser) });
-        navigate(`/dashboard/paysubUser?${params.toString()}`);
+        navigate(`/dashboard/paysubUser/${id}`);
     }
 
     return (
@@ -165,14 +165,7 @@ const User = () => {
                                     <option value="inactive">InActive</option>
                                 </select>
                             </div>
-                            {PaidUser.length > 0 &&
-                                <button
-                                    className='bg-gray py-1 px-4 rounded-xl text-white border-2 border-gray hover:bg-transparent hover:text-gray font-para font-semibold ease-in-out duration-300'
-                                    onClick={() => { handlePayKnow() }}
-                                >
-                                    Pay Users
-                                </button>
-                            }
+
                         </div>
                     </div>
                     {loading ? (
@@ -185,26 +178,26 @@ const User = () => {
                                 <table className='w-full'>
                                     <thead className="text-sm md:text-base font-normal uppercase text-slate-300">
                                         <tr>
-                                            <th className="px-2 md:px-6 py-2 md:py-4"></th>
                                             <th className="px-2 md:px-6 py-2 md:py-4">User name</th>
                                             <th className="px-2 md:px-6 py-2 md:py-4">Phone</th>
                                             <th className="px-2 md:px-6 py-2 md:py-4">Email</th>
                                             <th className="px-2 md:px-6 py-2 md:py-4">Action</th>
                                             <th className="px-2 md:px-6 py-2 md:py-4">Transaction Status</th>
                                             <th className="px-2 md:px-6 py-2 md:py-4">User Status</th>
+                                            <th className="px-2 md:px-6 py-2 md:py-4">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {filteredUsers?.map((item, index) => (
                                             <tr className="bg-white border-b font-medium text-sm md:text-sm border-slate-200" key={index}>
-                                                <th className="px-2 md:px-6 py-2 md:py-4">
+                                                {/* <th className="px-2 md:px-6 py-2 md:py-4">
                                                     {item?.TransactionStatus === "UnPaid" &&
                                                         <input
                                                             type="checkbox"
                                                             onChange={() => handleCheckboxChange(item?.Own_ID?._id)}
                                                         />
                                                     }
-                                                </th>
+                                                </th> */}
                                                 <th className="px-2 md:px-6 py-2 md:py-4">
                                                     <h2 className='w-max'>
                                                         {item?.Own_ID?.FirstName + " " + item?.Own_ID?.LastName}
@@ -266,6 +259,14 @@ const User = () => {
                                                     >
                                                         {loadingAction === item._id ? 'Loading...' : item?.Own_ID?.Status}
                                                     </button>
+                                                </td>
+                                                <td>
+                                                    {item.TransactionStatus == "UnPaid" && <button
+                                                        className={`bg-gray py-1 px-4 rounded-xl text-white border-2  hover:bg-transparent hover:text-gray border-gray  font-para font-semibold ease-in-out duration-300`}
+                                                        onClick={() => { handlePayKnow(item?.Own_ID?._id) }}
+                                                    >
+                                                        Pay Users
+                                                    </button>}
                                                 </td>
                                             </tr>
                                         ))}

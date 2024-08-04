@@ -29,7 +29,7 @@ const transporter = nodemailer.createTransport({
 router.post('/registertransactions', async (req, res) => {
   let success = false;
   try {
-    const { id: userid, Amount, DateCreated, ExpiryDate, Status, Plan, data, discount, DiscountPerce, SalesTax } = req.body;
+    const { id: userid, Amount, DateCreated, ExpiryDate, Status, Plan, data, discount, DiscountPerce, SalesTax, subscriptionId, orderId } = req.body;
 
     // Validate input data
     if (!userid || !Amount || !DateCreated || !ExpiryDate || !Status || !Plan) {
@@ -50,6 +50,8 @@ router.post('/registertransactions', async (req, res) => {
 
     const transaction = await Transaction.findOne({ User_ID: userid });
     transaction.Amount += Amount
+    transaction.SubscriptionID = subscriptionId
+    transaction.Order_ID = orderId
     transaction.DateCreated = DateCreated
     transaction.ExpiryDate = ExpiryDate
     transaction.Status = Status
@@ -113,8 +115,6 @@ router.post('/registertransactions', async (req, res) => {
           // Close the browser
           await browser.close();
 
-          console.log("File Created Successfully");
-
           // Prepare email details with attachment
           const mailDetails = {
             from: "no-reply@junito.at",
@@ -136,7 +136,6 @@ router.post('/registertransactions', async (req, res) => {
               return res.status(500).send({ message: "Email Sending Error", err, success });
             }
 
-            console.log("Email Sent Successfully");
             res.status(200).send({ success: true, transaction });
           });
 
@@ -164,7 +163,7 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
   let success = false;
   try {
     const userId = req.user.id;
-    const { subUserIds, DateCreated, ExpiryDate, beforediscount, DiscountPerce, data, SalesTax, Amount } = req.body;
+    const { subUserId, DateCreated, ExpiryDate, beforediscount, DiscountPerce, data, SalesTax, Amount } = req.body;
 
     // Check if the user exists
     const user = await User.findById(userId);
@@ -184,27 +183,20 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
       return res.status(404).json({ success, message: "Transaction not found" });
     }
 
-    let totalAddedAmount = 0;
-
-    // Iterate over each subUserId
-    for (const subUserId of subUserIds) {
-      // Find the subuser in the transaction
-      const subUser = transaction.subUsers.find(su => su.User.toString() === subUserId);
-      if (!subUser) {
-        return res.status(404).json({ success, message: `SubUser with id ${subUserId} not found` });
-      }
-
-      // Update the status of the subuser to "Paid"
-      subUser.Status = "Paid";
-      subUser.DateCreated = DateCreated;
-      subUser.ExpiryDate = ExpiryDate;
-
-      // Add 50 to the transaction amount for each subuser
-      totalAddedAmount += 50;
+    const subUser = transaction.subUsers.find(su => su.User.toString() === subUserId);
+    if (!subUser) {
+      return res.status(404).json({ success, message: `SubUser with id ${subUserId} not found` });
     }
 
+    // Update the status of the subuser to "Paid"
+    subUser.Status = "Paid";
+    subUser.DateCreated = DateCreated;
+    subUser.ExpiryDate = ExpiryDate;
+    subUser.SubscriptionID = data.subscriptionID;
+    subUser.Order_ID = data.orderID;
+
     // Update the total transaction amount
-    transaction.Amount += totalAddedAmount;
+    transaction.Amount += 50;
 
     // Save the updated transaction
     await transaction.save();
@@ -218,7 +210,7 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
         user,
         transaction,
         data,
-        subUsers: transaction.subUsers.filter(su => subUserIds.includes(su.User.toString())),
+        subUsers: transaction.subUsers.filter(su => subUserId.includes(su.User.toString())),
         beforediscount,
         DiscountPerce,
         SalesTax,
@@ -274,7 +266,6 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
           // Close the browser
           await browser.close();
 
-          console.log("File Created Successfully");
 
           // Prepare email details with attachment
           const mailDetails = {
@@ -297,7 +288,6 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
               return res.status(500).json({ message: "Email Sending Error", err, success });
             }
 
-            console.log("Email Sent Successfully");
             success = true;
             res.status(200).json({ success, transaction });
           });
@@ -365,8 +355,6 @@ router.put('/CheckSubUser', async (req, res) => {
       const expiryDate = new Date(subUser.ExpiryDate);
       const timeDiff = expiryDate - currentDate;
       const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
-      console.log(timeDiff)
-      console.log(daysDiff)
 
       // Check if the expiry date is within two days
       if (daysDiff <= 2) {

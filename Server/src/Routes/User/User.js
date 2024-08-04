@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer')
 const multer = require('multer');
-
+const fetch = require('node-fetch');
 const User = require("../../Models/User");
 const OTP = require("../../Models/EmailOtp");
 const Company = require("../../Models/Company");
@@ -15,7 +15,8 @@ const SubUser = require("../../Models/SubUser");
 const dayjs = require('dayjs');
 
 const JWT_KEY = process.env.JWT_KEY;
-
+const ClientID = process.env.PAYPAL_CLIENT_ID;
+const SecretKey = process.env.PAYPAL_SECERET_KEY;
 
 const PhotosStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -36,7 +37,7 @@ const transporter = nodemailer.createTransport({
     secure: false,
     auth: {
         user: "no-reply@junito.at",
-        pass: "Scott691980!", 
+        pass: "Scott691980!",
     }
 });
 
@@ -66,7 +67,6 @@ const sendOTPEmail = async (id, email, res) => {
         })
 
         const response = await transporter.sendMail(mailOptions)
-        console.log(response)
 
         return {
             status: "Pending",
@@ -74,7 +74,6 @@ const sendOTPEmail = async (id, email, res) => {
             response: response
         };
     } catch (error) {
-        console.log(error)
         return {
             status: "Failed",
             message: error.message,
@@ -118,7 +117,7 @@ router.post("/createuser", async (req, res) => {
 
         let company = await Company.create({
             CompanyName: req.body.CompanyName,
-            Country:req.body.Country,
+            Country: req.body.Country,
             Owner_ID: user._id
         })
 
@@ -174,7 +173,7 @@ router.post("/createpassword/:id", async (req, res) => {
         const SecPassword = await bcrypt.hash(req.body.Password, Salt)
 
         const userfield = {
-            Is_Verfied:true,
+            Is_Verfied: true,
             ActiveUsed: true,
             Password: SecPassword
         }
@@ -283,10 +282,9 @@ router.post("/SendOTPagain", async (req, res) => {
         // Send new OTP email
         const response = await sendOTPEmail(userID, email);
 
-        console.log(response)
 
         res.json({
-            reponse:response,
+            reponse: response,
             success: true,
             message: "OTP Sent Successfully"
         });
@@ -338,12 +336,6 @@ router.post("/SendOTPemail", async (req, res) => {
 //Login a user
 router.post("/loginuser", async (req, res) => {
     let success = false;
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
     const { Email, Password } = req.body;
 
     try {
@@ -351,34 +343,61 @@ router.post("/loginuser", async (req, res) => {
         if (!user) {
             return res.status(400).json({ success: false, message: "Account doesn't Found" })
         }
-
         const passwordCompare = await bcrypt.compare(Password, user.Password)
         if (!passwordCompare) {
             return res.status(400).json({ success: false, message: "UserName or Password Does not Find" })
         }
 
-
-
-        const newDa = dayjs();
-
         if (user.User_Type == "Owner") {
             let transaction = await Transaction.findOne({ User_ID: user._id });
             if (transaction.Plan == "AdminFree") {
-
-            } else if (transaction.Status == "UnPaid") {
+                if (dayjs(transaction.ExpiryDate).isBefore(dayjs().add(2, 'day'), 'day')) {
+                    transaction.Status="UnPaid";
+                    transaction.Plan = "";
+                    if (transaction?.subUsers?.length > 0) {
+                        transaction.subUsers[0].Status = "UnPaid";
+                    }
+                    await transaction.save()
+                    return res.status(400).json({
+                        Status: "UnPaid",
+                        type: "User",
+                        message: "Your Admin Trial is Expired Continue Payment for next plan",
+                        id: user._id
+                    });
+                }
+            }
+            else if (transaction.Status == "UnPaid") {
                 return res.status(400).json({
                     Status: "UnPaid",
                     type: "User",
-                    message: "You haven't Paid Your Dues",
+                    message: "You are Unpaid upgrade your payment plam",
                     id: user._id
                 });
-            } else if (dayjs(transaction.ExpiryDate).isBefore(dayjs().add(2, 'day'), 'day')) {
-                return res.status(400).json({
-                    Status: "Expired",
-                    type: "User",
-                    message: "Your Payment is Due. Please pay your dues to continue using the platform.",
-                    id: user._id
+            }
+            else {
+                const response = await fetch(`https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${transaction.SubscriptionID}`, {
+                    headers: {
+                        'Authorization': `Basic QWFCX24ycUJGYXFZMFQ3aXBLNldFWVR6WXZnNHlvTXdGSU9xLVJwMHZET3l5UVlhaV8tdmZUa3pBWFNKaDVUdFlQWnUtWTVTZ2ZfR3NpWDM6RUhxQUNIUHNJY0Q1MWhpaEJzeWgyUEJGcFRaRGQ4QXpPRDZEeERURWtKRjVIM2lFTkdGNkViWG1zYW1VVHJFS2dTalFXT2pSNjJxbnctOV8=`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
                 });
+                const data = await response.json()
+                if (dayjs(data.billing_info.next_billing_time).isBefore(dayjs().add(2, 'day'), 'day')) {
+                    if (transaction?.subUsers?.length > 0) {
+                        transaction.subUsers[0].Status = "UnPaid";
+                    }
+                    return res.status(400).json({
+                        Status: "Expired",
+                        type: "User",
+                        message: "Your Payment is Due 2 days clear your payment to continue using the platform.",
+                        id: user._id
+                    });
+                } else {
+                    if (transaction?.subUsers?.length > 0) {
+                        transaction.subUsers[0].Status = "Paid";
+                    }
+                }
             }
         } else {
             let Owner = await SubUser.findOne({ Own_ID: user._id });
@@ -388,31 +407,34 @@ router.post("/loginuser", async (req, res) => {
                     return su;
                 }
             });
-            const transaction22 = await Transaction.findOne({ User_ID: Owner.User_ID });
-            // Current date
-            const currentDate = new Date();
 
-            // Iterate through each subUser
-            transaction22?.subUsers?.forEach(subUser => {
-                const expiryDate = new Date(subUser.ExpiryDate);
-                const timeDiff = expiryDate - currentDate;
-                const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
-
-                // Check if the expiry date is within two days
-                if (daysDiff <= 2) {
-                    subUser.Status = "UnPaid";
-                }
-            });
-
-            // Save the updated transaction
-            await transaction22.save();
             if (!subUser) {
                 return res.status(404).json({ success: false, message: "SubUser not found" });
             }
             if (subUser.Status == "UnPaid") {
-                return res.status(400).json({ Status: "UnPaid", type: "SubUser", message: "Your Payment is Pending contact your company owner", id: user._id });
-            } else if (dayjs(transaction.ExpiryDate).isSame(newDa.add(2, 'day'))) {
-                return res.status(400).json({ Status: "Expired", type: "SubUser", message: "Your Payment is Expired contact your company", id: user._id });
+                return res.status(400).json({
+                    Status: "Expired",
+                    type: "User",
+                    message: "Your Payment is Due 2 days clear your payment to continue using the platform.",
+                    id: user._id
+                });
+            } else {
+                const response = await fetch(`https://api-m.sandbox.paypal.com/v1/billing/subscriptions/${transaction.SubscriptionID}`, {
+                    headers: {
+                        'Authorization': `Basic QWFCX24ycUJGYXFZMFQ3aXBLNldFWVR6WXZnNHlvTXdGSU9xLVJwMHZET3l5UVlhaV8tdmZUa3pBWFNKaDVUdFlQWnUtWTVTZ2ZfR3NpWDM6RUhxQUNIUHNJY0Q1MWhpaEJzeWgyUEJGcFRaRGQ4QXpPRDZEeERURWtKRjVIM2lFTkdGNkViWG1zYW1VVHJFS2dTalFXT2pSNjJxbnctOV8=`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json()
+                if (dayjs(data.billing_info.next_billing_time).isBefore(dayjs().add(2, 'day'), 'day')) {
+                    return res.status(400).json({
+                        Status: "Expired",
+                        type: "User",
+                        message: "Your Payment is Due 2 days clear your payment to continue using the platform.",
+                        id: user._id
+                    });
+                }
             }
         }
 
@@ -527,9 +549,6 @@ router.put("/UpdateUser", fetchuser, PhotosUploader.fields([{ name: 'ProfilePhot
     try {
         const { FirstName, LastName, Phone, Age, Gender } = req.body;
         let path = req.files && req.files.ProfilePhoto ? req.files.ProfilePhoto[0].path : null;
-        if (path) {
-            path = path.replace(/^src\\/, ''); // Remove 'src\' from the beginning of the path
-        }
 
         const newUser = {};
         if (FirstName) newUser.FirstName = FirstName;

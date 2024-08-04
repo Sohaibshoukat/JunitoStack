@@ -40,7 +40,6 @@ const sendEmail = async (Name, Email,Phone, Company, Subject, Message, res) => {
             status: true
         };
     } catch (error) {
-        console.log(error)
         return {
             status: "Failed",
             message: error,
@@ -93,7 +92,6 @@ const sendEmailContact = async (Name, Email, Message, res) => {
         }
 
         const response = await transporter.sendMail(mailOptions)
-        console.log(response)
 
         return {
             response : response,
@@ -113,7 +111,6 @@ router.post("/sendcontactMail", async (req, res) => {
         const { Name, Email, Message } = req.body;
 
         const response = await sendEmailContact(Name, Email, Message);
-        console.log(response);
 
         let savedemail = await Emails.create({
             Email: Email,

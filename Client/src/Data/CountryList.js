@@ -1,5 +1,5 @@
 export const taxes = [
-    { 'Belgium': "21%" },
+    { 'Belgium': "21" },
     { 'Bulgaria': "20" },
     { 'Denmark': "25" },
     { 'Germany': "19" },
@@ -17,7 +17,7 @@ export const taxes = [
     { 'Spain': "21" },
     { 'Sweden': "25" },
     { 'Hungary': '27' },
-    { "switzerland": '7.7' },
+    { "Switzerland": '7.7' },
 ]
 
 export const Countries = [

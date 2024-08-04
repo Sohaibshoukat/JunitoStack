@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { BaseURL } from '../../../Data/BaseURL';
 import AlertContext from '../../../Context/Alert/AlertContext';
 import { taxes } from '../../../Data/CountryList';
 
 const PaySubUser = () => {
     const location = useLocation();
+    const { userid } = useParams()
     const params = new URLSearchParams(location.search);
     const users = JSON.parse(params.get('users'));
     const [SubUsers, setSubUsers] = useState([]);
@@ -21,6 +22,10 @@ const PaySubUser = () => {
     const { showAlert } = alertContext;
     const navigate = useNavigate();
     const paypal = useRef();
+
+    useEffect(() => {
+        loadPayPalScript();
+    }, [TotalAmount]);
 
     const fetchUserData = async () => {
         try {
@@ -66,37 +71,27 @@ const PaySubUser = () => {
 
     const fetchSubUsers = async () => {
         try {
-            let SubUserArray = [];
-            let AmountCal = 0;
 
-            const responses = await Promise.all(
-                users.map(async (item) => {
-                    const response = await fetch(`${BaseURL}/api/user/getbyid/${item}`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
+            const response = await fetch(`${BaseURL}/api/user/getbyid/${userid}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-                    const data = await response.json();
-                    if (data.success) {
-                        AmountCal += 50;
-                        SubUserArray.push(data.userData);
-                    }
-                })
-            );
+            const data = await response.json();
 
-            setSubUsers(SubUserArray);
-            setBeforeDiscount(AmountCal);
+
+            setSubUsers(data.userData);
+            setBeforeDiscount(49);
             const taxrate = getTaxRate(Company?.Country)
             console.log(taxrate);
             setSalesTax(taxrate);
 
-            const newTotal = (AmountCal + (AmountCal * taxrate / 100)).toFixed(2);
-
-            setTotalAmount(newTotal);
-            renderPaypalButton(newTotal);
+            setTotalAmount(49);
+            renderPaypalButton();
         } catch (error) {
+            console.log(error)
             showAlert(error.message, 'danger');
         }
     };
@@ -141,27 +136,37 @@ const PaySubUser = () => {
         }
     };
 
-    const renderPaypalButton = (amount) => {
+    const loadPayPalScript = () => {
+        const existingScript = document.getElementById('paypal-sdk');
+        if (existingScript) return;
+
+        const script = document.createElement('script');
+        script.src = 'https://www.paypal.com/sdk/js?client-id=AaB_n2qBFaqY0T7ipK6WEYTzYvg4yoMwFIOq-Rp0vDOyyQYai_-vfTkzAXSJh5TtYPZu-Y5Sgf_GsiX3&vault=true&intent=subscription';
+        script.id = 'paypal-sdk';
+        script.onload = renderPaypalButton; // Render button once the script is loaded
+        document.body.appendChild(script);
+    };
+
+    const renderPaypalButton = () => {
         if (paypal.current) {
             paypal.current.innerHTML = '';
             window.paypal.Buttons({
-                createOrder: (data, actions) => {
-                    return actions.order.create({
-                        intent: "CAPTURE",
-                        purchase_units: [
-                            {
-                                description: "Bizz Bot Junito",
-                                amount: {
-                                    currency_code: "EUR",
-                                    value: amount,
-                                },
-                            },
-                        ],
+                style: {
+                    shape: 'pill',
+                    color: 'white',
+                    layout: 'vertical',
+                    label: 'subscribe'
+                },
+                createSubscription: function (data, actions) {
+                    return actions.subscription.create({
+                        plan_id: 'P-1LK67962UP6141429M2XFLUY',
                     });
                 },
                 onApprove: async (data, actions) => {
-                    const order = await actions.order.capture();
-                    console.log(users)
+                    console.log(data);
+                    // alert(data.subscriptionID); // Optional success message for the subscriber
+
+                    // Add subscription details to your backend
                     const responses = await fetch(`${BaseURL}/api/transaction/SubUserAdd`, {
                         method: "PUT",
                         headers: {
@@ -169,8 +174,8 @@ const PaySubUser = () => {
                             "auth-token": localStorage.getItem('auth-token'),
                         },
                         body: JSON.stringify({
-                            subUserIds: users,
-                            data: order,
+                            subUserId: userid,
+                            data: data,
                             DateCreated: new Date().toISOString(),
                             ExpiryDate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
                             beforediscount: BeforeDiscount,
@@ -221,22 +226,20 @@ const PaySubUser = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {SubUsers.map((item, index) => (
-                            <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    <p className='w-max'>{item?.FirstName} {item?.LastName}</p>
-                                </th>
-                                <td className="px-6 py-4">
-                                    <p className='w-max'>{item?.User_Type}</p>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <p className='w-max'>{item?.Email}</p>
-                                </td>
-                                <td className="px-6 py-4">
-                                    €50
-                                </td>
-                            </tr>
-                        ))}
+                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <p className='w-max'>{SubUsers?.FirstName} {SubUsers?.LastName}</p>
+                            </th>
+                            <td className="px-6 py-4">
+                                <p className='w-max'>{SubUsers?.User_Type}</p>
+                            </td>
+                            <td className="px-6 py-4">
+                                <p className='w-max'>{SubUsers?.Email}</p>
+                            </td>
+                            <td className="px-6 py-4">
+                                €49
+                            </td>
+                        </tr>
                         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 <p className='w-ma text-xl font-semibold'>Before Discount</p>
@@ -245,14 +248,14 @@ const PaySubUser = () => {
                             <td className="px-6 py-4"></td>
                             <td className="px-6 py-4">€{BeforeDiscount}</td>
                         </tr>
-                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        {/* <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 <p className='w-ma text-xl font-semibold'>Discount Percentage</p>
                             </th>
                             <td className="px-6 py-4"></td>
                             <td className="px-6 py-4"></td>
                             <td className="px-6 py-4">{DiscountPerce} %</td>
-                        </tr>
+                        </tr> */}
                         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                 <p className='w-ma text-xl font-semibold'>Sales tax</p>
@@ -275,7 +278,7 @@ const PaySubUser = () => {
 
 
             <div className="flex justify-between my-6 flex-col lg:flex-row gap-10">
-                <div className="flex flex-col gap-4">
+                {/* <div className="flex flex-col gap-4">
                     <div className="flex flex-col font-para gap-2">
                         <h2 className='text-lg font-semibold'>PromoCode</h2>
                         <input
@@ -292,7 +295,7 @@ const PaySubUser = () => {
                     >
                         Apply Discount
                     </button>
-                </div>
+                </div> */}
 
                 <div ref={paypal}></div>
             </div>

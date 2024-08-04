@@ -419,7 +419,25 @@ const Chating = () => {
                                                 <>
                                                     {SearchSugesstonsData?.map((item) => {
                                                         return (
-                                                            <div className="bg-gray cursor-pointer  px-4 py-2" onClick={() => { setQuery(item) }}>
+                                                            <div
+                                                                className="bg-gray cursor-pointer  px-4 py-2"
+                                                                onClick={() => {
+                                                                    if (Query !== "" && !IsDisable) {
+                                                                        setQuery(item)
+                                                                        const NewData = ChatsData
+                                                                        NewData.push({
+                                                                            Type: "User",
+                                                                            Query: item
+                                                                        })
+                                                                        NewData.push({
+                                                                            Type: "BizBot",
+                                                                            Query: ""
+                                                                        })
+                                                                        setChatsData(NewData)
+                                                                        UpdateChat()
+                                                                    }
+                                                                }}
+                                                            >
                                                                 <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
                                                             </div>
                                                         )
@@ -453,9 +471,10 @@ const Chating = () => {
                                                     onChange={(e) => setSelectedFile(e.target.files[0])} // Update state on file select
                                                 />
                                             </label>
-                                            <input
+                                            <textarea
                                                 name=""
                                                 id=""
+                                                rows={'2'}
                                                 value={Query}
                                                 onChange={(e) => { setQuery(e.target.value) }}
                                                 placeholder='Ask my anything......'
@@ -465,7 +484,7 @@ const Chating = () => {
                                         <img
                                             src="../../Porp/send.png"
                                             alt=""
-                                            className={`w-6 h-6 ${Query == "" && !IsDisable && "opacity-35"}`}
+                                            className={`w-6 h-6 ${Query == "" && !IsDisable && "opacity-35"} cursor-pointer`}
                                             onClick={() => {
                                                 if (Query !== "" && !IsDisable) {
                                                     const NewData = ChatsData

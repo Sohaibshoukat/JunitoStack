@@ -48,8 +48,8 @@ async function fillChatDetails(message, user_id, department) {
     var placeholders = message.match(/\[(.*?)\]/g);
     placeholders = Array.from(new Set(placeholders))
     if (placeholders) {
-        const user = await User.findById({ _id: user_id });
-        const company = await Company.findOne({ Owner_ID: user_id });
+        let user = await User.findById({ _id: user_id });
+        let company = await Company.findOne({ Owner_ID: user_id });
         if (!company) {
             let subuser = await SubUser.findOne({ Own_ID: user_id });
             if (!subuser) {
@@ -60,6 +60,7 @@ async function fillChatDetails(message, user_id, department) {
                 return res.status(404).json({ success: false, message: "Company not found" });
             }
         }
+
 
 
         const accountDetails = {
@@ -80,6 +81,7 @@ async function fillChatDetails(message, user_id, department) {
             date: new Date().toISOString().split('T')[0],
             year: new Date().getFullYear()
         };
+
 
         let filledMsg = message;
         placeholders.forEach((placeholder) => {
@@ -129,7 +131,6 @@ router.post('/ask', fetchuser, async (req, res) => {
         const response = await axios.post(`${pythonServerURL}/chat`, chatDetails);
         res.status(response.status).json(response.data);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
@@ -198,11 +199,9 @@ router.post("/fillPlaceholders", fetchuser, async (req, res) => {
 
         const message = completions.choices[0].message.content;
         const filledMsg = await fillChatDetails(message, user_id, department);
+
         res.status(200).json({ filledMessage: filledMsg });
-
-
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: error.message })
     }
 });
@@ -283,7 +282,6 @@ router.post('/createnewchat', fetchuser, async (req, res) => {
         res.status(201).json({ success: true, message: "Chat created successfully", Chat: newChat });
 
     } catch (error) {
-        console.log(error)
         res.status(500).send('Internal Server Error');
     }
 });
@@ -472,7 +470,6 @@ router.post('/chat/share', fetchuser, async (req, res) => {
         res.status(201).json({ success: true, message: "Chat shared with company successfully", SharedChat: sharedChat });
 
     } catch (error) {
-        console.log(error)
         res.status(500).send('Internal Server Error');
     }
 });
@@ -511,7 +508,6 @@ router.put('/editchat/share/:id', fetchuser, async (req, res) => {
         res.status(201).json({ success: true, message: "Shared Chat Editied Successfully", SharedChat: sharedChat });
 
     } catch (error) {
-        console.log(error)
         res.status(500).send('Internal Server Error');
     }
 });
@@ -537,10 +533,6 @@ router.get('/sharedChats', fetchuser, async (req, res) => {
             }
         }
 
-        // Check if the user is authorized to access shared chats for this company
-        if (user._id.toString() !== company.Owner_ID.toString()) {
-            return res.status(403).json({ success: false, message: "You do not have permission to access shared chats for this company" });
-        }
 
         // Fetch shared chats for the company and populate Chat details
         const sharedChats = await SharedChat.find({ Company: company._id }).populate('Chat_id', 'Title Department ChatConversation');
@@ -571,11 +563,6 @@ router.get('/sharedChatList', fetchuser, async (req, res) => {
             if (!company) {
                 return res.status(404).json({ success: false, message: "Company not found" });
             }
-        }
-
-        // Check if the user is authorized to access shared chats for this company
-        if (user._id.toString() !== company.Owner_ID.toString()) {
-            return res.status(403).json({ success: false, message: "You do not have permission to access shared chats for this company" });
         }
 
         // Fetch shared chats for the company and populate Chat details
@@ -670,7 +657,6 @@ router.delete('/sharedChat/:sharedChatId', fetchuser, async (req, res) => {
         res.status(200).json({ success: true, message: "Shared chat deleted successfully" });
 
     } catch (error) {
-        console.log(error)
         res.status(500).send('Internal Server Error');
     }
 });

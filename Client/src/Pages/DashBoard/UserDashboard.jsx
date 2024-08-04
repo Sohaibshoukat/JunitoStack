@@ -111,7 +111,7 @@ const UserDashboard = () => {
                             <Route path="/" element={<Home />}></Route>
                             <Route path="/faq" element={<FAQ />}></Route>
                             <Route path="/users" element={<User />}></Route>
-                            <Route path="/paysubUser" element={<PaySubUser />}></Route>
+                            <Route path="/paysubUser/:userid" element={<PaySubUser />}></Route>
                             <Route path="/prompts-browsing" element={<Prompts />}></Route>
                             <Route path="/shared" element={<SharedChat />}></Route>
                             <Route path="/to-do" element={<ToDos />}></Route>

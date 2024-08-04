@@ -350,7 +350,25 @@ const ChatBot = () => {
                                                 <>
                                                     {SearchSugesstonsData?.map((item) => {
                                                         return (
-                                                            <div className="bg-gray cursor-pointer  px-4 py-2" onClick={() => { setQuery(item) }}>
+                                                            <div 
+                                                                className="bg-gray cursor-pointer  px-4 py-2" 
+                                                                onClick={() => { 
+                                                                    if (Query !== "" || IsDisable) {
+                                                                        const NewData = ChatsData
+                                                                        setQuery(item)
+                                                                        NewData.push({
+                                                                            Type: "User",
+                                                                            Query: item
+                                                                        })
+                                                                        NewData.push({
+                                                                            Type: "BizBot",
+                                                                            Query: ""
+                                                                        })
+                                                                        setChatsData(NewData)
+                                                                        NewChatCreate()
+                                                                    }
+                                                                }}
+                                                            >
                                                                 <h2 className='text-white text-sm font-medium font-para'>{item}</h2>
                                                             </div>
                                                         )
@@ -384,7 +402,7 @@ const ChatBot = () => {
                                                     onChange={(e) => setSelectedFile(e.target.files[0])} // Update state on file select
                                                 />
                                             </label>
-                                            <input
+                                            <textarea
                                                 name=""
                                                 id=""
                                                 rows={'2'}
