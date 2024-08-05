@@ -4,7 +4,6 @@ import { FiChevronDown } from 'react-icons/fi';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 import Home from './Views/Home';
 import UserAnalysis from './Views/UserAnalysis';
-import Features from './Views/Features';
 import FAQ from './Views/FAQ';
 import Blogs from './Views/Blogs';
 import Testimonials from './Views/Testimonials';
@@ -142,10 +141,6 @@ const AdminDashboard = () => {
                         <Route
                             path='/emails'
                             element={<Emails />}
-                        />
-                        <Route
-                            path='/features'
-                            element={<Features />}
                         />
                         <Route
                             path='/FAQ'

@@ -27,11 +27,6 @@ const Nav = () => {
             link: '/admin-dashboard/user-analysis',
         },
         {
-            name: 'Promotions',
-            Icon: RiCoupon2Line,
-            link: '/admin-dashboard/PromoCode',
-        },
-        {
             name: 'Emails',
             Icon: IoBag,
             link: '/admin-dashboard/emails',

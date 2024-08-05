@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { BaseURL } from '../../../Data/BaseURL'
 
 const Prompts = () => {
     const Department = [
@@ -42,22 +43,39 @@ const Prompts = () => {
     ]
     const navigate = useNavigate()
     return (
-        <div className='grid grid-cols-1 mt-5 md:mt-10 mb-20 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 w-[90%] lg:w-[80%] m-auto'>
-            {Department.map((item, index) => (
-                <div className={`flex flex-row group items-center gap-3 font-para py-4 px-4 md:px-6 bg-gradientBot rounded-2xl shadow-shadow3 hover:bg-gradienthover ease-in-out duration-300`} key={index}>
-                    <img src={item.Icon} alt="" className='w-16 h-16' />
-                    <div className="flex flex-col text-gray group-hover:text-white gap-1 md:gap-2 ease-in-out duration-300">
-                        <h2 className='text-lg md:text-2xl font-bold'>{item.Title}</h2>
-                        <p className='text-sm md:text-sm'>{item.Des}</p>
-                        <button 
-                            className='bg-gray py-1 md:py-1 px-2 text-sm md:text-base md:px-4 rounded-lg border-2 border-gray text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 w-fit'
-                            onClick={()=>{navigate(`/dashboard/prompts-browsing/${item.Title}`)}}
-                        >
-                            Lets Go
-                        </button>
-                    </div>
+        <div className="flex flex-col gap-4  mt-5 md:mt-10 mb-20 w-[90%] lg:w-[80%] m-auto">
+            <div className="flex lg:flex-row flex-col justify-between gap-6 items-center">
+                <div className="flex flex-col gap-2">
+            <h1 className='text-2xl font-bold font-para'>Prompts</h1>
+            <p className='text-sm'>The 6-step formula for effective ChatGPT prompts</p>
                 </div>
-            ))}
+                <a 
+                    href={`${BaseURL}/src/Uploads/Data/Bot Benutzung.pdf`} 
+                    download
+                    target='_blank'
+                    className='bg-gray rounded-lg py-2 px-4 font-para text-white'
+                >
+                    Download
+                </a>
+            </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 '>
+                {Department.map((item, index) => (
+                    <div className={`flex flex-row group items-center gap-3 font-para py-4 px-4 md:px-6 bg-gradientBot rounded-2xl shadow-shadow3 hover:bg-gradienthover ease-in-out duration-300`} key={index}>
+                        <img src={item.Icon} alt="" className='w-16 h-16' />
+                        <div className="flex flex-col text-gray group-hover:text-white gap-1 md:gap-2 ease-in-out duration-300">
+                            <h2 className='text-lg md:text-2xl font-bold'>{item.Title}</h2>
+                            <p className='text-sm md:text-sm'>{item.Des}</p>
+                            <button
+                                className='bg-gray py-1 md:py-1 px-2 text-sm md:text-base md:px-4 rounded-lg border-2 border-gray text-white hover:bg-transparent hover:text-gray font-para ease-in-out duration-300 w-fit'
+                                onClick={() => { navigate(`/dashboard/prompts-browsing/${item.Title}`) }}
+                            >
+                                Lets Go
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
         </div>
     )
 }
