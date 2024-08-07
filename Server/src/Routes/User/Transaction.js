@@ -26,6 +26,223 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Dummy HTML content
+const dummyHTMLContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Page</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #Major { margin-top: 20px; font-size: 24px; color: blue; }
+  </style>
+</head>
+<body>
+  <h1>Hello, World!</h1>
+  <div id="Major">This is the Major section</div>
+</body>
+</html>
+`;
+
+router.get('/testtransactionsw', async (req, res) => {
+  let success = false;
+  try {
+    // Validate Chrome executable path
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable';
+    if (!fs.existsSync(executablePath)) {
+      console.error(`Chrome executable not found at path: ${executablePath}`);
+      return res.status(500).json({
+        message: `Chrome executable not found at path: ${executablePath}`,
+        success
+      });
+    }
+
+    // Launch Puppeteer
+    const browser = await puppeteer.launch({
+      executablePath: executablePath,
+      headless: true,
+      args: [
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--no-zygote',
+        '--single-process',
+      ],
+    });
+
+    const page = await browser.newPage();
+
+        console.log("success");
+
+    // Log page console messages
+    page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+
+    // Set content to dummy HTML
+    await page.setContent(dummyHTMLContent, { waitUntil: 'networkidle2' });
+
+    // Wait for the specific selector
+    await page.waitForSelector('#Major', { timeout: 120000 });
+
+    // Generate PDF from the content
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true
+    });
+
+    // Close the browser
+    await browser.close();
+
+    // Prepare email details with attachment
+    const mailDetails = {
+      from: "no-reply@junito.at",
+      to: "ironbytefixes@gmail.com",
+      subject: "Junito Payment Invoice",
+      text: "Below is Your Payment Invoice for Junito BizzBot Platform",
+      attachments: [
+        {
+          filename: 'Invoice.pdf',
+          content: pdfBuffer
+        }
+      ]
+    };
+
+    // Send email with the PDF attachment
+    transporter.sendMail(mailDetails, (err, data) => {
+      if (err) {
+        console.error("Email Sending Error:", err);
+        return res.status(500).send({ message: "Email Sending Error", err, success });
+      }
+
+      res.status(200).send({ success: true });
+    });
+
+  } catch (puppeteerError) {
+    console.error("Puppeteer Error:", puppeteerError);
+    return res.status(500).json({
+      message: "Failed to generate PDF or send email",
+      err: puppeteerError.message,
+      success
+    });
+  }
+});
+
+router.get('/testtransactionsr', async (req, res) => {
+  let success = false;
+  try {
+    console.log("Starting EJS rendering");
+    // Render HTML for PDF
+    ejs.renderFile(
+      path.join('/home/inzamam-1121/Junito/JunitoStack/Server/src/views', 'test.ejs'),
+      {},
+      async (err, htmlContent) => {
+        if (err) {
+          console.error("EJS Rendering Error:", err);
+          return res.status(500).json({ message: "EJS Rendering Error", err, success });
+        }
+
+        console.log("EJS rendering completed successfully");
+
+        try {
+          // Validate Chrome executable path
+          console.log("Validating Chrome executable path");
+          const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable';
+          if (!fs.existsSync(executablePath)) {
+            console.error(`Chrome executable not found at path: ${executablePath}`);
+            return res.status(500).json({
+              message: `Chrome executable not found at path: ${executablePath}`,
+              success
+            });
+          }
+
+          console.log("Chrome executable found at path:", executablePath);
+
+          console.log("Launching Puppeteer");
+          const browser = await puppeteer.launch({
+            executablePath: executablePath,
+            headless: true,
+            args: [
+              '--disable-gpu',
+              '--disable-dev-shm-usage',
+              '--disable-setuid-sandbox',
+              '--no-sandbox',
+              '--no-zygote',
+              '--single-process',
+            ],
+          });
+
+          const page = await browser.newPage();
+
+          console.log("Puppeteer launched successfully");
+
+          // Log page console messages
+          page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+
+          console.log("Setting page content with rendered HTML");
+          // Set content to rendered HTML
+          await page.setContent(htmlContent, { waitUntil: 'networkidle2' });
+
+          console.log("Waiting for the specific selector");
+          // Wait for the specific selector
+          await page.waitForSelector('#Major', { timeout: 60000 });
+
+          console.log("Generating PDF from the content");
+          // Generate PDF from the content
+          const pdfBuffer = await page.pdf({
+            format: 'A4',
+            printBackground: true
+          });
+
+          console.log("Closing Puppeteer browser");
+          // Close the browser
+          await browser.close();
+
+          console.log("Preparing email details with attachment");
+          // Prepare email details with attachment
+          const mailDetails = {
+            from: "no-reply@junito.at",
+            to: "ironbytefixes@gmail.com",
+            subject: "Junito Payment Invoice",
+            text: "Below is Your Payment Invoice for Junito BizzBot Platform",
+            attachments: [
+              {
+                filename: 'Invoice.pdf',
+                content: pdfBuffer
+              }
+            ]
+          };
+
+          console.log("Sending email with the PDF attachment");
+          // Send email with the PDF attachment
+          transporter.sendMail(mailDetails, (err, data) => {
+            if (err) {
+              console.error("Email Sending Error:", err);
+              return res.status(500).send({ message: "Email Sending Error", err, success });
+            }
+
+            console.log("Email sent successfully");
+            res.status(200).send({ success: true });
+          });
+
+        } catch (puppeteerError) {
+          console.error("Puppeteer Error:", puppeteerError);
+          return res.status(500).json({
+            message: "Failed to generate PDF or send email",
+            err: puppeteerError.message,
+            success
+          });
+        }
+      }
+    );
+
+  } catch (error) {
+    console.error("General Error:", error);
+    res.status(400).json({ message: "Catch Error", err: error.message, success });
+  }
+});
+
 router.post('/registertransactions', async (req, res) => {
   let success = false;
   try {
@@ -137,104 +354,6 @@ router.post('/registertransactions', async (req, res) => {
             }
 
             res.status(200).send({ success: true, transaction });
-          });
-
-        } catch (puppeteerError) {
-          console.error("Puppeteer Error:", puppeteerError);
-          return res.status(500).json({
-            message: "Failed to generate PDF or send email",
-            err: puppeteerError.message,
-            success
-          });
-        }
-      }
-    );
-
-  } catch (error) {
-    console.error("General Error:", error);
-    res.status(400).json({ message: "Catch Error", err: error.message, success });
-  }
-});
-
-router.get('/testtransactions', async (req, res) => {
-  let success = false;
-  try {
-
-    // Render HTML for PDF
-    ejs.renderFile(
-      path.join(__dirname, '../../views/', 'test.ejs'),
-      async (err, htmlContent) => {
-        if (err) {
-          console.error("EJS Rendering Error:", err);
-          return res.status(500).json({ message: "EJS Rendering Error", err, success });
-        }
-
-        try {
-          // // Validate Chrome executable path
-          // const executablePath = ExecutablePath;
-          // if (!fs.existsSync(executablePath)) {
-          //   console.error(`Chrome executable not found at path: ${executablePath}`);
-          //   return res.status(500).json({
-          //     message: `Chrome executable not found at path: ${executablePath}`,
-          //     success
-          //   });
-          // }
-
-          // const browser = await puppeteer.launch({
-          //   executablePath: executablePath,
-          //   headless: true,
-          //   args: [
-          //     '--disable-gpu',
-          //     '--disable-dev-shm-usage',
-          //     '--disable-setuid-sandbox',
-          //     '--no-first-run',
-          //     '--no-sandbox',
-          //     '--no-zygote',
-          //     '--single-process',
-          //   ],
-          // });
-
-          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
-
-          // Create a new page and set content
-          const page = await browser.newPage();
-          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-
-          // Wait for the specific selector
-          await page.waitForSelector('#Major', { timeout: 60000 });
-
-          // Generate PDF from the content
-          const pdfBuffer = await page.pdf({
-            format: 'A4',
-            timeout: 60000,
-            printBackground: true
-          });
-
-          // Close the browser
-          await browser.close();
-
-          // Prepare email details with attachment
-          const mailDetails = {
-            from: "no-reply@junito.at",
-            to: "sohaibshoukat94@gmail.com",
-            subject: "Junito Payment Invoice",
-            text: "Below is Your Payment Invoice for Junito BizzBot Platform",
-            attachments: [
-              {
-                filename: 'Invoice.pdf',
-                content: pdfBuffer
-              }
-            ]
-          };
-
-          // Send email with the PDF attachment
-          transporter.sendMail(mailDetails, (err, data) => {
-            if (err) {
-              console.error("Email Sending Error:", err);
-              return res.status(500).send({ message: "Email Sending Error", err, success });
-            }
-
-            res.status(200).send({ success: true });
           });
 
         } catch (puppeteerError) {
