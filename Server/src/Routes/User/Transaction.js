@@ -280,7 +280,7 @@ router.post('/registertransactions', async (req, res) => {
 
     // Render HTML for PDF
     ejs.renderFile(
-      path.join(__dirname, '../../views/', 'index.ejs'),
+      path.join('/home/inzamam-1121/Junito/JunitoStack/Server/src/views', 'index.ejs'),
       { user, transaction, company, data, discount, DiscountPerce, SalesTax },
       async (err, htmlContent) => {
         if (err) {
@@ -289,35 +289,40 @@ router.post('/registertransactions', async (req, res) => {
         }
 
         try {
-          // // Validate Chrome executable path
-          // const executablePath = ExecutablePath;
-          // if (!fs.existsSync(executablePath)) {
-          //   console.error(`Chrome executable not found at path: ${executablePath}`);
-          //   return res.status(500).json({
-          //     message: `Chrome executable not found at path: ${executablePath}`,
-          //     success
-          //   });
-          // }
+          console.log("Validating Chrome executable path");
+          const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable';
+          if (!fs.existsSync(executablePath)) {
+            console.error(`Chrome executable not found at path: ${executablePath}`);
+            return res.status(500).json({
+              message: `Chrome executable not found at path: ${executablePath}`,
+              success
+            });
+          }
 
-          // const browser = await puppeteer.launch({
-          //   executablePath: executablePath,
-          //   headless: true,
-          //   args: [
-          //     '--disable-gpu',
-          //     '--disable-dev-shm-usage',
-          //     '--disable-setuid-sandbox',
-          //     '--no-first-run',
-          //     '--no-sandbox',
-          //     '--no-zygote',
-          //     '--single-process',
-          //   ],
-          // });
+          console.log("Chrome executable found at path:", executablePath);
 
-          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+          console.log("Launching Puppeteer");
+          const browser = await puppeteer.launch({
+            executablePath: executablePath,
+            headless: true,
+            args: [
+              '--disable-gpu',
+              '--disable-dev-shm-usage',
+              '--disable-setuid-sandbox',
+              '--no-sandbox',
+              '--no-zygote',
+              '--single-process',
+            ],
+          });
+
+          // const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
           // Create a new page and set content
           const page = await browser.newPage();
-          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+          page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+
+          await page.setContent(htmlContent, { waitUntil: 'networkidle2' });
 
           // Wait for the specific selector
           await page.waitForSelector('#Major', { timeout: 60000 });
@@ -325,7 +330,6 @@ router.post('/registertransactions', async (req, res) => {
           // Generate PDF from the content
           const pdfBuffer = await page.pdf({
             format: 'A4',
-            timeout: 60000,
             printBackground: true
           });
 
@@ -420,7 +424,7 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
 
     // Render the updated invoice
     ejs.renderFile(
-      path.join(__dirname, '../../views/', 'indexsubuser.ejs'),
+      path.join('/home/inzamam-1121/Junito/JunitoStack/Server/src/views', 'indexsubuser.ejs'),
       {
         user,
         transaction,
@@ -438,35 +442,40 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
         }
 
         try {
-          // Validate Chrome executable path
-          // const executablePath = ExecutablePath;
-          // if (!fs.existsSync(executablePath)) {
-          //   console.error(`Chrome executable not found at path: ${executablePath}`);
-          //   return res.status(500).json({
-          //     message: `Chrome executable not found at path: ${executablePath}`,
-          //     success
-          //   });
-          // }
+          console.log("Validating Chrome executable path");
+          const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/google-chrome-stable';
+          if (!fs.existsSync(executablePath)) {
+            console.error(`Chrome executable not found at path: ${executablePath}`);
+            return res.status(500).json({
+              message: `Chrome executable not found at path: ${executablePath}`,
+              success
+            });
+          }
 
-          // const browser = await puppeteer.launch({
-          //   executablePath: executablePath,
-          //   headless: true,
-          //   args: [
-          //     '--disable-gpu',
-          //     '--disable-dev-shm-usage',
-          //     '--disable-setuid-sandbox',
-          //     '--no-first-run',
-          //     '--no-sandbox',
-          //     '--no-zygote',
-          //     '--single-process',
-          //   ],
-          // });
+          console.log("Chrome executable found at path:", executablePath);
 
-          const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+          console.log("Launching Puppeteer");
+          const browser = await puppeteer.launch({
+            executablePath: executablePath,
+            headless: true,
+            args: [
+              '--disable-gpu',
+              '--disable-dev-shm-usage',
+              '--disable-setuid-sandbox',
+              '--no-sandbox',
+              '--no-zygote',
+              '--single-process',
+            ],
+          });
+
+          // const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 
           // Create a new page and set content
           const page = await browser.newPage();
-          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+          page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+
+          await page.setContent(htmlContent, { waitUntil: 'networkidle2' });
 
           // Wait for the specific selector
           await page.waitForSelector('#Major', { timeout: 60000 });
@@ -474,7 +483,6 @@ router.put('/SubUserAdd', fetchuser, async (req, res) => {
           // Generate PDF from the content
           const pdfBuffer = await page.pdf({
             format: 'A4',
-            timeout: 60000,
             printBackground: true
           });
 
