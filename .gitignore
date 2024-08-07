@@ -4,3 +4,4 @@ Server/docker-compose.yml
 Server/docker-compose.yml
 Server/docker-compose.yml
 Server/Dockerfile
+Server/dummy.env
